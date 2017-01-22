@@ -24,7 +24,7 @@ function love.load()
   setupManipulator(Game)
 
   Game.touches = {}
-  Game.touchCount = 0
+  Game.touchIds = {}
 end
 
 
@@ -216,11 +216,18 @@ end
 
 function updateTouches(game,dt,input)
   local gts = game.touches
+  local tids = game.touchIds
+  local updateNums = false
   for id,gt in pairs(gts) do
     gt.elapsed = gt.elapsed + dt
     if gt.type == "released" then
       gts[id] = nil
-      game.touchCount = game.touchCount - 1
+      for i,tid in ipairs(tids) do
+        if id == tid then
+          table.remove(tids,i)
+        end
+        updateNums = true
+      end
     end
   end
   local gt
@@ -229,8 +236,8 @@ function updateTouches(game,dt,input)
     if not gt and t.type == "pressed" then
       gt = {id=t.id, elapsed=0}
       gts[t.id] = gt
-      game.touchCount = game.touchCount + 1
-      gt.num = game.touchCount
+      tids[#tids + 1] = t.id
+      updateNums = true
     end
     if gt then
       gt.type = t.type
@@ -238,6 +245,11 @@ function updateTouches(game,dt,input)
       gt.y = t.y
       gt.dx = t.dx
       gt.dy = t.dy
+    end
+  end
+  if updateNums then
+    for i,tid in ipairs(tids) do
+      gts[tid].num = i
     end
   end
 end
@@ -253,7 +265,7 @@ function clamp(val, min, max)
 end
 
 function drawTouches(game)
-  if game.touchCount <= 0 then return end
+  if #game.touchIds <= 0 then return end
 
   local scale = 0.3
   for id,t in pairs(game.touches) do
@@ -268,5 +280,7 @@ function drawTouches(game)
       rot,
       scale, scale,
       256,256)  -- offx, offy
+
+    love.graphics.print("Touch "..t.num, t.x - 20, t.y - 100)
   end
 end
