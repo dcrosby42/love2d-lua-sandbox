@@ -1,3 +1,4 @@
+require 'vendor/TEsound'
 Debug = require 'mydebug'
 
 Game = {}
@@ -25,6 +26,12 @@ function love.load()
 
   Game.touches = {}
   Game.touchIds = {}
+
+
+
+  TEsound.playLooping("sounds/fx/tng_hum_clean.mp3","thrum")
+  TEsound.play("sounds/fx/tng_viewscreen_on.mp3","viewon")
+  TEsound.volume("ebeep",0.4)
 end
 
 
@@ -37,6 +44,8 @@ function love.update(dt)
   -- clear touch inputs
   local ts = Input.touches
   for i=1,#ts do ts[i] = nil end
+
+  TEsound.cleanup()
 end
 
 function love.draw()
@@ -282,5 +291,15 @@ function drawTouches(game)
       256,256)  -- offx, offy
 
     love.graphics.print("Touch "..t.num, t.x - 20, t.y - 100)
+
+    -- SOUND
+    if t.elapsed == 0 then
+      -- TEsound.play("sounds/fx/deskviewerbeep.mp3")
+      -- TEsound.play("sounds/fx/computerbeep_12.mp3")
+      TEsound.play("sounds/fx/computerbeep_5.mp3","beep")
+    end 
+    if t.type == "released" then
+      TEsound.play("sounds/fx/computerbeep_12.mp3", "ebeep")
+    end
   end
 end
