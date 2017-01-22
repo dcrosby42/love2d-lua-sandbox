@@ -1,10 +1,12 @@
 require 'vendor/TEsound'
-Debug = require 'mydebug'
 
-Game = {}
-Input = {}
+local Debug = require 'mydebug'
+local TouchLog = require 'touchlog'
 
-TouchOnly = false
+local Game = {}
+local Input = {}
+
+local TouchOnly = false
 
 function love.load()
   if love.system.getOS() == "OS X" then
@@ -21,12 +23,12 @@ function love.load()
 
   setupCat(Game)
   
-  -- Touch manipulator
-  setupManipulator(Game)
+  -- setupManipulator(Game)
 
   Game.touches = {}
   Game.touchIds = {}
 
+  TouchLog.setup(Game)
 
 
   TEsound.playLooping("sounds/fx/tng_hum_clean.mp3","thrum")
@@ -36,12 +38,14 @@ end
 
 
 function love.update(dt)
+  -- UPDATE
   updateTouches(Game,dt,Input)
-  updateManipulator(Game,dt,Input)
+  -- updateManipulator(Game,dt,Input)
   -- updateCat(Game,dt,Input)
   Debug.update(Game,dt,Input)
+  TouchLog.update(Game,dt,Input)
 
-  -- clear touch inputs
+  -- AFTER UPDATE
   local ts = Input.touches
   for i=1,#ts do ts[i] = nil end
 

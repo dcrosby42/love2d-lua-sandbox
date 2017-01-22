@@ -52,7 +52,7 @@ end
 
 local function draw(game)
   -- DEBUG
-  local dlines = Debug.toLines()
+  local dlines = toLines()
   local y = D.d.bounds.y
   for i,line in ipairs(dlines) do
     love.graphics.print(line,0,y)
