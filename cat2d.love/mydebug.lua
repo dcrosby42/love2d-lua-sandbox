@@ -3,8 +3,10 @@ local D = {}
 D.d = {
   varNames = {},
   varMap = {},
+  lineHeight = 12,
   maxStringLines = 10,
   stringLines = {},
+  bounds = {}
 }
 
 local function appendScrolled(lines,s,max)
@@ -19,12 +21,12 @@ local function appendScrolled(lines,s,max)
   lines[n] = s
 end
 
-function println(str)
+local function println(str)
   lines = D.d.stringLines
   appendScrolled(lines, str, D.d.maxStringLines)
 end
 
-function toLines()
+local function toLines()
   local lines = {}
   i = 1
   for sli,line in ipairs(D.d.stringLines) do
@@ -34,7 +36,34 @@ function toLines()
   return lines
 end
 
+local function setup(game)
+  local bounds = D.d.bounds
+  bounds.height = D.d.maxStringLines * D.d.lineHeight
+  bounds.width = love.graphics.getWidth() / 2
+  bounds.y = love.graphics.getHeight() - bounds.height
+  bounds.x = 0
+end
+
+local function update(game, dt, input)
+  for i,t in ipairs(input.touches) do
+    -- if t.type == "pressed" and geom.isPointInRect(t.x, t.y, 
+  end
+end
+
+local function draw(game)
+  -- DEBUG
+  local dlines = Debug.toLines()
+  local y = D.d.bounds.y
+  for i,line in ipairs(dlines) do
+    love.graphics.print(line,0,y)
+    y = y + D.d.lineHeight
+  end
+end
+
 D.toLines = toLines
 D.println = println
+D.setup = setup
+D.update = update
+D.draw = draw
 
 return D
