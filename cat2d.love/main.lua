@@ -279,18 +279,20 @@ function drawTouches(game)
   local scale = 0.3
   for id,t in pairs(game.touches) do
     -- love.graphics.rectangle("line", t.x-50, t.y-50, 100, 100)
+    love.graphics.ellipse("line", t.x, t.y, 48, 48)
+    love.graphics.ellipse("line", t.x, t.y, 62, 62)
     --
     -- scale = clamp(begin + ((t.elapsed / span) * 0.3), 0, 0.6)
-    scale = clamp(0.3 + ((t.elapsed / 2) * 0.3), 0, 0.6)
-    rot = t.elapsed * 3.1415926
-    love.graphics.draw(
-      game.cat.image,
-      t.x, t.y,
-      rot,
-      scale, scale,
-      256,256)  -- offx, offy
+    -- scale = clamp(0.3 + ((t.elapsed / 2) * 0.3), 0, 0.6)
+    -- rot = t.elapsed * 3.1415926
+    -- love.graphics.draw(
+    --   game.cat.image,
+    --   t.x, t.y,
+    --   rot,
+    --   scale, scale,
+    --   256,256)  -- offx, offy
 
-    love.graphics.print("Touch "..t.num, t.x - 20, t.y - 100)
+    love.graphics.print(t.num, t.x - 5, t.y - 61)
 
     -- SOUND
     if t.elapsed == 0 then
