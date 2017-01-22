@@ -1,1 +1,1 @@
-spike/physdemo.lua
+cat2d.lua

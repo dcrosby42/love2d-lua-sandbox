@@ -20,7 +20,7 @@ function love.load()
   objects.ball.body = love.physics.newBody(world, 650/2, 650/2, "dynamic") --place the body in the center of the world and make it dynamic, so it can move around
   objects.ball.shape = love.physics.newCircleShape(20) --the ball's shape has a radius of 20
   objects.ball.fixture = love.physics.newFixture(objects.ball.body, objects.ball.shape, 1) -- Attach fixture to body and give it a density of 1.
-  objects.ball.fixture:setRestitution(0.9) --let the ball bounce
+  objects.ball.fixture:setRestitution(1) --let the ball bounce
  
   --let's create a couple blocks to play around with
   objects.block1 = {}

@@ -7,6 +7,7 @@ local Game = {}
 local Input = {}
 
 local TouchOnly = false
+local Accel
 
 function love.load()
   if love.system.getOS() == "OS X" then
@@ -61,6 +62,10 @@ function love.draw()
   drawTouches(Game)
 
   Debug.draw(Game)
+
+  if Accel then
+    drawAccel()
+  end
 
 
 end
@@ -308,4 +313,38 @@ function drawTouches(game)
       TEsound.play("sounds/fx/computerbeep_12.mp3", "ebeep")
     end
   end
+end
+
+function love.joystickadded(joystick)
+  Debug.println("joystick added: " .. joystick:getName())
+  if joystick:getName() == "iOS Accelerometer" then
+    Debug.println("Accel!")
+    Accel = joystick
+  end
+end
+
+function drawAccel()
+  local a,b,c = Accel:getAxes()
+  drawAccelVals(a,b,c)
+
+  local half = love.graphics.getWidth() / 2
+  local y = 100
+  love.graphics.rectangle("fill", half,y, a*half,40)
+  y = y + 42
+  love.graphics.rectangle("fill", half,y, b*half,40)
+  y = y + 42
+  love.graphics.rectangle("fill", half,y, c*half,40)
+end
+
+function drawAccelVals(a,b,c)
+  local x = 0
+  local y = 20
+  love.graphics.print(Accel:getName(), x, y)
+  x = x + 20
+  y = y + 12
+  love.graphics.print(string.format("%.3f", a), x, y)
+  y = y + 12
+  love.graphics.print(string.format("%.3f", b), x, y)
+  y = y + 12
+  love.graphics.print(string.format("%.3f", c), x, y)
 end
