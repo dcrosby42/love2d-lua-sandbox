@@ -5,6 +5,7 @@ local msgpack = require 'vendor/msgpack'
 -- the address and port of the server
 local address, port = "192.168.1.124", 12345
 -- local address, port = "10.1.1.1", 12345
+-- local address, port = "107.155.66.22", 12345
 
 
 local udp
@@ -38,7 +39,10 @@ local function update(game,opts)
         if err then
           Debug.println("Send failed: "..err)
         else
-          udp:send(data)
+          local ok, err = pcall(function() udp:send(data) end)
+          if not ok then
+            print("udp:send failed: " .. err)
+          end
         end
       end
     end
