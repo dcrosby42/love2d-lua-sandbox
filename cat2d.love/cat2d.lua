@@ -8,10 +8,12 @@ local Input = {}
 
 local TouchOnly = false
 local Accel
+local KeybAccel = false
 
 function love.load()
   if love.system.getOS() == "OS X" then
     love.window.setMode(1024,768)
+    KeybAccel = true
   elseif love.system.getOS() == "iOS" then
     TouchOnly = true
   end
@@ -21,8 +23,10 @@ function love.load()
   Debug.println("Bounds " .. flattenTable({width=love.graphics.getHeight(), height=love.graphics.getWidth()}))
 
   Input.touches = {}
+  Input.accel = {x=0, y=0, z=0}
 
   setupCat(Game)
+  setupRoller(Game)
   
   -- setupManipulator(Game)
 
@@ -39,8 +43,11 @@ end
 
 
 function love.update(dt)
+  input_updateAccel(dt,Input)
+
   -- UPDATE
   updateTouches(Game,dt,Input)
+  updateRoller(Game,dt,Input)
   -- updateManipulator(Game,dt,Input)
   -- updateCat(Game,dt,Input)
   Debug.update(Game,dt,Input)
@@ -59,6 +66,7 @@ function love.draw()
 
   -- drawCat(Game)
   -- drawManipulator(Game)
+  drawRoller(Game)
   drawTouches(Game)
 
   Debug.draw(Game)
@@ -274,11 +282,11 @@ end
 
 function clamp(val, min, max)
   if val < min then 
-    return min
+    return min, true
   elseif val > max then
-    return max
+    return max, true
   else
-    return val
+    return val, false
   end
 end
 
@@ -298,7 +306,7 @@ function drawTouches(game)
     --   game.cat.image,
     --   t.x, t.y,
     --   rot,
-    --   scale, scale,
+    --   scale, scale,e
     --   256,256)  -- offx, offy
 
     love.graphics.print(t.num, t.x - 5, t.y - 61)
@@ -320,6 +328,30 @@ function love.joystickadded(joystick)
   if joystick:getName() == "iOS Accelerometer" then
     Debug.println("Accel!")
     Accel = joystick
+  end
+end
+
+function input_updateAccel(dt, input)
+  if Accel then
+    local x,y,z = Accel:getAxes()
+    input.accel.x = x
+    input.accel.y = y
+    input.accel.z = z
+  elseif KeybAccel then
+    if love.keyboard.isDown("a") then
+      input.accel.y = -0.09
+    elseif love.keyboard.isDown("d") then
+      input.accel.y = 0.09
+    else
+      input.accel.y = 0
+    end
+    if love.keyboard.isDown("w") then
+      input.accel.x = 0.08
+    elseif love.keyboard.isDown("s") then
+      input.accel.x = -0.08
+    else
+      input.accel.x = 0
+    end
   end
 end
 
@@ -347,4 +379,69 @@ function drawAccelVals(a,b,c)
   love.graphics.print(string.format("%.3f", b), x, y)
   y = y + 12
   love.graphics.print(string.format("%.3f", c), x, y)
+end
+
+
+function setupRoller(game)
+  local roller = {}
+  roller.x = love.graphics.getWidth() / 2
+  roller.y = love.graphics.getHeight() / 2
+  roller.vx = 0
+  roller.vy = 0
+  roller.r = 50 
+  game.roller = roller
+end
+
+function accelnormalize(v, deadzone, scope, max)
+  local ab = math.abs(v)
+  if ab < deadzone then return 0 end
+  local nv = ab / scope
+  if nv > 1 then
+    return nv
+  end
+  if v < 0 then
+    return -nv
+  end
+  return nv
+end
+
+function dampen(v,amt)
+  if v == 0 then return 0 end
+  local nv = math.abs(v) - amt
+  if nv < 0 then nv = 0 end
+  if v < 0 then return -nv end
+  return nv
+end
+
+local rollerAccel = 100
+local rollerVmax = 800
+function updateRoller(game,dt,input)
+  local r = game.roller
+  r.vx = dampen(r.vx,20)
+  r.vy = dampen(r.vy,20)
+
+  local ax = accelnormalize(input.accel.y, 0.02, 0.2, 1)
+  local ay = accelnormalize(-input.accel.x, 0.02, 0.2, 1)
+
+  r.vx = clamp(r.vx + ax * rollerAccel, -rollerVmax,rollerVmax)
+  r.vy = clamp(r.vy + ay * rollerAccel, -rollerVmax,rollerVmax)
+
+  local hit
+  r.x,hit = clamp(r.x + r.vx * dt,  r.r, love.graphics.getWidth()-r.r)
+  if hit then r.vx = 0 end
+
+  r.y,hit = clamp(r.y + r.vy * dt,  r.r, love.graphics.getHeight()-r.r)
+  if hit then r.vy = 0 end
+end
+
+function drawRoller(game)
+  local r = game.roller
+  love.graphics.setColor(0,0,0)
+  love.graphics.circle("line", r.x, r.y, r.r)
+
+  love.graphics.setColor(255,0,0)
+  love.graphics.line(r.x, r.y, r.x + (r.vx/rollerVmax*r.r), r.y)
+  love.graphics.setColor(0,255,0)
+  love.graphics.line(r.x, r.y, r.x,r.y + (r.vy/rollerVmax*r.r))
+  love.graphics.setColor(0,0,0)
 end
