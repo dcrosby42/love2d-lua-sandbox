@@ -1,4 +1,5 @@
 local socket = require "socket"
+local msgpack = require "vendor/msgpack"
  
 local udp = socket.udp()
 udp:settimeout(0)
@@ -14,11 +15,15 @@ print "UDP server bound to 12345"
 while running do
   local data, host, port = udp:receivefrom()
   if data then
-    print("FROM[" .. host .. ", " .. port .. "]: " .. data)
+    local msg = msgpack.unpack(data)
+    print("FROM[" .. host .. ", " .. port .. "]: " .. msg.type .. ", " .. msg.message)
 
-    local outmsg = "Same to you!"
-    print("TO[" .. host .. ", " .. port .. "]: " .. outmsg)
-    local ok,err = udp:sendto(outmsg, host,port)
+
+    -- local outmsg = "Same to you!"
+    local outmsg = {type="debugresp", message="A msgpack response from the server!"}
+    print("TO[" .. host .. ", " .. port .. "]: " .. outmsg.type .. ", " .. outmsg.message)
+    local outdata = msgpack.pack(outmsg)
+    local ok,err = udp:sendto(outdata, host,port)
     if not ok then 
       print("SEND FAILED: data="..data.." host="..host.." port="..port.." err="..tostring(err)) 
     end
