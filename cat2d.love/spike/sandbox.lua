@@ -33,7 +33,7 @@ function love.load()
   Game.touches = {}
   Game.touchIds = {}
 
-  TouchLog.setup(Game)
+  TouchLog.setup(Game, {host="localhost", port=12345})
 
 
   TEsound.playLooping("sounds/fx/tng_hum_clean.mp3","thrum")

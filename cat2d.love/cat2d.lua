@@ -1,4 +1,5 @@
 require 'vendor/TEsound'
+require 'helpers'
 
 local Debug = require 'mydebug'
 local TouchLog = require 'touchlog'
@@ -125,14 +126,6 @@ function love.touchreleased(id, x,y, dx,dy, pressure)
   ts[#ts + 1] = { type="released", id=id, x=x, y=y }
 end
 
-function flattenTable(t)
-  s = ""
-  for k,v in pairs(t) do
-    if #s > 0 then s = s .. " " end
-    s = s .. tostring(k) .. "=" .. tostring(v)
-  end
-  return s
-end
 
 --
 -- Touch Manipulator

@@ -1,48 +1,31 @@
 local Debug = require 'mydebug'
-local socket = require "socket"
-local msgpack = require 'vendor/msgpack'
 
--- the address and port of the server
-local address, port = "192.168.1.124", 12345
--- local address, port = "10.1.1.1", 12345
--- local address, port = "107.155.66.22", 12345
+-- local conn = require 'conn'
+local Client = require 'msgclient'
 
-
-local udp
-
+local client
 local function setup(game,opts)
-  if not opts then opts = {} end
-
-  udp = socket.udp()
-  udp:settimeout(0)
-  udp:setpeername(address,port)
+  -- udp = conn.udp_client(opts.host, opts.port)
+  client = Client:new(opts.host, opts.port)
 end
 
 local function update(game,opts)
-  if udp then
+  if client then
     -- IN FROM SERVER
-    local data
-    repeat
-      data, err = udp:receive()
-      if data then
-        local msg = msgpack.unpack(data)
-        Debug.println("FROM SERVER: "..msg.type .. "," .. msg.message)
+    msgs = client:receive_many()
+    if #msgs > 0 then
+      for _,msg in ipairs(msgs) do
+        Debug.println("FROM SERVER: " .. msg.type .. "," .. msg.message)
       end
-    until not data
+    end
 
     -- OUT TO SERVER
     for id,t in pairs(game.touches) do
       if t.elapsed == 0 then
-        Debug.println("(sending msgpack msg to server...)")
         local toMsg = { type='debug', message="Dude this is the msg." }
-        local data,err = msgpack.pack(toMsg)
-        if err then
-          Debug.println("Send failed: "..err)
-        else
-          local ok, err = pcall(function() udp:send(data) end)
-          if not ok then
-            print("udp:send failed: " .. err)
-          end
+        ok, err = client:send(toMsg)
+        if not ok then
+          Debug.println("Failed to send msg: "..err)
         end
       end
     end
