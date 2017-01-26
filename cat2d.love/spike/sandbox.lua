@@ -35,7 +35,6 @@ function love.load()
 
   TouchLog.setup(Game, {host="localhost", port=12345})
 
-
   TEsound.playLooping("sounds/fx/tng_hum_clean.mp3","thrum")
   TEsound.play("sounds/fx/tng_viewscreen_on.mp3","viewon")
   TEsound.volume("ebeep",0.4)

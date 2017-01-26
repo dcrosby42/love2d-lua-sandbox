@@ -41,4 +41,8 @@ function Server:sleep(t)
   socket.sleep(t)
 end
 
+function Server:getTime()
+  return socket.gettime()
+end
+
 return Server
