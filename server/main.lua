@@ -9,44 +9,89 @@ local Packet = require 'packet'
 local PORT = 12345
 local LOOP_DELAY = 0.01
 
+local PING_TIMER = 2
+local CLIENT_IDLE_THRESH = 5
+local CLIENT_IDLE_MAX = CLIENT_IDLE_THRESH + (3 * PING_TIMER)
+
 local server = Server:new("*", PORT)
  
 local running = true
 
 local clientIdCounter = os.time()
+local clients = {}
+local clientsByHost = {}
+
+local function removeClient(client)
+  clientsByHost[client.host][client.port] = nil
+  clients[client.clientId] = nil
+end
  
 print("UDP server bound to "..PORT)
 while running do
-  local t = server.getTime()
+  local t = socket.gettime()
+
   local packet, host, port, err = server:receive_from()
   if packet then
-    print(t.." FROM[" .. host .. ", " .. port .. "]: " .. flattenTable(packet))
-
     local type = packet[1]
     if type == Packet.SIGN_IN then 
       -- handshake / new client
       local clientId = clientIdCounter
       clientIdCounter = clientIdCounter + 1
-      server:send_to({Packet.CLIENT_ID, clientId}, host, port)
+      local client = {
+        host = host,
+        port = port,
+        clientId = clientId,
+        signIn = t,
+        lastSeen = t,
+        lastPinged = 0
+      }
+      clients[clientId] = client
+      bh = clientsByHost[host]
+      if not bh then
+        bh = {}
+        clientsByHost[host] = bh
+      end
+      bh[port] = client
 
-    elseif type == Packet.PING then
-      server:send_to({Packet.PONG, "Server time is "..os.time()}, host, port)
+      print(tostring(t) .. " - Client["..clientId.."] - SIGNED_IN")
+      server:send_to({Packet.SIGNED_IN, clientId}, client.host, client.port)
+
     else
-      print("?? "..flattenTable(packet))
+      bh = clientsByHost[host]
+      if bh and bh[port] then
+        local client = bh[port]
+        client.lastSeen = t
+        if type == Packet.PING then
+          print(tostring(t) .. " - Client[".. client.clientId .."] - ping'd, ponging..")
+          server:send_to({Packet.PONG}, client.host, client.port)
+        elseif type == Packet.PING then
+          print(tostring(t) .. " - Client[".. client.clientId .."] - pong.")
+        elseif type == Packet.QUIT then
+          print(tostring(t) .. " - Client[".. client.clientId .."] - quit.")
+          removeClient(client)
+        end
+      else
+        -- client isn't properly signed in
+      end
+
     end
-    --
-    --
-    --
-    --
-    -- local outmsg = {type="debugresp", message="A msgpack response from the server!"}
-    -- print(t.. " TO[" .. host .. ", " .. port .. "]: " .. outmsg.type .. ", " .. outmsg.message)
-    -- -- local outdata = msgpack.pack(outmsg)
-    -- -- local ok,err = udp:sendto(outdata, host,port)
-    -- local ok, err = server:send_to(outmsg, host, port)
-    -- if not ok then 
-    --   print(t .. " SEND FAILED: data="..data.." host="..host.." port="..port.." err="..tostring(err)) 
-    -- end
   end
+
+  for clientId, client in pairs(clients) do
+    local idle = (t - client.lastSeen)
+    if idle > CLIENT_IDLE_MAX then
+      print(tostring(t) .. " - Client["..clientId.."] - idled out, removing client.")
+      removeClient(client)
+
+    elseif idle > CLIENT_IDLE_THRESH then
+      if (t - client.lastPinged) > PING_TIMER then
+        print(tostring(t) .. " - Client["..clientId.."] - idling, sending PING.")
+        server:send_to({Packet.PING}, client.host, client.port)
+        client.lastPinged = t
+      end
+    end
+  end
+
   server:sleep(LOOP_DELAY)
 end
  

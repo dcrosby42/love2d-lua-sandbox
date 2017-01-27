@@ -2,6 +2,7 @@ require 'vendor/TEsound'
 
 local Debug = require 'mydebug'
 local TouchLog = require 'touchlog'
+local GameClient = require 'gameclient'
 
 local Game = {}
 local Input = {}
@@ -33,7 +34,9 @@ function love.load()
   Game.touches = {}
   Game.touchIds = {}
 
-  TouchLog.setup(Game, {host="localhost", port=12345})
+  -- GameClient.setup(Game, {host="localhost", port=12345})
+  GameClient.setup(Game, {host="192.168.1.124", port=12345})
+  -- TouchLog.setup(Game, {host="localhost", port=12345})
 
   TEsound.playLooping("sounds/fx/tng_hum_clean.mp3","thrum")
   TEsound.play("sounds/fx/tng_viewscreen_on.mp3","viewon")
@@ -50,7 +53,8 @@ function love.update(dt)
   -- updateManipulator(Game,dt,Input)
   -- updateCat(Game,dt,Input)
   Debug.update(Game,dt,Input)
-  TouchLog.update(Game,dt,Input)
+  -- TouchLog.update(Game,dt,Input)
+  GameClient.update(Game,dt,Input)
 
   -- AFTER UPDATE
   local ts = Input.touches
@@ -75,6 +79,10 @@ function love.draw()
   end
 
 
+end
+
+function love.quit()
+  GameClient.teardown(Game)
 end
 
 function love.mousepressed(x,y, button, istouch)

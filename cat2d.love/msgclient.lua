@@ -41,4 +41,8 @@ function Client:receive_many()
   return msgs
 end
 
+function Client:close()
+  self.udp:close()
+end
+
 return Client
