@@ -1,4 +1,7 @@
 
+numberlua = require 'vendor/numberlua' -- intentionally global
+bit32 = numberlua.bit32 -- intentionally global
+
 function flattenTable(t)
   s = ""
   for k,v in pairs(t) do

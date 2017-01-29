@@ -13,5 +13,5 @@ Comp.define("tag", {})
 
 Comp.define("iconAdder", {'imgId', '', 'tagName', ''})
 
-Comp.define("scene", {'active', false})
 Comp.define("parent", {'parentEid', ''})
+Comp.define("filter", {'bits', 0})

@@ -1,5 +1,6 @@
 require 'helpers'
 require 'ecs/ecshelpers'
+require 'ecs/flags'
 
 local Estore = require 'ecs/estore'
 
@@ -41,8 +42,7 @@ function love.load()
   estore = Estore:new()
 
   local s1ent = estore:newEntity()
-  local scene1 = estore:newComp(s1ent, 'scene', {name="scene1", active=true})
-  estore:newComp(s1ent, 'parent', {parentEid="ROOT"})
+  local filter1 = estore:newComp(s1ent, 'filter', {name="filter1", bits=bit32.bor(Flags.Update, Flags.Draw)})
 
   local p1ad = estore:newEntity()
   estore:newComp(p1ad, 'iconAdder', {id='p1', imgId=catIcon, tagName='cattish'})
@@ -55,16 +55,15 @@ function love.load()
 
   -- 
   local s2ent = estore:newEntity()
-  local scene2 = estore:newComp(s2ent, 'scene', {name="scene2"})
-  estore:newComp(s2ent, 'parent', {parentEid="ROOT"})
+  local filter2 = estore:newComp(s2ent, 'filter', {name="filter2", bits=Flags.None})
 
   local l1 = estore:newEntity()
   estore:newComp(l1, 'label', {text="YOU ARE LOOKING AT SCENE 2!"})
   estore:newComp(l1, 'pos', {x=50,y=50})
   estore:newComp(l1, 'parent', {parentEid = s2ent.eid})
 
-  THE_CHEAT.scene1 = scene1
-  THE_CHEAT.scene2 = scene2
+  THE_CHEAT.filter1 = filter1
+  THE_CHEAT.filter2 = filter2
 end
 
 function love.update(dt)
@@ -89,11 +88,16 @@ function love.keypressed(key, scancode, isrepeat)
   if key == "p" then
     print("============================================================================")
     print(estore:debugString())
+  elseif key == "g" then
+    if output.scenegraph then
+      print("============================================================================")
+      print(tdebug(output.scenegraph.ROOT))
+    end
   elseif key == "1" then
-    THE_CHEAT.scene1.active = true
-    THE_CHEAT.scene2.active = false
+    THE_CHEAT.filter1.bits = Flags.Draw
+    THE_CHEAT.filter2.bits = Flags.None
   elseif key == "2" then
-    THE_CHEAT.scene1.active = false
-    THE_CHEAT.scene2.active = true
+    THE_CHEAT.filter1.bits = Flags.None
+    THE_CHEAT.filter2.bits = Flags.Draw
   end
 end
