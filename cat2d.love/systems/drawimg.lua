@@ -1,17 +1,94 @@
 
-return function(estore,output,res)
+local function updateSceneGraph(estore, output, res)
+  local changed = false
+  local t = output.scenegraph
+  if not t then
+    t = {}
+    output.scenegraph = t
+  end
   estore:search(
-    hasComps('img','pos','parent'),
+    hasComps('parent'),
     function(e)
-      local parent = estore:getEntity(e.parent.parentEid)
-      if parent.scene and parent.scene.active then
-        love.graphics.draw(
-          res.images[e.img.imgId],
-          e.pos.x, e.pos.y,
-          e.img.r,     -- radians
-          e.img.sx, e.img.sy,
-          e.img.offx, e.img.offy)
+      local eid = e.eid
+      local pid = e.parent.parentEid
+      local skip = false
+      -- TODO seen[pid] = true, seen[eid] = true   ? ?
+      if t[eid] then 
+        if t[eid].pid == pid then
+          -- already ok
+          skip = true
+        else
+          -- parent set/changed
+          t[eid].pid = pid
+        end
+      else
+        -- first time we've seen this eid, create a node
+        t[eid] = {eid=eid, pid=pid, ch={}} 
+      end
+      if not skip then
+        changed = true
+        local pnode = t[pid]
+        if pnode then
+          -- parent node already exists, append this node to its children
+          table.insert(pnode.ch, t[eid])
+        else
+          -- parent node not added yet; add it and set this node as first child
+          pnode = {eid=pid, ch={t[eid]}}
+          t[pid] = pnode
+        end
       end
     end
   )
+  -- TODO -- HANDLE REMOVALS
+  -- TODO -- HANDLE RE-PARENTING
+  if changed then print("== Scene graph updated ==\n"..tdebug(t.ROOT)) end
+  return t["ROOT"]
 end
+
+local function forEachActiveEntity(estore, node,fn, parentEntity)
+  -- if node.eid == "ROOT" then
+  --   for _,chnode in ipairs(node.ch) do
+  --     forEachActiveEntity(chnode, fn, nil)
+  --   end
+  -- else
+  local e = estore:getEntity(node.eid)
+  if e then
+    if (not e.scene) or (e.scene and e.scene.active) then
+      fn(e, parentEntity)
+      for _,chnode in ipairs(node.ch) do
+        forEachActiveEntity(estore, chnode, fn, e)
+      end
+    end
+  else
+    print("!! ERR forEachActiveEntity: no entity for node.eid="..node.eid.."; node:"..tdebug(node,' '))
+  end
+  -- end
+end
+
+local function drawEntity(estore, output, res, e, parentE)
+  if e.img and e.pos then
+    local img = e.img
+    love.graphics.draw(
+      res.images[img.imgId],
+      e.pos.x, e.pos.y,
+      img.r,     -- radians
+      img.sx, img.sy,
+      img.offx, img.offy)
+
+  elseif e.label and e.pos then
+    local label = e.label
+    love.graphics.setColor(label.r, label.g, label.b)
+    love.graphics.print(label.text, e.pos.x, e.pos.y)
+  end
+end
+
+return function(estore,output,res)
+  local root = updateSceneGraph(estore,output,res)
+
+  for _,node in pairs(root.ch) do
+    forEachActiveEntity(estore, node, function(e, parentE)
+      drawEntity(estore, output, res, e, parentE)
+    end)
+  end
+end
+

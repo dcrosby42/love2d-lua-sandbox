@@ -20,7 +20,7 @@ local updateWorld = iterateFuncs({
 
 local drawWorld = iterateFuncs({
   drawImgSystem,
-  drawLabelSystem,
+  -- drawLabelSystem,
 })
 
 local input, output, estore, res
@@ -42,6 +42,7 @@ function love.load()
 
   local s1ent = estore:newEntity()
   local scene1 = estore:newComp(s1ent, 'scene', {name="scene1", active=true})
+  estore:newComp(s1ent, 'parent', {parentEid="ROOT"})
 
   local p1ad = estore:newEntity()
   estore:newComp(p1ad, 'iconAdder', {id='p1', imgId=catIcon, tagName='cattish'})
@@ -55,6 +56,7 @@ function love.load()
   -- 
   local s2ent = estore:newEntity()
   local scene2 = estore:newComp(s2ent, 'scene', {name="scene2"})
+  estore:newComp(s2ent, 'parent', {parentEid="ROOT"})
 
   local l1 = estore:newEntity()
   estore:newComp(l1, 'label', {text="YOU ARE LOOKING AT SCENE 2!"})
