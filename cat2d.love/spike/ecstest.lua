@@ -8,20 +8,24 @@ local posMoverSystem = require 'systems/posmover'
 local iconAdderSystem = require 'systems/iconadder'
 
 local drawImgSystem = require 'systems/drawimg'
+local drawLabelSystem = require 'systems/drawlabel'
 
 require 'comps'
 
-local updateWorld = iterateFuncs(
+local updateWorld = iterateFuncs({
   controllerSystem,
   iconAdderSystem,
-  posMoverSystem
-)
+  posMoverSystem,
+})
 
-local drawWorld = iterateFuncs(
-  drawImgSystem
-)
+local drawWorld = iterateFuncs({
+  drawImgSystem,
+  drawLabelSystem,
+})
 
 local input, output, estore, res
+
+THE_CHEAT = {}
 
 local catIcon = "images/black-cat-icon.png"
 
@@ -32,15 +36,33 @@ function love.load()
     images={}
   }
   res.images[catIcon] = love.graphics.newImage(catIcon)
+  -- print(catIcon .. ": " .. res.images[catIcon]:getWidth() .. " x " .. res.images[catIcon]:getHeight())
 
   estore = Estore:new()
 
+  local s1ent = estore:newEntity()
+  local scene1 = estore:newComp(s1ent, 'scene', {name="scene1", active=true})
+
   local p1ad = estore:newEntity()
   estore:newComp(p1ad, 'iconAdder', {id='p1', imgId=catIcon, tagName='cattish'})
+  estore:newComp(p1ad, 'parent', {parentEid = s1ent.eid})
 
   local p1 = estore:newEntity()
   estore:newComp(p1, 'pos', {x=50,y=50})
   estore:newComp(p1, 'controller', {id='p1'})
+  estore:newComp(p1, 'parent', {parentEid = s1ent.eid})
+
+  -- 
+  local s2ent = estore:newEntity()
+  local scene2 = estore:newComp(s2ent, 'scene', {name="scene2"})
+
+  local l1 = estore:newEntity()
+  estore:newComp(l1, 'label', {text="YOU ARE LOOKING AT SCENE 2!"})
+  estore:newComp(l1, 'pos', {x=50,y=50})
+  estore:newComp(l1, 'parent', {parentEid = s2ent.eid})
+
+  THE_CHEAT.scene1 = scene1
+  THE_CHEAT.scene2 = scene2
 end
 
 function love.update(dt)
@@ -61,5 +83,11 @@ function love.keypressed(key, scancode, isrepeat)
   if key == "p" then
     print("============================================================================")
     print(estore:debugString())
+  elseif key == "1" then
+    THE_CHEAT.scene1.active = true
+    THE_CHEAT.scene2.active = false
+  elseif key == "2" then
+    THE_CHEAT.scene1.active = false
+    THE_CHEAT.scene2.active = true
   end
 end
