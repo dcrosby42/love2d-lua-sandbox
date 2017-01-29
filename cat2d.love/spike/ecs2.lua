@@ -1,103 +1,78 @@
 package.path = package.path .. ';../?.lua'
 
 require 'helpers'
+require 'ecshelpers'
 
 local Estore = require 'estore'
 local Comp = require 'component'
 local T = Comp.types
 
--- print("timer pool A: "..T.timer._pool:debugString())
--- print(estore:debugString())
--- print(Comp.debugString(e1.imgs.dude))
-
-
--- Comp.define("trans", {'x',0,'y',0,'w',50,'h',50,'ax',0.5,'ay',1,'r',0}, {initSize=1,incSize=0,mulSize=17})
--- Comp.define("img", {})
--- Comp.define("timer",{'event',"", 't',0, 'init',0, 'loop',false}, {initSize=1,incSize=2})
--- estore = Estore:new()
--- e1 = estore:newEntity()
-
-Comp.define("controller", {'id','','up',false,'down',false,'left',false,'right',false})
+Comp.define("controller", {'id','','leftx',0,'lefty',0,})
 Comp.define("pos", {'x',0,'y',0})
+Comp.define("bounds", {'x',0,'y',0,'w',0,'h',0})
+Comp.define("img", {'imgId','','ax',0,'ay',0,'sx',1,'sy',1,'r',0})
+Comp.define("tag", {})
+Comp.define("iconAdder", {'imgId', '', 'tagName', ''})
 
-
-local function hasComps(...)
-  local ctypes = {...}
-  local num = #ctypes
-  if num == 0 then
-    return function(e) return true end
-  elseif num == 1 then
-    return function(e) 
-      return e[ctypes[1]] ~= nil
-    end
-  elseif num == 2 then
-    return function(e) 
-      return e[ctypes[1]] ~= nil and e[ctypes[2]] ~= nil
-    end
-  elseif num == 3 then
-    return function(e) 
-      return e[ctypes[1]] ~= nil and e[ctypes[2]] and e[ctypes[3]] ~= nil
-    end
-  elseif num == 4 then
-    return function(e) 
-      return e[ctypes[1]] ~= nil and e[ctypes[2]] and e[ctypes[3]] ~= nil and e[ctypes[4]] ~= nil 
-    end
-  else
-    return function(e)
-      for _,ctype in ipairs(ctypes) do
-        if e[ctype] == nil then return end
-      end
-      return true
-    end
-  end
-end
-    
-
-local function controllerSystem(estore, input)
+local function controllerSystem(estore, input,res)
   estore:search(
     hasComps('controller'),
     function(e)
       local events = input.events.controller or {}
       for _,evt in ipairs(events) do
         if evt.id == e.controller.id then
-          if evt.action == 'pressed' then
-            e.controller[evt.input] = true
-          elseif evt.action == 'released' then
-            e.controller[evt.input] = false
-          end
+          e.controller[evt.input] = evt.action
         end
       end
     end
   )
 end
 
-local function posMoverSystem(estore, input)
-  estore:eachEntity(function(e)
-    if e.controller and e.pos then
-      if e.controller.right then
-        e.pos.x = e.pos.x + 5
-      end
-      if e.controller.left then
-        e.pos.x = e.pos.x - 5
-      end
+local function posMoverSystem(estore, input,res)
+  estore:search(
+    hasComps('controller', 'pos'),
+    function(e)
+      e.pos.x = e.pos.x + (600 * e.controller.leftx * input.dt)
     end
-  end)
+  )
 end
 
-local function iterFuncs(...)
-  local funcs = {...} -- convert varargs into an array
-  return function(estore,input)
-    for _,fn in ipairs(funcs) do
-      fn(estore,input)
-    end
+local function createNewIcon(estore, tap, adderComp, res)
+  local e = estore:newEntity()
+  estore:newComp(e, 'tag', {name=adderComp.tagName})
+  estore:newComp(e, 'img', {imgId=adderComp.imgId})
+  estore:newComp(e, 'pos', {x=tap.x, y=tap.y})
+  estore:newComp(e, 'bounds', {x=tap.x, y=tap.y, w=50, h=50})
+end
+
+local function iconAdderSystem(estore, input,res)
+  for _,tap in ipairs(input.events.tap or {}) do
+    estore:search(
+      hasComps('iconAdder'),
+      function(e)
+        for _,adder in pairs(e.iconAdders) do
+          if adder.id == tap.id then
+            createNewIcon(estore, tap, adder, res)
+          end
+        end
+      end
+    )
   end
 end
 
-local function addInputEvent(input, evt)
-  if not input.events[evt.type] then
-    input.events[evt.type] = {}
-  end
-  table.insert(input.events[evt.type], evt)
+local function drawImgSystem(estore,output,res)
+  estore:search(
+    hasComps('img','pos'),
+    function(e)
+      print(":: love.graphics.draw(res.images["..e.img.imgId.."], "..e.pos.x..","..e.pos.y..")")
+      -- love.graphics.draw(
+      --   res.images[img.imgid]
+      --   e.pos.x, e.pos.y,
+      --   e.img.r,     -- radians
+      --   e.img.sx, e.img.sy,  -- scalex, scaley
+      --   e.img.ax, ay)  -- offx, offy
+    end
+  )
 end
 
 print("----------------------------------------------------------------------------")
@@ -105,11 +80,21 @@ print("-------------------------------------------------------------------------
 local estore = Estore:new()
 local e1 = estore:newEntity()
 estore:newComp(e1, 'pos', {x=50,y=50})
-estore:newComp(e1, 'controller', {id='k1'})
+estore:newComp(e1, 'controller', {id='p1'})
+estore:newComp(e1, 'iconAdder', {id='p1', imgId='cat.jpg', tagName='cattish'})
 
-updateWorld = iterFuncs(
+local e2 = estore:newEntity()
+estore:newComp(e2, 'iconAdder', {id='p2', imgId='dog.jpg', tagName='doggish'})
+estore:newComp(e2, 'iconAdder', {id='p2', imgId='circle.jpg', tagName='circ'})
+
+updateWorld = iterateFuncs(
   controllerSystem,
+  iconAdderSystem,
   posMoverSystem
+)
+
+drawWorld = iterateFuncs(
+  drawImgSystem
 )
 
 input = {
@@ -120,7 +105,7 @@ input = {
 print(estore:debugString())
 
 -- tick 1
-addInputEvent(input, { type='controller', id='k1', input='right', action='pressed' })
+addInputEvent(input, { type='controller', id='p1', input='leftx', action=1.0 })
 updateWorld(estore,input)
 print(estore:debugString())
 
@@ -130,7 +115,18 @@ updateWorld(estore,input)
 print(estore:debugString())
 
 -- tick 3
-addInputEvent(input, { type='controller', id='k1', input='right', action='released' })
+addInputEvent(input, { type='controller', id='p1', input='leftx', action=0.0 })
 updateWorld(estore,input)
 print(estore:debugString())
 
+-- tick 4
+addInputEvent(input, { type='tap', id='p1', touchid='0x12345', x=120, y=73})
+addInputEvent(input, { type='tap', id='p1', touchid='0x12346', x=66, y=88})
+addInputEvent(input, { type='tap', id='p2', touchid='0x45451', x=200, y=124})
+updateWorld(estore,input)
+print(estore:debugString())
+
+-- faux draw
+output={}
+res={}
+drawWorld(estore,output,res)

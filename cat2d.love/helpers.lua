@@ -10,6 +10,12 @@ end
 
 tflatten = flattenTable
 
+function tcount(t)
+  local ct = 0
+  for _,_ in pairs(t) do ct = ct + 1 end
+  return ct
+end
+
 function tcopy(orig)
   local orig_type = type(orig)
   local copy
@@ -86,5 +92,14 @@ end
 function valsearchfirst(t,matchFn,callbackFn)
   for _,v in pairs(t) do
     if fn(v) then return callbackFn(v) end
+  end
+end
+
+local function iterateFuncs(...)
+  local funcs = {...} -- convert varargs into an array
+  return function(estore,input)
+    for _,fn in ipairs(funcs) do
+      fn(estore,input)
+    end
   end
 end

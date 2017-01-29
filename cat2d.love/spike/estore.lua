@@ -164,11 +164,14 @@ function Estore:transferComp(eFrom, eTo, comp)
   self:addComp(eTo, comp) 
 end
 
--- TODO?
--- function Estore:getEntity(eid)
---   return self.ents[eid]
--- end
--- TODO?
+function Estore:getEntity(eid)
+  return self.ents[eid]
+end
+
+function Estore:getComp(cid)
+  return self.comps[cid]
+end
+
 function keyvalsearch(t,matchFn,callbackFn)
   for _,v in pairs(t) do
     if fn(k,v) then callbackFn(k,v) end
@@ -186,9 +189,6 @@ function valsearchfirst(t,matchFn,callbackFn)
     if fn(v) then return callbackFn(v) end
   end
 end
--- function Estore:getComp(cid)
---   return self.comps[cid]
--- end
 
 function Estore:eachEntity(fn)
   for _,ent in pairs(self.ents) do
@@ -207,6 +207,29 @@ local function compDebugString(comp)
   return Comp.debugString(comp)
 end
 
+local function entityDebugString(e)
+  s = e.eid .. ": " .. "\n"
+  for k,v in pairs(e) do
+    if v.cid and v.eid then
+      keyp = k.."s"
+      if tcount(e[keyp]) == 1 then
+        s = s.."  "..k..": "..Comp.debugString(v) .. "\n"
+      else
+        s = s.."  "..keyp..": \n"
+        for name,comp in pairs(e[keyp]) do
+          s = s.."    "..name..": "
+          if v.cid == comp.cid then
+            s = s .. "*"
+          end
+          s = s..Comp.debugString(comp) 
+          s = s .."\n"
+        end
+      end
+    end
+  end
+  return s
+end
+
 function Estore:debugString()
   local s = ""
   s = s .. "-- Estore:\n"
@@ -217,17 +240,7 @@ function Estore:debugString()
   end
   s = s .. "--- Entities (self.ents):\n"
   for eid,e in pairs(self.ents) do
-    s = s..eid .. ": " .. "\n"
-    for k,v in pairs(e) do
-      if v.cid and v.eid then
-        s = s.."  "..k..": "..Comp.debugString(v) .. "\n"
-        keyp = k.."s"
-        s = s.."  "..keyp..": \n"
-        for name,comp in pairs(e[keyp]) do
-          s = s.."    "..name..": "..Comp.debugString(comp) .."\n"
-        end
-      end
-    end
+    s = s .. entityDebugString(e)
   end
   return s
 end
