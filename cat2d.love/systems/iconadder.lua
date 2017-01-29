@@ -9,22 +9,58 @@ local function createNewIcon(estore, parE, tap, adderComp, res)
   estore:newComp(e, 'tag', {name=adderComp.tagName})
   estore:newComp(e, 'img', {imgId=imgId, sx=0.3, sy=0.3, offx=w/2, offy=h/2})
   estore:newComp(e, 'pos', {x=tap.x, y=tap.y})
-  estore:newComp(e, 'bounds', {x=tap.x, y=tap.y, w=50, h=50})
+  estore:newComp(e, 'bounds', {x=tap.x, y=tap.y, w=256, h=256})
   -- estore:newComp(e, 'parent', {parentEid = parE.parent.parentEid})
   estore:newComp(e, 'parent', {parentEid = parE.eid})
 end
 
+local function destroyIcon(estore, parE, untap, adderComp, res)
+  local kills = {}
+  estore:search(
+    hasComps('img','tag','pos'),
+    function(e)
+      if e.tags[adderComp.tagName] then
+        local r = 256 * e.img.sx -- FIXME cheatsies precious
+        if math.dist(untap.x,untap.y, e.pos.x, e.pos.y) <= r then
+          table.insert(kills,e)
+        end
+      end
+    end
+  )
+  for _,e in ipairs(kills) do
+    estore:destroyEntity(e)
+  end
+end
+
 return function(estore, input,res)
-  for _,tap in ipairs(input.events.tap or {}) do
-    estore:search(
-      hasComps('iconAdder'),
-      function(e)
-        for _,adder in pairs(e.iconAdders) do
+  -- for _,tap in ipairs(input.events.tap or {}) do
+  --   estore:search(
+  --     hasComps('iconAdder'),
+  --     function(e)
+  --       for _,adder in pairs(e.iconAdders) do
+  --         if adder.id == tap.id then
+  --           createNewIcon(estore, e, tap, adder, res)
+  --         end
+  --       end
+  --     end
+  --   )
+  -- end
+
+  estore:search(
+    hasComps('iconAdder'),
+    function(e)
+      for _,adder in pairs(e.iconAdders) do
+        for _,tap in ipairs(input.events.tap or {}) do
           if adder.id == tap.id then
             createNewIcon(estore, e, tap, adder, res)
           end
         end
+        for _,untap in ipairs(input.events.untap or {}) do
+          if adder.id == untap.id then
+            destroyIcon(estore, e, untap, adder, res)
+          end
+        end
       end
-    )
-  end
+    end
+  )
 end

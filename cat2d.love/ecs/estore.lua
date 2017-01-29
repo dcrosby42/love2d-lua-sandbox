@@ -35,6 +35,18 @@ function Estore:newEntity()
   return e
 end
 
+function Estore:destroyEntity(e)
+  local kills={}
+  for _,comp in pairs(self.comps) do
+    if comp.eid == e.eid then
+      table.insert(kills,comp)
+    end
+  end
+  for _,comp in ipairs(kills) do
+    self:removeComp(comp)
+  end
+end
+
 -- Get the component name, for use as a key into the collection of a particular comp type in an entity.
 -- Eg, comp { type="imgsprite", name="door" } could be stored in e.imgsprites.door.
 -- If name is nil or empty string, use count+1 (stringified).  Eg,  e.imgsprites["3"]
@@ -118,13 +130,9 @@ function Estore:detachComp(e,comp)
     local plural = e[keyp]
 
     -- Remove comp from the plural ref table:
-    if plural[comp.name] then 
-      -- comp name was used as a key in the plural table, nil it:
-      plural[comp.name] = nil
-    else
-      -- plural table may have used a contrived name for this comp, find it:
-      for k,c in pairs(plural) do
-        if c.cid == comp.id then plural[k] = nil end
+    for k,c in pairs(plural) do
+      if c.cid == comp.cid then 
+        plural[k] = nil 
       end
     end
 

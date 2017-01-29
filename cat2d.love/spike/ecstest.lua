@@ -78,7 +78,11 @@ function love.draw()
 end
 
 function love.mousepressed(x,y, button, istouch)
-  addInputEvent(input, {type='tap', id='p1', x=x, y=y})
+  if button == 1 then
+    addInputEvent(input, {type='tap', id='p1', x=x, y=y})
+  elseif button == 2 then
+    addInputEvent(input, {type='untap', id='p1', x=x, y=y})
+  end
 end
 
 function love.keypressed(key, scancode, isrepeat)

@@ -1,9 +1,10 @@
 
 local function updateSceneGraph(estore, output, res)
+  local seen = {ROOT=true}
   local changed = false
   local t = output.scenegraph
   if not t then
-    t = {}
+    t = {} -- {ROOT={ch={}}}
     output.scenegraph = t
   end
   estore:search(
@@ -12,7 +13,7 @@ local function updateSceneGraph(estore, output, res)
       local eid = e.eid
       local pid = e.parent.parentEid
       local skip = false
-      -- TODO seen[pid] = true, seen[eid] = true   ? ?
+      seen[eid] = true
       if t[eid] then 
         if t[eid].pid == pid then
           -- already ok
@@ -39,9 +40,29 @@ local function updateSceneGraph(estore, output, res)
       end
     end
   )
-  -- TODO -- HANDLE REMOVALS
-  -- TODO -- HANDLE RE-PARENTING
-  if changed then print("== Scene graph updated ==\n"..tdebug(t.ROOT)) end
+  for eid,node in pairs(t) do
+    if not seen[eid] then
+      changed = true
+      -- entity for eid is in the graph but NOT in the estore
+      -- remove from parent node's ch list:
+      local pnode = t[t[eid].pid]
+      if pnode then
+        local remi
+        for i,node in ipairs(pnode.ch) do
+          if node.eid == eid then
+            remi = i
+            break
+          end
+        end
+        if remi then table.remove(pnode.ch, remi) end
+      end
+      -- remove from cache
+      t[eid] = nil
+      changed = true
+    end
+  end
+    
+  -- if changed then print("== Scene graph updated ==\n"..tdebug(t.ROOT)) end
   return t["ROOT"]
 end
 
