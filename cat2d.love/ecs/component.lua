@@ -1,5 +1,5 @@
 
-local ObjPool = require 'objpool'
+local ObjPool = require 'ecs/objpool'
 
 -- Define and access Components.
 -- Comp.define("Img", {name:""}) creates a new Component type Img, available via Comp.Img.

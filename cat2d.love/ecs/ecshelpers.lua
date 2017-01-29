@@ -37,11 +37,3 @@ function addInputEvent(input, evt)
   table.insert(input.events[evt.type], evt)
 end
 
-function iterateFuncs(...)
-  local funcs = {...} -- convert varargs into an array
-  return function(estore,input)
-    for _,fn in ipairs(funcs) do
-      fn(estore,input)
-    end
-  end
-end

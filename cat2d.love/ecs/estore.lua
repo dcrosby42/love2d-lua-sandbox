@@ -1,4 +1,4 @@
-Comp = require 'component'
+Comp = require 'ecs/component'
 
 local Estore = {
   eidCounter=1,

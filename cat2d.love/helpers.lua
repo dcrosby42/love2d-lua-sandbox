@@ -95,11 +95,11 @@ function valsearchfirst(t,matchFn,callbackFn)
   end
 end
 
-local function iterateFuncs(...)
+function iterateFuncs(...)
   local funcs = {...} -- convert varargs into an array
-  return function(estore,input)
+  return function(a,b,c)
     for _,fn in ipairs(funcs) do
-      fn(estore,input)
+      fn(a,b,c)
     end
   end
 end
