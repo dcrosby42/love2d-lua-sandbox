@@ -10,6 +10,7 @@ require 'comps'
 local controllerSystem = require 'systems/controller'
 local posMoverSystem = require 'systems/posmover'
 local iconAdderSystem = require 'systems/iconadder'
+local timerSystem = require 'systems/timer'
 local Etree = require 'ecs/entitytree'
 
 local drawImgSystem = require 'systems/drawimg'
@@ -35,6 +36,7 @@ local outputWorld -- super-system for generating "output" (audio, video etc.)
 
 function love.load()
   updateWorld = iterateFuncs({
+    timerSystem,
     iconAdderSystem,
     Etree.etreeSystem,
   })
@@ -73,6 +75,12 @@ function love.load()
   estore:newComp(l1, 'pos', {x=50,y=50})
   estore:newComp(l1, 'parent', {parentEid = s2ent.eid})
 
+  local t1 = estore:newEntity()
+  estore:newComp(t1, 'timer', {countDown=false})
+  estore:newComp(t1, 'parent', {parentEid = s2ent.eid})
+
+  estore:updateEntityTree()
+
   THE_CHEAT.filter1 = filter1
   THE_CHEAT.filter2 = filter2
 end
@@ -81,6 +89,7 @@ end
 -- UPDATE
 --
 function love.update(dt)
+  input.dt = dt
   updateWorld(estore, input, res)
   input.events = {}
 end
@@ -115,10 +124,10 @@ function love.keypressed(key, scancode, isrepeat)
       print(tdebug(estore.etree.ROOT))
     end
   elseif key == "1" then
-    THE_CHEAT.filter1.bits = Flags.Draw
+    THE_CHEAT.filter1.bits = bit32.bor(Flags.Draw,Flags.Update)
     THE_CHEAT.filter2.bits = Flags.None
   elseif key == "2" then
     THE_CHEAT.filter1.bits = Flags.None
-    THE_CHEAT.filter2.bits = Flags.Draw
+    THE_CHEAT.filter2.bits = bit32.bor(Flags.Draw,Flags.Update)
   end
 end

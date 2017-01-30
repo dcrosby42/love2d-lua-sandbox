@@ -206,13 +206,15 @@ function Estore:eachEntity(fn)
   end
 end
 
-function Estore:_walkEntitiesFromNode(node, flags, fn)
+function Estore:_walkEntitiesFromNode(node, flags, matchFn, doFn)
   local e = self:getEntity(node.eid)
   if e then
     if (not e.filter) or (e.filter and bit32.btest(e.filter.bits, flags)) then
-      fn(e)
+      if (not matchFn) or matchFn(e) then -- execute doFn if either a) no matcher, or b) matcher provided and returns true
+        doFn(e) 
+      end
       for _,chnode in ipairs(node.ch) do
-        self:_walkEntitiesFromNode(chnode, flags, fn)
+        self:_walkEntitiesFromNode(chnode, flags, matchFn, doFn)
       end
     end
   else
@@ -220,9 +222,9 @@ function Estore:_walkEntitiesFromNode(node, flags, fn)
   end
 end
 
-function Estore:walkEntities(flags, fn)
+function Estore:walkEntities(flags, matchFn, doFn)
   for _,node in pairs(self.etree.ROOT.ch) do
-    self:_walkEntitiesFromNode(node, flags, fn)
+    self:_walkEntitiesFromNode(node, flags, matchFn, doFn)
   end
 end
 
@@ -232,9 +234,6 @@ end
 
 function Estore:search(matchFn,doFn)
   valsearch(self.ents, matchFn, doFn)
-  -- for _,ent in pairs(self.ents) do
-  --   fn(ent)
-  -- end
 end
 
 

@@ -3,7 +3,7 @@ require 'flags'
 return function(estore,output,res)
   -- estore:updateEntityTree()
 
-  estore:walkEntities(Flags.Draw, function(e)
+  estore:walkEntities(Flags.Draw, nil, function(e)
     if e.img and e.pos then
       local img = e.img
       love.graphics.draw(

@@ -14,3 +14,5 @@ Comp.define("tag", {})
 
 Comp.define("iconAdder", {'imgId', '', 'tagName', ''})
 
+Comp.define("timer", {'t',0, 'reset',0, 'countDown',true, 'loop',false})
+
