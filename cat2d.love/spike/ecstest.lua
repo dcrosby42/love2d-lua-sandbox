@@ -11,6 +11,7 @@ local controllerSystem = require 'systems/controller'
 local posMoverSystem = require 'systems/posmover'
 local iconAdderSystem = require 'systems/iconadder'
 local timerSystem = require 'systems/timer'
+local gravitySystem = require 'systems/gravity'
 local Etree = require 'ecs/entitytree'
 
 local drawImgSystem = require 'systems/drawimg'
@@ -37,6 +38,7 @@ local outputWorld -- super-system for generating "output" (audio, video etc.)
 function love.load()
   updateWorld = iterateFuncs({
     timerSystem,
+    gravitySystem,
     iconAdderSystem,
     Etree.etreeSystem,
   })
