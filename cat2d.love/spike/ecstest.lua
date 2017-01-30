@@ -1,43 +1,54 @@
+-- Framework
 require 'helpers'
 require 'ecs/ecshelpers'
-require 'ecs/flags'
-
 local Estore = require 'ecs/estore'
+
+-- Game-specific:
+require 'flags'
+require 'comps'
 
 local controllerSystem = require 'systems/controller'
 local posMoverSystem = require 'systems/posmover'
 local iconAdderSystem = require 'systems/iconadder'
+local Etree = require 'ecs/entitytree'
 
 local drawImgSystem = require 'systems/drawimg'
-local drawLabelSystem = require 'systems/drawlabel'
-
-require 'comps'
-
-local updateWorld = iterateFuncs({
-  controllerSystem,
-  iconAdderSystem,
-  posMoverSystem,
-})
-
-local drawWorld = iterateFuncs({
-  drawImgSystem,
-  -- drawLabelSystem,
-})
-
-local input, output, estore, res
 
 THE_CHEAT = {}
 
+
+
+-- resource name shortcuts 
+-- FIXME is this really the right place for this?
 local catIcon = "images/black-cat-icon.png"
 
+--
+-- SETUP
+--
+local estore -- Entity store, mgmt and retrieval
+local input  -- dt and user input events
+local output -- ?
+local res    -- bag for "static" resources such as sound and image resource objects
+
+local updateWorld -- super-system for updating the game state
+local outputWorld -- super-system for generating "output" (audio, video etc.)
+
 function love.load()
+  updateWorld = iterateFuncs({
+    iconAdderSystem,
+    Etree.etreeSystem,
+  })
+
+  outputWorld = iterateFuncs({
+    drawImgSystem,
+  })
+
   input = { dt=0, events={} }
   output = {}
   res = {
     images={}
   }
   res.images[catIcon] = love.graphics.newImage(catIcon)
-  -- print(catIcon .. ": " .. res.images[catIcon]:getWidth() .. " x " .. res.images[catIcon]:getHeight())
 
   estore = Estore:new()
 
@@ -66,16 +77,25 @@ function love.load()
   THE_CHEAT.filter2 = filter2
 end
 
+--
+-- UPDATE
+--
 function love.update(dt)
   updateWorld(estore, input, res)
   input.events = {}
 end
 
+--
+-- OUTPUT
+--
 function love.draw()
   love.graphics.setBackgroundColor(255,255,255)
-  drawWorld(estore, output, res)
+  outputWorld(estore, output, res)
 end
 
+--
+-- INPUT EVENT HANDLERS
+--
 function love.mousepressed(x,y, button, istouch)
   if button == 1 then
     addInputEvent(input, {type='tap', id='p1', x=x, y=y})
@@ -89,9 +109,10 @@ function love.keypressed(key, scancode, isrepeat)
     print("============================================================================")
     print(estore:debugString())
   elseif key == "g" then
-    if output.scenegraph then
+    if estore.etree then
       print("============================================================================")
-      print(tdebug(output.scenegraph.ROOT))
+      print("-- Entity tree (Estore.etree):")
+      print(tdebug(estore.etree.ROOT))
     end
   elseif key == "1" then
     THE_CHEAT.filter1.bits = Flags.Draw

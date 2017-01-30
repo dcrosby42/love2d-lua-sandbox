@@ -1,4 +1,5 @@
 local Comp = require 'ecs/component'
+-- N.B. -- 'parent' and 'filter' components are BOTH DEFINED AND UTILIZED INTERNALLY BY ESTORE. (don't mess with them)
 
 Comp.define("controller", {'id','','leftx',0,'lefty',0,})
 
@@ -13,5 +14,3 @@ Comp.define("tag", {})
 
 Comp.define("iconAdder", {'imgId', '', 'tagName', ''})
 
-Comp.define("parent", {'parentEid', ''})
-Comp.define("filter", {'bits', 0})

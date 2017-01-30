@@ -1,10 +1,12 @@
 Comp = require 'ecs/component'
+Etree = require 'ecs/entitytree'
 
 local Estore = {
   eidCounter=1,
   cidCounter=1,
+  comps={},
   ents={},
-  comps={}
+  etree={},
 }
 
 function Estore:new(o)
@@ -95,7 +97,7 @@ function Estore:addComp(e,comp)
     self.ents[e.eid] = e -- shenanigans... if while modifying an entity, it becomes empty of comps, it may have gotten cleaned out of the ents cache.
   end
 
-  -- Parent this comp
+  -- Officially relate this comp to its entity
   comp.eid = e.eid
 
   -- Index the comp by cid
@@ -204,12 +206,37 @@ function Estore:eachEntity(fn)
   end
 end
 
+function Estore:_walkEntitiesFromNode(node, flags, fn)
+  local e = self:getEntity(node.eid)
+  if e then
+    if (not e.filter) or (e.filter and bit32.btest(e.filter.bits, flags)) then
+      fn(e)
+      for _,chnode in ipairs(node.ch) do
+        self:_walkEntitiesFromNode(chnode, flags, fn)
+      end
+    end
+  else
+    print("!! ERR Estore:walkEntitiesFromNode: no entity for node.eid="..node.eid.."; node:"..tdebug(node,' '))
+  end
+end
+
+function Estore:walkEntities(flags, fn)
+  for _,node in pairs(self.etree.ROOT.ch) do
+    self:_walkEntitiesFromNode(node, flags, fn)
+  end
+end
+
+function Estore:updateEntityTree()
+  Etree.updateEntityTree(self.ents, self.etree)
+end
+
 function Estore:search(matchFn,doFn)
   valsearch(self.ents, matchFn, doFn)
   -- for _,ent in pairs(self.ents) do
   --   fn(ent)
   -- end
 end
+
 
 local function compDebugString(comp)
   return Comp.debugString(comp)

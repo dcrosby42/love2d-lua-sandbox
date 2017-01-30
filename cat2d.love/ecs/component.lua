@@ -119,4 +119,16 @@ Comp.define = define
 Comp.release = releaseComp
 Comp.debugString = compDebugString
 
+--
+-- BUILT-IN COMPONENTS (these are used internally by Estore)
+--
+-- 'parent' is used to declare parent-child relationships between entities.
+Comp.define("parent", {'parentEid', ''})
+
+-- 'filter' is used to prune searches through the tree via Estore:walkEntities().
+-- filter.bits is a 32-bit integer flag set. The actual definition and usage of the flags 
+-- are up to individual systems, but the most obvious to me are Flags.Update and Flags.Draw.
+Comp.define("filter", {'bits', 0})
+
+
 return Comp

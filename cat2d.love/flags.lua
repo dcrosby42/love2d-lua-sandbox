@@ -8,5 +8,3 @@ Flags = {
   None   = 0,
   All    = 0xffffffff, -- 32 bits
 }
-
-print(tdebug(Flags))
