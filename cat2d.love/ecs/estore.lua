@@ -67,7 +67,8 @@ end
 -- Claim a comp from its object pool and (optionally) initialize with values from given data.
 -- Once initialized, the comp is then added via Estore:addComp(e,comp)... see those docs for more info.
 function Estore:newComp(e, typeName, data)
-  local comp = Comp.types[typeName].cleanCopy(data)
+  local compType = assert(Comp.types[typeName], "No component type '"..typeName.."'")
+  local comp = compType.cleanCopy(data)
   return self:addComp(e, comp)
 end
 
@@ -237,11 +238,11 @@ function Estore:search(matchFn,doFn)
 end
 
 
-local function compDebugString(comp)
+function compDebugString(comp)
   return Comp.debugString(comp)
 end
 
-local function entityDebugString(e)
+function entityDebugString(e)
   s = e.eid .. ": " .. "\n"
   for k,v in pairs(e) do
     if v.cid and v.eid then

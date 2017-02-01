@@ -17,6 +17,12 @@ return function(estore,output,res)
       local label = e.label
       love.graphics.setColor(label.r, label.g, label.b)
       love.graphics.print(label.text, e.pos.x, e.pos.y)
+
+    elseif e.circle and e.pos then
+      local pos = e.pos
+      local circle = e.circle
+      love.graphics.setColor(unpack(circle.color))
+      love.graphics.circle("fill", pos.x, pos.y, circle.radius)
     end
   end)
 end

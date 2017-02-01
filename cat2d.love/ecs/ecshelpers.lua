@@ -37,8 +37,13 @@ function addInputEvent(input, evt)
   table.insert(input.events[evt.type], evt)
 end
 
-function defineUpdateSystem(ctypes,fn)
-  local matchFn = hasComps(unpack(ctypes))
+function defineUpdateSystem(matchSpec,fn)
+  local matchFn
+  if type(matchSpec) == "function" then
+    matchFn = matchSpec
+  else
+    matchFn = hasComps(unpack(matchSpec))
+  end
   return function(estore, input, res)
     estore:walkEntities(
       1, -- Flags.Update   FIXME I AM TEH CHEAT!!! I said the user can define flags, but this helper actually assumes that there's such a thing as the Update flag and it is 1.
@@ -46,4 +51,18 @@ function defineUpdateSystem(ctypes,fn)
       function(e) fn(e, estore, input, res) end
     )
   end
+end
+
+function buildEntity(estore, compList, opts)
+  local e = estore:newEntity()
+  for _,cinfo in ipairs(compList) do
+    local ctype, data = unpack(cinfo)
+    estore:newComp(e, ctype, data)
+  end
+  if opts then
+    if opts.parent then
+      estore:newComp(e, 'parent', {parentEid = opts.parent.eid})
+    end
+  end
+  return e
 end

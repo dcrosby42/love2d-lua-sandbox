@@ -8,8 +8,10 @@ return function(estore,input,res)
       for _,timer in pairs(e.timers) do
         if timer.countDown then
           if timer.t > 0 then
+            timer.alarm = false
             timer.t = timer.t - input.dt
           else
+            timer.alarm =  true
             if timer.loop then 
               timer.t = timer.reset
             end

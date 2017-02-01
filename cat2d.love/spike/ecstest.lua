@@ -11,7 +11,8 @@ local controllerSystem = require 'systems/controller'
 local posMoverSystem = require 'systems/posmover'
 local iconAdderSystem = require 'systems/iconadder'
 local timerSystem = require 'systems/timer'
-local gravitySystem = require 'systems/gravity'
+-- local gravitySystem = require 'systems/gravity'
+local snowSystem = require 'systems/snow'
 local Etree = require 'ecs/entitytree'
 
 local drawImgSystem = require 'systems/drawimg'
@@ -35,10 +36,12 @@ local res    -- bag for "static" resources such as sound and image resource obje
 local updateWorld -- super-system for updating the game state
 local outputWorld -- super-system for generating "output" (audio, video etc.)
 
+local setupSnowscape
+
 function love.load()
   updateWorld = iterateFuncs({
     timerSystem,
-    gravitySystem,
+    snowSystem,
     iconAdderSystem,
     Etree.etreeSystem,
   })
@@ -56,17 +59,8 @@ function love.load()
 
   estore = Estore:new()
 
-  local s1ent = estore:newEntity()
-  local filter1 = estore:newComp(s1ent, 'filter', {name="filter1", bits=bit32.bor(Flags.Update, Flags.Draw)})
+  setupSnowscape(estore, res)
 
-  local p1ad = estore:newEntity()
-  estore:newComp(p1ad, 'iconAdder', {id='p1', imgId=catIcon, tagName='cattish'})
-  estore:newComp(p1ad, 'parent', {parentEid = s1ent.eid})
-
-  local p1 = estore:newEntity()
-  estore:newComp(p1, 'pos', {x=50,y=50})
-  estore:newComp(p1, 'controller', {id='p1'})
-  estore:newComp(p1, 'parent', {parentEid = s1ent.eid})
 
   -- 
   local s2ent = estore:newEntity()
@@ -83,7 +77,6 @@ function love.load()
 
   estore:updateEntityTree()
 
-  THE_CHEAT.filter1 = filter1
   THE_CHEAT.filter2 = filter2
 end
 
@@ -100,7 +93,7 @@ end
 -- OUTPUT
 --
 function love.draw()
-  love.graphics.setBackgroundColor(255,255,255)
+  love.graphics.setBackgroundColor(0,0,100)
   outputWorld(estore, output, res)
 end
 
@@ -132,4 +125,38 @@ function love.keypressed(key, scancode, isrepeat)
     THE_CHEAT.filter1.bits = Flags.None
     THE_CHEAT.filter2.bits = bit32.bor(Flags.Draw,Flags.Update)
   end
+end
+
+--
+-- -----------------------------------
+--
+
+
+function setupSnowscape(estore,res)
+  local group = buildEntity(estore, {
+    {'tag', {name='snowscape_group'}},
+    {'filter', {bits = bit32.bor(Flags.Update, Flags.Draw)}},
+  })
+  THE_CHEAT.filter1 = group.filter -- XXX
+
+  buildEntity(estore, {
+    {'iconAdder', {id='p1', imgId=catIcon, tagName='cattish'}},
+  }, {parent=group})
+
+  buildEntity(estore, {
+    {'snowmachine', {large=5, small=3}},
+    {'vel', {dx=0, dy=60}},
+    {'bounds', {x=0,y=0, w=love.graphics.getWidth(), h=love.graphics.getHeight()}},
+    {'timer', {name='flake', reset=0.2, loop=true}},
+    {'timer', {name='acc', countDown=false}},
+  }, {parent=group})
+
+  buildEntity(estore, {
+    {'snowmachine', {large=3,small=1}},
+    {'vel', {dx=0, dy=30}},
+    {'bounds', {x=0,y=0, w=love.graphics.getWidth(), h=love.graphics.getHeight()}},
+    {'timer', {name='flake', reset=0.2, loop=true}},
+    {'timer', {name='acc', countDown=false}},
+  }, {parent=group})
+
 end
