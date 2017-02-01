@@ -159,4 +159,12 @@ function setupSnowscape(estore,res)
     {'timer', {name='acc', countDown=false}},
   }, {parent=group})
 
+  buildEntity(estore, {
+    {'snowmachine', {large=2,small=1}},
+    {'vel', {dx=0, dy=15}},
+    {'bounds', {x=0,y=0, w=love.graphics.getWidth(), h=love.graphics.getHeight()}},
+    {'timer', {name='flake', reset=0.2, loop=true}},
+    {'timer', {name='acc', countDown=false}},
+  }, {parent=group})
+
 end
