@@ -15,7 +15,7 @@ local timerSystem = require 'systems/timer'
 local snowSystem = require 'systems/snow'
 local Etree = require 'ecs/entitytree'
 
-local drawImgSystem = require 'systems/drawimg'
+local drawSystem = require 'systems/drawstuff'
 
 THE_CHEAT = {}
 
@@ -47,7 +47,7 @@ function love.load()
   })
 
   outputWorld = iterateFuncs({
-    drawImgSystem,
+    drawSystem,
   })
 
   input = { dt=0, events={} }
@@ -150,7 +150,7 @@ function setupSnowscape(estore,res)
     {'timer', {name='flake', reset=0.2, loop=true}},
     {'timer', {name='acc', countDown=false}},
   }, {parent=group})
-
+  
   buildEntity(estore, {
     {'snowmachine', {large=3,small=1}},
     {'vel', {dx=0, dy=30}},

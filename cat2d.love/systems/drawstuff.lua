@@ -22,6 +22,7 @@ return function(estore,output,res)
       local pos = e.pos
       local circle = e.circle
       love.graphics.setColor(unpack(circle.color))
+      love.graphics.circle("line", pos.x, pos.y, circle.radius)
       love.graphics.circle("fill", pos.x, pos.y, circle.radius)
     end
   end)

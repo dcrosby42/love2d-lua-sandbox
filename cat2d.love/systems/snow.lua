@@ -26,10 +26,12 @@ local snowMachineSystem = defineUpdateSystem(
   {'snowmachine'}, 
   function(e, estore,input,res)
     if e.snowmachine.init then
+      -- Pre-populate the screen with proper distribution of snowflakes
       e.snowmachine.init = false
       local top = e.bounds.y
       local bottom = top + e.bounds.h
-      for y = top, bottom, (bottom - top) / e.vel.dy * e.timers.flake.reset do -- FIXME this vertical distribution is not correct
+      local step = (e.timers.flake.reset * e.vel.dy)
+      for y = top, bottom, step do 
         addSnowflake(e,estore,y)
       end
     end
