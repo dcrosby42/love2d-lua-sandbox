@@ -53,16 +53,12 @@ function defineUpdateSystem(matchSpec,fn)
   end
 end
 
-function buildEntity(estore, compList, opts)
+function buildEntity(estore, compList) 
   local e = estore:newEntity()
   for _,cinfo in ipairs(compList) do
     local ctype, data = unpack(cinfo)
     estore:newComp(e, ctype, data)
   end
-  if opts then
-    if opts.parent then
-      estore:newComp(e, 'parent', {parentEid = opts.parent.eid})
-    end
-  end
+  -- print(tdebug(e))
   return e
 end

@@ -24,6 +24,7 @@ THE_CHEAT = {}
 -- resource name shortcuts 
 -- FIXME is this really the right place for this?
 local catIcon = "images/black-cat-icon.png"
+local arcticCatTitle = "images/arctic_cat_title.png"
 
 --
 -- SETUP
@@ -56,6 +57,7 @@ function love.load()
     images={}
   }
   res.images[catIcon] = love.graphics.newImage(catIcon)
+  res.images[arcticCatTitle] = love.graphics.newImage(arcticCatTitle)
 
   estore = Estore:new()
 
@@ -141,7 +143,8 @@ function setupSnowscape(estore,res)
 
   buildEntity(estore, {
     {'iconAdder', {id='p1', imgId=catIcon, tagName='cattish'}},
-  }, {parent=group})
+    {'parent', {parentEid=group.eid}},
+  })
 
   buildEntity(estore, {
     {'snowmachine', {large=5, small=3}},
@@ -149,7 +152,8 @@ function setupSnowscape(estore,res)
     {'bounds', {x=0,y=0, w=love.graphics.getWidth(), h=love.graphics.getHeight()}},
     {'timer', {name='flake', reset=0.2, loop=true}},
     {'timer', {name='acc', countDown=false}},
-  }, {parent=group})
+    {'parent', {parentEid=group.eid}},
+  })
   
   buildEntity(estore, {
     {'snowmachine', {large=3,small=1}},
@@ -157,7 +161,8 @@ function setupSnowscape(estore,res)
     {'bounds', {x=0,y=0, w=love.graphics.getWidth(), h=love.graphics.getHeight()}},
     {'timer', {name='flake', reset=0.2, loop=true}},
     {'timer', {name='acc', countDown=false}},
-  }, {parent=group})
+    {'parent', {parentEid=group.eid}},
+  })
 
   buildEntity(estore, {
     {'snowmachine', {large=2,small=1}},
@@ -165,6 +170,19 @@ function setupSnowscape(estore,res)
     {'bounds', {x=0,y=0, w=love.graphics.getWidth(), h=love.graphics.getHeight()}},
     {'timer', {name='flake', reset=0.2, loop=true}},
     {'timer', {name='acc', countDown=false}},
-  }, {parent=group})
+    {'parent', {parentEid=group.eid}},
+  })
+
+  -- buildEntity(estore, {
+  --   {'img', {imgId=arcticCatTitle}},
+  --   {'pos', {x=10,y=10}},
+  --   {'parent', {parentEid=group.eid}},
+  -- })
+  -- local e = estore:newEntity()
+  -- estore:newComp(e, 'tag', {name=adderComp.tagName})
+  -- estore:newComp(e, 'img', {imgId=imgId, sx=0.3, sy=0.3, offx=w/2, offy=h/2})
+  -- estore:newComp(e, 'pos', {x=tap.x, y=tap.y})
+  -- estore:newComp(e, 'bounds', {x=tap.x, y=tap.y, w=256, h=256})
+  -- estore:newComp(e, 'parent', {eid = parE.eid})
 
 end

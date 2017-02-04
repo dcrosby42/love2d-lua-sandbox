@@ -3,7 +3,8 @@ require 'flags'
 return function(estore,output,res)
   -- estore:updateEntityTree()
 
-  estore:walkEntities(Flags.Draw, nil, function(e)
+  -- estore:walkEntities(Flags.Draw, nil, function(e)
+  estore:search(hasComps('pos'), function(e)
     if e.img and e.pos then
       local img = e.img
       love.graphics.draw(
@@ -15,7 +16,7 @@ return function(estore,output,res)
 
     elseif e.label and e.pos then
       local label = e.label
-      love.graphics.setColor(label.r, label.g, label.b)
+      love.graphics.setColor(unpack(label.color))
       love.graphics.print(label.text, e.pos.x, e.pos.y)
 
     elseif e.circle and e.pos then

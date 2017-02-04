@@ -10,8 +10,7 @@ local function createNewIcon(estore, parE, tap, adderComp, res)
   estore:newComp(e, 'img', {imgId=imgId, sx=0.3, sy=0.3, offx=w/2, offy=h/2})
   estore:newComp(e, 'pos', {x=tap.x, y=tap.y})
   estore:newComp(e, 'bounds', {x=tap.x, y=tap.y, w=256, h=256})
-  -- estore:newComp(e, 'parent', {parentEid = parE.parent.parentEid})
-  estore:newComp(e, 'parent', {parentEid = parE.eid})
+  estore:newComp(e, 'parent', {eid = parE.eid})
 end
 
 local function destroyIcon(estore, parE, untap, adderComp, res)
