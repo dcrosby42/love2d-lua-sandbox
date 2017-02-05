@@ -12,8 +12,12 @@ Comp.define("timer", {'t',0, 'reset',0, 'countDown',true, 'loop',false})
 Comp.define("controller", {'id','','leftx',0,'lefty',0,})
 
 Comp.define("img", {'imgId','','offx',0,'offy',0,'sx',1,'sy',1,'r',0})
+
 Comp.define("label", {'text','Label', 'color', {0,0,0}})
 
 
 Comp.define("iconAdder", {'imgId', '', 'tagName', ''})
 
+
+Comp.define("circle", {'radius',0, 'color',{0,0,0}})
+Comp.define("rect", {'w',0, 'h',0, 'color',{0,0,0}})

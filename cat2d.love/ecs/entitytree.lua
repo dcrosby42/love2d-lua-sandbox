@@ -1,40 +1,55 @@
 Etree = {}
 
+local function byOrder(a,b) 
+  if a.order == nil then print("NIL ORDER for a? eid="..a.eid.." pid="..a.pid) end
+  if b.order == nil then print("NIL ORDER for b? eid="..b.eid.." pid="..b.pid) end
+  return a.order < b.order
+end
+
 local function updateEntityTree(entities, t)
   local seen = {ROOT=true}
   local changed = false
   for _, e in pairs(entities) do
     local eid = e.eid
-    local pid
+    local pid, order
     if e.parent then 
       pid = e.parent.parentEid
+      order = e.parent.order
     else
       pid = "ROOT"
+      order = 0
     end
 
-    local skip = false
     seen[eid] = true
-    if t[eid] then 
-      if t[eid].pid == pid then
+    local skip = false
+    local node = t[eid]
+    if node then 
+      if node.pid == pid then
         -- already ok
         skip = true
       else
         -- parent set/changed
-        t[eid].pid = pid
+        node.pid = pid
+      end
+      if node.order ~= order then
+        node.order = order
       end
     else
       -- first time we've seen this eid, create a node
-      t[eid] = {eid=eid, pid=pid, ch={}} 
+      node = {eid=eid, pid=pid, order=order, ch={}} 
+      t[eid] = node
     end
+    -- TODO: If RE-parenting or RE-ordering has transpired, we;re not handing that yet
     if not skip then
       changed = true
       local pnode = t[pid]
       if pnode then
         -- parent node already exists, append this node to its children
-        table.insert(pnode.ch, t[eid])
+        table.insert(pnode.ch, node)
+        table.sort(pnode.ch, byOrder)
       else
         -- parent node not added yet; add it and set this node as first child
-        pnode = {eid=pid, ch={t[eid]}}
+        pnode = {eid=pid, order=0, ch={node}}
         t[pid] = pnode
       end
     end

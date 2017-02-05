@@ -1,10 +1,12 @@
 require 'flags'
 
+local DBG=true
+
 return function(estore,output,res)
   -- estore:updateEntityTree()
 
-  -- estore:walkEntities(Flags.Draw, nil, function(e)
-  estore:search(hasComps('pos'), function(e)
+  -- estore:search(hasComps('pos'), function(e)
+  estore:walkEntities(Flags.Draw, nil, function(e)
     if e.img and e.pos then
       local img = e.img
       love.graphics.draw(
@@ -25,7 +27,19 @@ return function(estore,output,res)
       love.graphics.setColor(unpack(circle.color))
       love.graphics.circle("line", pos.x, pos.y, circle.radius)
       love.graphics.circle("fill", pos.x, pos.y, circle.radius)
+    elseif e.rect and e.pos then
+      if DBG then
+        print("DRAWING "..e.eid)
+      end
+      local pos = e.pos
+      local rect = e.rect
+      love.graphics.setColor(unpack(rect.color))
+      love.graphics.rectangle("fill", pos.x, pos.y, rect.w, rect.h)
+      love.graphics.setColor(0,0,0)
+      love.graphics.rectangle("line", pos.x, pos.y, rect.w, rect.h)
     end
   end)
+
+  if DBG then DBG=false end
 end
 

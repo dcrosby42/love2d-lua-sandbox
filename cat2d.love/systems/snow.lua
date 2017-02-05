@@ -2,8 +2,6 @@ local Comp = require 'ecs/component'
 
 Comp.define("snowmachine", {'large',1,'small',1,'init',true})
 
-Comp.define("circle", {'radius',0, 'color',{0,0,0}})
-
 Comp.define("snow", {'lowerbound',0})
 
 
