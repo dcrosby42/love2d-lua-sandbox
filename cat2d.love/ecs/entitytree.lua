@@ -8,13 +8,13 @@ end
 
 local function updateEntityTree(entities, t)
   local seen = {ROOT=true}
-  local changed = false
   for _, e in pairs(entities) do
     local eid = e.eid
     local pid, order
     if e.parent then 
       pid = e.parent.parentEid
       order = e.parent.order
+      if not order then order = 0 end
     else
       pid = "ROOT"
       order = 0
@@ -22,6 +22,7 @@ local function updateEntityTree(entities, t)
 
     seen[eid] = true
     local skip = false
+    local pidChanged, orderChanged
     local node = t[eid]
     if node then 
       if node.pid == pid then
@@ -30,18 +31,21 @@ local function updateEntityTree(entities, t)
       else
         -- parent set/changed
         node.pid = pid
+        pidChanged = true
       end
       if node.order ~= order then
         node.order = order
+        orderChanged = true
       end
     else
       -- first time we've seen this eid, create a node
       node = {eid=eid, pid=pid, order=order, ch={}} 
       t[eid] = node
+      pidChanged = true
+      orderChanged = true
     end
     -- TODO: If RE-parenting or RE-ordering has transpired, we;re not handing that yet
     if not skip then
-      changed = true
       local pnode = t[pid]
       if pnode then
         -- parent node already exists, append this node to its children
@@ -54,11 +58,10 @@ local function updateEntityTree(entities, t)
       end
     end
   end
-  -- )
+
   -- Phase 2: iterate the tree and cleanup anything that isn't in estore:
   for eid,node in pairs(t) do
     if not seen[eid] then
-      changed = true
       -- entity for eid is in the graph but NOT in the estore
       -- remove from parent node's ch list:
       local pnode = t[t[eid].pid]
@@ -74,12 +77,8 @@ local function updateEntityTree(entities, t)
       end
       -- remove from cache
       t[eid] = nil
-      changed = true
     end
   end
-    
-  -- if changed then print("== Scene graph updated ==\n"..tdebug(t.ROOT)) end
-  -- return t["ROOT"]
 end
 
 Etree.updateEntityTree = updateEntityTree
