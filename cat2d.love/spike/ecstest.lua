@@ -17,9 +17,7 @@ local Etree = require 'ecs/entitytree'
 
 local drawSystem = require 'systems/drawstuff'
 
-THE_CHEAT = {}
-
-
+local adminSystem
 
 -- resource name shortcuts 
 -- FIXME is this really the right place for this?
@@ -41,6 +39,7 @@ local setupSnowscape
 
 function love.load()
   updateWorld = iterateFuncs({
+    adminSystem,
     timerSystem,
     snowSystem,
     iconAdderSystem,
@@ -63,23 +62,11 @@ function love.load()
 
   setupSnowscape(estore, res)
 
+  setupOtherScene(estore, res)
 
-  -- 
-  local s2ent = estore:newEntity()
-  local filter2 = estore:newComp(s2ent, 'filter', {name="filter2", bits=Flags.None})
-
-  local l1 = estore:newEntity()
-  estore:newComp(l1, 'label', {text="YOU ARE LOOKING AT SCENE 2!"})
-  estore:newComp(l1, 'pos', {x=50,y=50})
-  estore:newComp(l1, 'parent', {parentEid = s2ent.eid})
-
-  local t1 = estore:newEntity()
-  estore:newComp(t1, 'timer', {countDown=false})
-  estore:newComp(t1, 'parent', {parentEid = s2ent.eid})
 
   estore:updateEntityTree()
 
-  THE_CHEAT.filter2 = filter2
 end
 
 --
@@ -121,11 +108,9 @@ function love.keypressed(key, scancode, isrepeat)
       print(tdebug(estore.etree.ROOT))
     end
   elseif key == "1" then
-    THE_CHEAT.filter1.bits = bit32.bor(Flags.Draw,Flags.Update)
-    THE_CHEAT.filter2.bits = Flags.None
+    addInputEvent(input, {type='admin', cmd='toSnowScene'})
   elseif key == "2" then
-    THE_CHEAT.filter1.bits = Flags.None
-    THE_CHEAT.filter2.bits = bit32.bor(Flags.Draw,Flags.Update)
+    addInputEvent(input, {type='admin', cmd='toOtherScene'})
   end
 end
 
@@ -136,31 +121,12 @@ end
 
 function setupSnowscape(estore,res)
   local group = buildEntity(estore, {
-    {'tag', {name='snowscape_group'}},
+    {'tag', {name='snowScene'}},
     {'filter', {bits = bit32.bor(Flags.Update, Flags.Draw)}},
   })
-  THE_CHEAT.filter1 = group.filter -- XXX
 
   buildEntity(estore, {
     {'iconAdder', {id='p1', imgId=catIcon, tagName='cattish'}},
-    {'parent', {parentEid=group.eid}},
-  })
-
-  buildEntity(estore, {
-    {'snowmachine', {large=5, small=3}},
-    {'vel', {dx=0, dy=60}},
-    {'bounds', {x=0,y=0, w=love.graphics.getWidth(), h=love.graphics.getHeight()}},
-    {'timer', {name='flake', reset=0.2, loop=true}},
-    {'timer', {name='acc', countDown=false}},
-    {'parent', {parentEid=group.eid}},
-  })
-  
-  buildEntity(estore, {
-    {'snowmachine', {large=3,small=1}},
-    {'vel', {dx=0, dy=30}},
-    {'bounds', {x=0,y=0, w=love.graphics.getWidth(), h=love.graphics.getHeight()}},
-    {'timer', {name='flake', reset=0.2, loop=true}},
-    {'timer', {name='acc', countDown=false}},
     {'parent', {parentEid=group.eid}},
   })
 
@@ -170,19 +136,83 @@ function setupSnowscape(estore,res)
     {'bounds', {x=0,y=0, w=love.graphics.getWidth(), h=love.graphics.getHeight()}},
     {'timer', {name='flake', reset=0.2, loop=true}},
     {'timer', {name='acc', countDown=false}},
-    {'parent', {parentEid=group.eid}},
+    {'parent', {parentEid=group.eid, order=1}},
   })
 
-  -- buildEntity(estore, {
-  --   {'img', {imgId=arcticCatTitle}},
-  --   {'pos', {x=10,y=10}},
-  --   {'parent', {parentEid=group.eid}},
-  -- })
-  -- local e = estore:newEntity()
-  -- estore:newComp(e, 'tag', {name=adderComp.tagName})
-  -- estore:newComp(e, 'img', {imgId=imgId, sx=0.3, sy=0.3, offx=w/2, offy=h/2})
-  -- estore:newComp(e, 'pos', {x=tap.x, y=tap.y})
-  -- estore:newComp(e, 'bounds', {x=tap.x, y=tap.y, w=256, h=256})
-  -- estore:newComp(e, 'parent', {eid = parE.eid})
+  buildEntity(estore, {
+    {'snowmachine', {large=3,small=1}},
+    {'vel', {dx=0, dy=30}},
+    {'bounds', {x=0,y=0, w=love.graphics.getWidth(), h=love.graphics.getHeight()}},
+    {'timer', {name='flake', reset=0.2, loop=true}},
+    {'timer', {name='acc', countDown=false}},
+    {'parent', {parentEid=group.eid, order=2}},
+  })
 
+  buildEntity(estore, {
+    {'tag', {name='title'}},
+    {'img', {imgId=arcticCatTitle}},
+    {'pos', {x=20, y=100}},
+    -- {'bounds', {x=tap.x, y=tap.y, w=256, h=256}},
+    {'parent', {parentEid=group.eid, order=3}}
+  })
+
+  buildEntity(estore, {
+    {'snowmachine', {large=5, small=3}},
+    {'vel', {dx=0, dy=60}},
+    {'bounds', {x=0,y=0, w=love.graphics.getWidth(), h=love.graphics.getHeight()}},
+    {'timer', {name='flake', reset=0.2, loop=true}},
+    {'timer', {name='acc', countDown=false}},
+    {'parent', {parentEid=group.eid, order=4}},
+  })
+  
+
+end
+
+function setupOtherScene(estore, res)
+  local otherScene = buildEntity(estore, {
+    {'tag', {name='otherScene'}},
+    {'filter', {}},
+  })
+
+  buildEntity(estore, {
+    {'label', {text="YOU ARE LOOKING AT SCENE 2!", color={255,255,255}}},
+    {'pos', {x=50,y=50}},
+    {'parent', {parentEid = otherScene.eid}},
+  })
+end
+
+
+function adminSystem(estore, input, res)
+  forEach(input.events.admin, function(i,evt)
+    if evt.cmd == 'toSnowScene' then
+      local other,snow
+      estore:search(hasComps('filter','tag'), function(e)
+        if e.tags.otherScene then other = e end
+        if e.tags.snowScene then snow = e end
+      end)
+      if snow then
+        snow.filter.bits = bit32.bor(Flags.Draw,Flags.Update)
+        -- print("snow: "..entityDebugString(snow,'  '))
+      end
+      if other then
+        other.filter.bits = Flags.None
+        -- print("other: "..entityDebugString(other,'  '))
+      end
+
+    elseif evt.cmd == 'toOtherScene' then
+      local other,snow
+      estore:search(hasComps('filter','tag'), function(e)
+        if e.tags.otherScene then other = e end
+        if e.tags.snowScene then snow = e end
+      end)
+      if snow then
+        snow.filter.bits = Flags.None
+        -- print("snow: "..entityDebugString(snow,'  '))
+      end
+      if other then
+        other.filter.bits = bit32.bor(Flags.Draw,Flags.Update)
+        -- print("other: "..entityDebugString(other,'  '))
+      end
+    end
+  end)
 end

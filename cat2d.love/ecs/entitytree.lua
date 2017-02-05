@@ -1,8 +1,8 @@
 Etree = {}
 
 local function byOrder(a,b) 
-  if a.order == nil then print("NIL ORDER for a? eid="..a.eid.." pid="..a.pid) end
-  if b.order == nil then print("NIL ORDER for b? eid="..b.eid.." pid="..b.pid) end
+  -- if a.order == nil then print("NIL ORDER for a? eid="..a.eid.." pid="..a.pid) end
+  -- if b.order == nil then print("NIL ORDER for b? eid="..b.eid.." pid="..b.pid) end
   return a.order < b.order
 end
 
@@ -70,7 +70,7 @@ local function updateEntityTree(entities, t)
       if prevPid then
         local prevpnode = t[prevPid]
         if prevpnode then
-          print("Etree: removing node "..node.eid.." from parent "..prevpnode.eid)
+          -- print("Etree: removing node "..node.eid.." from parent "..prevpnode.eid)
           removeNodeFromList(prevpnode.ch, node)
         end
       end
@@ -78,12 +78,12 @@ local function updateEntityTree(entities, t)
       local pnode = t[pid]
       if pnode then
         -- parent node already exists, append this node to its children
-        print("Etree: adding node "..node.eid.." to parent "..pnode.eid)
+        -- print("Etree: adding node "..node.eid.." to parent "..pnode.eid)
         table.insert(pnode.ch, node)
         table.sort(pnode.ch, byOrder)
       else
         -- parent node not added yet; add it and set this node as first child
-        print("Etree: adding node "..node.eid.." to STUBBED parent "..eid)
+        -- print("Etree: adding node "..node.eid.." to STUBBED parent "..eid)
         pnode = {eid=pid, order=0, ch={node}}
         t[pid] = pnode
       end
@@ -91,7 +91,7 @@ local function updateEntityTree(entities, t)
       -- The order value has changed for this node, but its parenting stayed the same
       local pnode = t[pid]
       if pnode then
-        print("Etree: re-sorting children of "..pnode.eid.." due to order change")
+        -- print("Etree: re-sorting children of "..pnode.eid.." due to order change")
         table.sort(pnode.ch, byOrder)
       end
     end

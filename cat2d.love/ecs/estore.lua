@@ -218,9 +218,10 @@ function Estore:_walkEntitiesFromNode(node, flags, matchFn, doFn)
         self:_walkEntitiesFromNode(chnode, flags, matchFn, doFn)
       end
     end
-  else
-    print("!! ERR Estore:walkEntitiesFromNode: no entity for node.eid="..node.eid.."; node:"..tdebug(node,' '))
   end
+  -- else
+  --   print("!! ERR Estore:walkEntitiesFromNode: no entity for node.eid="..node.eid.."; node:"..tdebug(node,' '))
+  -- end
 end
 
 function Estore:walkEntities(flags, matchFn, doFn)

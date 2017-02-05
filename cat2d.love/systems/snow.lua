@@ -19,7 +19,8 @@ local function addSnowflake(e,estore,y)
     {'vel', {dx=e.vel.dx, dy=e.vel.dy}},
     {'pos', { x=x, y=y}},
     {'circle', { radius=rad, color={255,255,255}}},
-  }, {parent=e})
+    {'parent', { parentEid=e.eid }}
+  })
 end
 
 local snowMachineSystem = defineUpdateSystem(
@@ -47,6 +48,7 @@ local snowSystem = defineUpdateSystem(
   function(e, estore, input, res)
     e.pos.y = e.pos.y + e.vel.dy * input.dt
     if e.pos.y > e.snow.lowerbound then
+      -- print("Snow system: removing snow "..e.eid)
       estore:destroyEntity(e)
     end
   end

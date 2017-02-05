@@ -110,3 +110,10 @@ function math.dist(x1,y1, x2,y2)
   return ((x2-x1)^2+(y2-y1)^2)^0.5 
 end
 
+function forEach(list,fn)
+  if list then
+    for i,x in ipairs(list) do
+      fn(i,x)
+    end
+  end
+end
