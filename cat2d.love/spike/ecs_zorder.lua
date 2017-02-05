@@ -19,7 +19,7 @@ local drawSystem = require 'systems/drawstuff'
 
 THE_CHEAT = {}
 
-
+local adminSystem
 
 -- resource name shortcuts 
 -- FIXME is this really the right place for this?
@@ -42,6 +42,7 @@ local setupSnowscape
 function love.load()
   updateWorld = iterateFuncs({
     timerSystem,
+    adminSystem,
     Etree.etreeSystem,
   })
 
@@ -106,6 +107,8 @@ function love.keypressed(key, scancode, isrepeat)
       print("-- Entity tree (Estore.etree):")
       print(tdebug(estore.etree.ROOT))
     end
+  elseif key == "space" then
+    addInputEvent(input, {type="admin", cmd='swap'})
   elseif key == "1" then
     -- THE_CHEAT.filter1.bits = bit32.bor(Flags.Draw,Flags.Update)
     -- THE_CHEAT.filter2.bits = Flags.None
@@ -130,34 +133,50 @@ function setupScene1(estore,res)
   local w=100
   local h=100
 
-  local blues = buildEntity(estore, {
+  blues = buildEntity(estore, {
     {'name', {name='Blues'}},
-    {'parent', {parentEid = g1.eid, order = 0}},
+    {'parent', {parentEid = g1.eid, order = 2}},
   })
-  print("Blues ied "..blues.eid)
+  print("Blues eid "..blues.eid)
+  local bboxes = {}
   for i=0,200,20 do
     local e = buildEntity(estore, {
       {'rect', {w=w,h=h, color={i,i,255}}},
       {'pos', {x=i,y=i}},
       {'parent', {parentEid = blues.eid, order = i}},
     })
+    table.insert(bboxes,e)
   end
 
   local gx = 75
   local gy = 30
-  local greens = buildEntity(estore, {
+  greens = buildEntity(estore, {
     {'name', {name='Greens'}},
     {'parent', {parentEid = g1.eid, order = 1}},
   })
-  print("Greens ied "..greens.eid)
+  print("Greens eid "..greens.eid)
+  local gboxes = {}
   for i=0,200,20 do
     local e = buildEntity(estore, {
       {'rect', {w=w,h=h, color={i,255,i}}},
       {'pos', {x=gx+i,y=gy+i}},
       {'parent', {parentEid = greens.eid, order = i}},
     })
+    table.insert(gboxes,e)
   end
 
+end
+
+adminSystem = function(estore, input, res)
+  if input.events.admin then
+    for i,evt in ipairs(input.events.admin) do
+      if blues.parent.order < greens.parent.order then
+        blues.parent.order = greens.parent.order + 1
+      else
+        greens.parent.order = blues.parent.order + 1
+      end
+    end
+  end
 end
 
 function setupScene2(estore,res)
@@ -175,3 +194,4 @@ function setupScene2(estore,res)
   --
   -- THE_CHEAT.filter2 = filter2
 end
+

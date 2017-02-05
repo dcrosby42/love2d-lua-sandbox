@@ -6,6 +6,22 @@ local function byOrder(a,b)
   return a.order < b.order
 end
 
+local function removeNodeFromList(list, node)
+  if list then
+    local remi = -1
+    local eid = node.eid
+    for i,n in ipairs(list) do
+      if n.eid == node.eid then
+        remi = i
+        break
+      end
+    end
+    if remi > 0 then
+      table.remove(list,remi)
+    end
+  end
+end
+
 local function updateEntityTree(entities, t)
   local seen = {ROOT=true}
   for _, e in pairs(entities) do
@@ -22,39 +38,61 @@ local function updateEntityTree(entities, t)
 
     seen[eid] = true
     local skip = false
-    local pidChanged, orderChanged
+    local pidUpdated = false
+    local prevPid = nil
+    local orderUpdated = false
     local node = t[eid]
     if node then 
       if node.pid == pid then
-        -- already ok
-        skip = true
-      else
-        -- parent set/changed
+        -- no change
+      elseif node.pid == nil then
+        -- first time pid assigned
         node.pid = pid
-        pidChanged = true
+        pidUpdated = true
+      else 
+        -- pid has changed
+        prevPid = node.pid
+        node.pid = pid
+        pidUpdated = true
       end
       if node.order ~= order then
         node.order = order
-        orderChanged = true
+        orderUpdated = true
       end
     else
       -- first time we've seen this eid, create a node
       node = {eid=eid, pid=pid, order=order, ch={}} 
       t[eid] = node
-      pidChanged = true
-      orderChanged = true
+      pidUpdated = true
     end
-    -- TODO: If RE-parenting or RE-ordering has transpired, we;re not handing that yet
-    if not skip then
+
+    if pidUpdated then
+      if prevPid then
+        local prevpnode = t[prevPid]
+        if prevpnode then
+          print("Etree: removing node "..node.eid.." from parent "..prevpnode.eid)
+          removeNodeFromList(prevpnode.ch, node)
+        end
+      end
+
       local pnode = t[pid]
       if pnode then
         -- parent node already exists, append this node to its children
+        print("Etree: adding node "..node.eid.." to parent "..pnode.eid)
         table.insert(pnode.ch, node)
         table.sort(pnode.ch, byOrder)
       else
         -- parent node not added yet; add it and set this node as first child
+        print("Etree: adding node "..node.eid.." to STUBBED parent "..eid)
         pnode = {eid=pid, order=0, ch={node}}
         t[pid] = pnode
+      end
+    elseif orderUpdated then
+      -- The order value has changed for this node, but its parenting stayed the same
+      local pnode = t[pid]
+      if pnode then
+        print("Etree: re-sorting children of "..pnode.eid.." due to order change")
+        table.sort(pnode.ch, byOrder)
       end
     end
   end
@@ -66,14 +104,7 @@ local function updateEntityTree(entities, t)
       -- remove from parent node's ch list:
       local pnode = t[t[eid].pid]
       if pnode then
-        local remi
-        for i,node in ipairs(pnode.ch) do
-          if node.eid == eid then
-            remi = i
-            break
-          end
-        end
-        if remi then table.remove(pnode.ch, remi) end
+        removeNodeFromList(pnode.ch, node)
       end
       -- remove from cache
       t[eid] = nil
