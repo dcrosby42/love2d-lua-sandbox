@@ -1,11 +1,12 @@
 require 'helpers'
 
-local Snow = require 'spike/snowmodule'
+-- local Snow = require 'spike/snowmodule'
+local ArcticCat = require 'modules/arcticcat'
 
 local world
 
 function love.load()
-  world = Snow.newWorld(world)
+  world = ArcticCat.newWorld(world)
 end
 
 
@@ -13,11 +14,11 @@ local dtAction = {type="tick", dt=0}
 
 function love.update(dt)
   dtAction.dt = dt
-  Snow.updateWorld(world, dtAction)
+  ArcticCat.updateWorld(world, dtAction)
 end
 
 function love.draw()
-  Snow.drawWorld(world)
+  ArcticCat.drawWorld(world)
 end
 
 --
@@ -30,13 +31,13 @@ function love.mousepressed(x,y, button, isTouch)
   mouseAction.y=y
   mouseAction.button=button
   mouseAction.isTouch=isTouch
-  Snow.updateWorld(world, mouseAction)
+  ArcticCat.updateWorld(world, mouseAction)
 end
 
 local keyboardAction = {type="keyboard", action=nil, key=nil}
 function love.keypressed(key, _scancode, _isrepeat)
   keyboardAction.action="pressed"
   keyboardAction.key=key
-  Snow.updateWorld(world, keyboardAction)
+  ArcticCat.updateWorld(world, keyboardAction)
 end
 
