@@ -2,15 +2,16 @@ Comp = require 'ecs/component'
 Etree = require 'ecs/entitytree'
 
 local Estore = {
-  eidCounter=1,
-  cidCounter=1,
-  comps={},
-  ents={},
-  etree={},
 }
 
 function Estore:new(o)
-  local o = o or {}
+  local o = o or {
+    eidCounter=1,
+    cidCounter=1,
+    comps={},
+    ents={},
+    etree={},
+  }
   setmetatable(o, self)
   self.__index = self
   return o
