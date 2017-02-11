@@ -58,9 +58,13 @@ M.updateWorld = function(world, action)
 
   elseif action.type == 'mouse' then
     if action.button == 1 then
-      addInputEvent(world.input, {type='tap', id='p1', x=action.x, y=action.y})
-    elseif button == 2 then
-      addInputEvent(world.input, {type='untap', id='p1', x=action.x, y=action.y})
+      if action.state == "pressed" then
+        addInputEvent(world.input, {type='tap', id='p1', x=action.x, y=action.y})
+      end
+    elseif action.button == 2 then
+      if action.state == "pressed" then
+        addInputEvent(world.input, {type='untap', id='p1', x=action.x, y=action.y})
+      end
     end
 
   elseif action.type == 'keyboard' then

@@ -1,10 +1,8 @@
 local Modules = {}
-Modules.snow = require 'modules/snow'
+Modules.title = require 'modules/snow'
 Modules.other = require 'modules/other'
 
 local M ={}
-
--- local newSnowScene, newOtherScene
 
 local function getCurrent(w) 
   local cur = w.current
@@ -16,10 +14,10 @@ end
 M.newWorld = function()
   local w = {
     subWorlds = {
-      snow = Modules.snow.newWorld(),
+      title = Modules.title.newWorld(),
       other = Modules.other.newWorld(),
     },
-    current = "snow",
+    current = "title",
   }
   return w, nil
 end
@@ -30,10 +28,10 @@ M.updateWorld = function(world, action)
   if action.type == 'keyboard' then
     local key = action.key
     if key == "s" then
-      if current == "snow" then 
+      if current == "title" then 
         world.current = "other"
       else
-        world.current = "snow"
+        world.current = "title"
       end
       return world, nil
     end
@@ -45,10 +43,10 @@ M.updateWorld = function(world, action)
   if effects then
     for _, ef in ipairs(effects) do
       if ef.type == 'exit' then
-        if world.current == "snow" then
+        if world.current == "title" then
           world.current = "other"
         else
-          world.current = "snow"
+          world.current = "title"
         end
       end
     end
