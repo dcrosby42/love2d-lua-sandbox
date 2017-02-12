@@ -13,7 +13,7 @@ Comp.define("controller", {'id','','leftx',0,'lefty',0,})
 
 Comp.define("img", {'imgId','','offx',0,'offy',0,'sx',1,'sy',1,'r',0})
 
-Comp.define("label", {'text','Label', 'color', {0,0,0}})
+Comp.define("label", {'text','Label', 'color', {0,0,0},'font',nil, 'maxWidth', nil, 'align',nil})
 
 
 Comp.define("iconAdder", {'imgId', '', 'tagName', ''})

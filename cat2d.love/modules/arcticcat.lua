@@ -4,7 +4,7 @@ Modules.other = require 'modules/other'
 
 local M ={}
 
-local function getCurrent(w) 
+local function getCurrent(w)
   local cur = w.current
   local s = w.subWorlds[cur]
   local m = Modules[cur]
@@ -28,7 +28,7 @@ M.updateWorld = function(world, action)
   if action.type == 'keyboard' then
     local key = action.key
     if key == "s" then
-      if current == "title" then 
+      if current == "title" then
         world.current = "other"
       else
         world.current = "title"

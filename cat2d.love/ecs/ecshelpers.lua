@@ -5,20 +5,20 @@ function hasComps(...)
   if num == 0 then
     return function(e) return true end
   elseif num == 1 then
-    return function(e) 
+    return function(e)
       return e[ctypes[1]] ~= nil
     end
   elseif num == 2 then
-    return function(e) 
+    return function(e)
       return e[ctypes[1]] ~= nil and e[ctypes[2]] ~= nil
     end
   elseif num == 3 then
-    return function(e) 
+    return function(e)
       return e[ctypes[1]] ~= nil and e[ctypes[2]] and e[ctypes[3]] ~= nil
     end
   elseif num == 4 then
-    return function(e) 
-      return e[ctypes[1]] ~= nil and e[ctypes[2]] and e[ctypes[3]] ~= nil and e[ctypes[4]] ~= nil 
+    return function(e)
+      return e[ctypes[1]] ~= nil and e[ctypes[2]] and e[ctypes[3]] ~= nil and e[ctypes[4]] ~= nil
     end
   else
     return function(e)
@@ -29,12 +29,19 @@ function hasComps(...)
     end
   end
 end
-    
+
 function addInputEvent(input, evt)
   if not input.events[evt.type] then
     input.events[evt.type] = {}
   end
   table.insert(input.events[evt.type], evt)
+end
+
+function setParentEntity(estore, childE, parentE, order)
+  if childE.parent then
+    estore:removeComp(childE.parent)
+  end
+  estore:newComp(childE, 'parent', {parentEid=parentE.eid, order=order})
 end
 
 function defineUpdateSystem(matchSpec,fn)
@@ -47,13 +54,13 @@ function defineUpdateSystem(matchSpec,fn)
   return function(estore, input, res)
     estore:walkEntities(
       1, -- Flags.Update   FIXME I AM TEH CHEAT!!! I said the user can define flags, but this helper actually assumes that there's such a thing as the Update flag and it is 1.
-      matchFn, 
+      matchFn,
       function(e) fn(e, estore, input, res) end
     )
   end
 end
 
-function buildEntity(estore, compList) 
+function buildEntity(estore, compList)
   local e = estore:newEntity()
   for _,cinfo in ipairs(compList) do
     local ctype, data = unpack(cinfo)

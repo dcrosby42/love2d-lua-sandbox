@@ -5,11 +5,13 @@ require 'flags'
 require 'comps'
 
 local timerSystem = require 'systems/timer'
+local mouseSystem = require 'systems/button'
 local drawSystem = require 'systems/drawstuff'
 local Etree = require 'ecs/entitytree'
 
 local DoUpdate = iterateFuncs({
   timerSystem,
+  mouseSystem,
   Etree.etreeSystem,
 })
 
@@ -23,7 +25,7 @@ local newOtherScene
 
 M.newWorld = function()
   local w = {
-    bgcolor = {0,0,100}, 
+    bgcolor = {0,0,100},
     scene = newOtherScene(),
     input = { dt=0, events={} },
     resources = {
@@ -40,6 +42,12 @@ M.updateWorld = function(world, action)
     world.input.dt = action.dt
     local estore = world.scene
     DoUpdate(estore, world.input, world.resources)
+    estore:search(hasComps('effect'), function(e)
+      for _,evt in ipairs(e.effects) do
+        print("EFFECT: "..tdebug(evt))
+      end
+    end)
+
 
     world.input.events = {}
 
@@ -58,6 +66,9 @@ M.updateWorld = function(world, action)
     elseif key == "x" then
       return world, {{type="exit"}}
     end
+
+  elseif action.type == 'mouse' then
+    addInputEvent(world.input, action)
   end
 
   return world, nil
@@ -80,11 +91,23 @@ function newOtherScene()
     {'filter', {bits = bit32.bor(Flags.Update, Flags.Draw)}},
   })
 
-  buildEntity(mystore, {
-    {'label', {text="YOU ARE LOOKING AT SCENE 2!", color={255,255,255}}},
-    {'pos', {x=50,y=50}},
+  local button = buildEntity(mystore, {
     {'parent', {parentEid = otherScene.eid}},
   })
+
+  buildEntity(mystore, {
+    {'rect', {w=200,h=50, color={0,180,0}}},
+    {'pos', {x=10,y=20}},
+    {'clickable', {onreleased=''}},
+    {'parent', {parentEid = button.eid}},
+  })
+
+  buildEntity(mystore, {
+    {'label', {text="CLICK ME", color={255,255,255}}},
+    {'pos', {x=50,y=50}},
+    {'parent', {parentEid = button.eid,order=1}},
+  })
+
 
   mystore:updateEntityTree()
   return mystore

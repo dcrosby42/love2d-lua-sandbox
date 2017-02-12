@@ -106,8 +106,12 @@ function iterateFuncs(funcs)
   end
 end
 
-function math.dist(x1,y1, x2,y2) 
-  return ((x2-x1)^2+(y2-y1)^2)^0.5 
+function math.dist(x1,y1, x2,y2)
+  return ((x2-x1)^2+(y2-y1)^2)^0.5
+end
+
+function math.pointinrect(x1,y1, rx,ry,rw,rh)
+  return x1 >= rx and x1 < rx+rw and y1 >= ry and y1 < ry + rh
 end
 
 function forEach(list,fn)

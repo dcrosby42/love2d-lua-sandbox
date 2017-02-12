@@ -19,7 +19,17 @@ return function(estore,output,res)
     elseif e.label and e.pos then
       local label = e.label
       love.graphics.setColor(unpack(label.color))
-      love.graphics.print(label.text, e.pos.x, e.pos.y)
+      if label.font then
+        local font = res.fonts[label.font]
+        if font then love.graphics.setFont(font) end
+      end
+      if label.maxWidth then
+        local align = label.align
+        if not align then align = 'left' end
+        love.graphics.printf(label.text, e.pos.x, e.pos.y, label.maxWidth,label.align)
+      else
+        love.graphics.print(label.text, e.pos.x, e.pos.y)
+      end
 
     elseif e.circle and e.pos then
       local pos = e.pos
@@ -42,4 +52,3 @@ return function(estore,output,res)
 
   if DBG then DBG=false end
 end
-

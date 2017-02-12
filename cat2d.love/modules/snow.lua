@@ -10,7 +10,7 @@ local snowSystem = require 'systems/snow'
 local drawSystem = require 'systems/drawstuff'
 local Etree = require 'ecs/entitytree'
 
--- resource name shortcuts 
+-- resource name shortcuts
 local catIcon = "images/black-cat-icon.png"
 local arcticCatTitle = "images/arctic_cat_title.png"
 
@@ -31,13 +31,19 @@ local newSnowScene
 
 M.newWorld = function()
   local w = {
-    bgcolor = {0,0,100}, 
+    bgcolor = {0,0,100},
     scene = newSnowScene(),
     input = { dt=0, events={} },
     resources = {
       images={
         [catIcon] = love.graphics.newImage(catIcon),
         [arcticCatTitle] = love.graphics.newImage(arcticCatTitle),
+      },
+      fonts={
+        ["Adventure-50"] = love.graphics.newFont("fonts/Adventure.ttf",50),
+        ["Adventure-100"] = love.graphics.newFont("fonts/Adventure.ttf",100),
+        ["AdventureOutline-50"] = love.graphics.newFont("fonts/Adventure Outline.ttf",50),
+        ["narpassword-medium"] = love.graphics.newFont("fonts/narpassword.ttf",30),
       }
     },
   }
@@ -127,13 +133,8 @@ function newSnowScene()
     {'parent', {parentEid=group.eid, order=2}},
   })
 
-  buildEntity(estore, {
-    {'tag', {name='title'}},
-    {'img', {imgId=arcticCatTitle}},
-    {'pos', {x=20, y=100}},
-    -- {'bounds', {x=tap.x, y=tap.y, w=256, h=256}},
-    {'parent', {parentEid=group.eid, order=3}}
-  })
+  local menu = buildMenu(estore)
+  setParentEntity(estore, menu, group, 3)
 
   buildEntity(estore, {
     {'snowmachine', {large=5, small=3}},
@@ -143,10 +144,39 @@ function newSnowScene()
     {'timer', {name='acc', countDown=false}},
     {'parent', {parentEid=group.eid, order=4}},
   })
-  
+
   estore:updateEntityTree()
   return estore
 end
 
--- ---------------------------------------------------------------
+local ColdBlue = {36,153,204}
+local ColdBlue_Bright = {86,203,254}
+
+function buildMenu(estore)
+  local menu = buildEntity(estore, {
+    {'tag', {name='menu'}},
+  })
+
+  local y = 170
+  buildEntity(estore, {
+    {'label', {text='Arctic Cat', font="Adventure-100", color=ColdBlue, maxWidth=800, align='center'}},
+    {'pos', {x=0, y=y}},
+    {'parent', {parentEid=menu.eid, order=2}}
+  })
+  y = y + 120
+  buildEntity(estore, {
+    {'label', {text='START', font="narpassword-medium", color=ColdBlue, maxWidth=800, align='center'}},
+    {'pos', {x=0, y=y}},
+    {'parent', {parentEid=menu.eid, order=2}}
+  })
+  y = y + 50
+  buildEntity(estore, {
+    {'label', {text='CONTINUE', font="narpassword-medium", color=ColdBlue_Bright, maxWidth=800, align='center'}},
+    {'pos', {x=0, y=y}},
+    {'parent', {parentEid=menu.eid, order=2}}
+  })
+
+  return menu
+end
+
 return M

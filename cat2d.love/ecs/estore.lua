@@ -19,14 +19,12 @@ end
 
 function Estore:nextEid()
   local eid = "e" .. self.eidCounter
-  -- local eid = self.eidCounter
   self.eidCounter = self.eidCounter + 1
   return eid
 end
 
 function Estore:nextCid()
   local cid = "c" .. self.cidCounter
-  -- local cid = self.cidCounter
   self.cidCounter = self.cidCounter + 1
   return cid
 end
@@ -135,8 +133,8 @@ function Estore:detachComp(e,comp)
 
     -- Remove comp from the plural ref table:
     for k,c in pairs(plural) do
-      if c.cid == comp.cid then 
-        plural[k] = nil 
+      if c.cid == comp.cid then
+        plural[k] = nil
       end
     end
 
@@ -151,13 +149,13 @@ function Estore:detachComp(e,comp)
 
     local keycount = 0
     for k,v in pairs(e) do keycount = keycount + 1 end
-    if keycount <= 1 then 
+    if keycount <= 1 then
       -- eid is only remaining key, meaning we have no comps
       -- remove e from ents
       self.ents[e.eid] = nil
     end
   end
-  comp.eid = '' 
+  comp.eid = ''
 end
 
 -- Remove the comp from its entity and the estore.
@@ -173,7 +171,7 @@ end
 
 function Estore:transferComp(eFrom, eTo, comp)
   self:detachComp(eFrom, comp)
-  self:addComp(eTo, comp) 
+  self:addComp(eTo, comp)
 end
 
 function Estore:getEntity(eid)
@@ -213,7 +211,7 @@ function Estore:_walkEntitiesFromNode(node, flags, matchFn, doFn)
   if e then
     if (not e.filter) or (e.filter and bit32.btest(e.filter.bits, flags)) then
       if (not matchFn) or matchFn(e) then -- execute doFn if either a) no matcher, or b) matcher provided and returns true
-        doFn(e) 
+        doFn(e)
       end
       for _,chnode in ipairs(node.ch) do
         self:_walkEntitiesFromNode(chnode, flags, matchFn, doFn)
@@ -258,7 +256,7 @@ function entityDebugString(e)
           if v.cid == comp.cid then
             s = s .. "*"
           end
-          s = s..Comp.debugString(comp) 
+          s = s..Comp.debugString(comp)
           s = s .."\n"
         end
       end
