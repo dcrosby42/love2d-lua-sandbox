@@ -1,6 +1,17 @@
-local Modules = {}
-Modules.title = require 'modules/snow'
-Modules.other = require 'modules/other'
+local Modules = {
+  title = require 'modules/titlescreen/titlescreen',
+  other = require 'modules/other',
+}
+
+local StateTransitions = {
+  title={
+    start='other',
+    continue='other',
+  },
+  other={
+    clicker='title'
+  },
+}
 
 local M ={}
 
@@ -13,40 +24,33 @@ end
 
 M.newWorld = function()
   local w = {
-    subWorlds = {
-      title = Modules.title.newWorld(),
-      other = Modules.other.newWorld(),
-    },
+    subWorlds = {},
     current = "title",
   }
+
+  for name,module in pairs(Modules) do
+    w.subWorlds[name] = module.newWorld()
+  end
+
   return w, nil
 end
 
 M.updateWorld = function(world, action)
+  -- Update the current subworld:
   state,mode,current = getCurrent(world)
-
-  if action.type == 'keyboard' then
-    local key = action.key
-    if key == "s" then
-      if current == "title" then
-        world.current = "other"
-      else
-        world.current = "title"
-      end
-      return world, nil
-    end
-  end
-
   state1, effects = mode.updateWorld(state, action)
   world.subWorlds[current] = state1
 
+  -- Process any returned aftereffects:
   if effects then
+    -- print("arcticcat.lua update: effects:"..tdebug(effects,'  '))
     for _, ef in ipairs(effects) do
-      if ef.type == 'exit' then
-        if world.current == "title" then
-          world.current = "other"
-        else
-          world.current = "title"
+      if ef.type == "transition" then
+        local trans = StateTransitions[world.current]
+        if trans and trans[ef.value] then
+          local next = trans[ef.value]
+          print("arcticcat.lua: TRANSITION "..world.current.."["..ef.value.."] -> "..next)
+          world.current = next
         end
       end
     end
@@ -57,6 +61,5 @@ M.drawWorld = function(world)
   state,mode = getCurrent(world)
   mode.drawWorld(state)
 end
-
 
 return M

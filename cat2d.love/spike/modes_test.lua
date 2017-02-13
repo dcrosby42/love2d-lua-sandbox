@@ -25,10 +25,16 @@ end
 -- INPUT EVENT HANDLERS
 --
 local keyboardAction = {type="keyboard", action=nil, key=nil}
-function love.keypressed(key, _scancode, _isrepeat)
-  keyboardAction.state="pressed"
+function toKeyboardAction(state,key)
+  keyboardAction.state=state
   keyboardAction.key=key
-  Mod.updateWorld(world, keyboardAction)
+  return keyboardAction
+end
+function love.keypressed(key, _scancode, _isrepeat)
+  Mod.updateWorld(world, toKeyboardAction("pressed",key))
+end
+function love.keyreleased(key, _scancode, _isrepeat)
+  Mod.updateWorld(world, toKeyboardAction("released",key))
 end
 
 local mouseAction = {type="mouse", state=nil, x=0, y=0, dx=0,dy=0,button=0, isTouch=0}

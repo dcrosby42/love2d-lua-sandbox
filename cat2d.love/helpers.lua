@@ -58,6 +58,13 @@ function tappend(t,x)
   t[#t+1] = x
 end
 
+function tindexOf(t,v)
+  for i,x in ipairs(t) do
+    if x == v then return i end
+  end
+  return nil
+end
+
 function tdebug(t,ind)
   if not ind then ind = "" end
 

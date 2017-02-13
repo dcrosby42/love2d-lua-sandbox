@@ -5,7 +5,7 @@ local ObjPool = require 'ecs/objpool'
 -- Comp.define("Img", {name:""}) creates a new Component type Img, available via Comp.Img.
 -- Img now manages an internal object pool and understands what the default Img component looks like.
 -- Copies of the proto object are used to fill the pool
--- 
+--
 -- Comp module
 --   .define(typeName, protoObj)
 --
@@ -88,10 +88,15 @@ local function define(typeName, fields, poolOpts)
 end
 
 local function getT(comp)
-  return Comp.types[comp.type]
+  local ct = Comp.types[comp.type]
+  if not ct then
+    error("GetT() -- no type descriptor for comp.type == "..comp.type)
+  end
+  return ct
 end
 
 local function compDebugString(comp)
+  if not comp then return "[NULL Component]" end
   local t = getT(comp)
   local parts = {}
   for i,f in ipairs(t.fields) do
@@ -126,7 +131,7 @@ Comp.debugString = compDebugString
 Comp.define("parent", {'parentEid', '', 'order',0})
 
 -- 'filter' is used to prune searches through the tree via Estore:walkEntities().
--- filter.bits is a 32-bit integer flag set. The actual definition and usage of the flags 
+-- filter.bits is a 32-bit integer flag set. The actual definition and usage of the flags
 -- are up to individual systems, but the most obvious to me are Flags.Update and Flags.Draw.
 Comp.define("filter", {'bits', 0})
 

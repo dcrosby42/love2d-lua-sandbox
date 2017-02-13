@@ -9,9 +9,10 @@ return defineUpdateSystem(
     for _,evt in ipairs(input.events.mouse or {}) do
       if math.pointinrect(evt.x,evt.y,  e.pos.x,e.pos.y, e.rect.w,e.rect.h) then
         if evt.state == 'pressed' then
-          print("CLICKED")
+          -- print("CLICKED")
         elseif evt.state == 'released' then
-          print("RELEASED")
+          -- print("RELEASED")
+          estore:newComp(e, 'output', {kind="transition",value="clicker"})
         end
       end
     end

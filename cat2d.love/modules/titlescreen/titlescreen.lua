@@ -7,6 +7,9 @@ require 'comps'
 local iconAdderSystem = require 'systems/iconadder'
 local timerSystem = require 'systems/timer'
 local snowSystem = require 'systems/snow'
+local selfDestructSystem = require 'systems/selfdestruct'
+local outputCleanupSystem = require 'systems/outputcleanup'
+local effectsSystem = require 'systems/effects'
 local drawSystem = require 'systems/drawstuff'
 local Etree = require 'ecs/entitytree'
 
@@ -14,10 +17,16 @@ local Etree = require 'ecs/entitytree'
 local catIcon = "images/black-cat-icon.png"
 local arcticCatTitle = "images/arctic_cat_title.png"
 
+local Menu = require 'modules/titlescreen/menu'
+
 local DoUpdate = iterateFuncs({
+  outputCleanupSystem,
   timerSystem,
+  selfDestructSystem,
+  Menu.System,
   snowSystem,
-  iconAdderSystem,
+  -- iconAdderSystem,
+  effectsSystem,
   Etree.etreeSystem,
 })
 
@@ -32,21 +41,22 @@ local newSnowScene
 M.newWorld = function()
   local w = {
     bgcolor = {0,0,100},
-    scene = newSnowScene(),
+    estore = newSnowScene(),
     input = { dt=0, events={} },
     resources = {
       images={
         [catIcon] = love.graphics.newImage(catIcon),
-        [arcticCatTitle] = love.graphics.newImage(arcticCatTitle),
+        -- [arcticCatTitle] = love.graphics.newImage(arcticCatTitle),
       },
       fonts={
-        ["Adventure-50"] = love.graphics.newFont("fonts/Adventure.ttf",50),
-        ["Adventure-100"] = love.graphics.newFont("fonts/Adventure.ttf",100),
-        ["AdventureOutline-50"] = love.graphics.newFont("fonts/Adventure Outline.ttf",50),
-        ["narpassword-medium"] = love.graphics.newFont("fonts/narpassword.ttf",30),
+        -- ["Adventure-50"] = love.graphics.newFont("fonts/Adventure.ttf",50),
+        -- ["Adventure-100"] = love.graphics.newFont("fonts/Adventure.ttf",100),
+        -- ["AdventureOutline-50"] = love.graphics.newFont("fonts/Adventure Outline.ttf",50),
+        -- ["narpassword-medium"] = love.graphics.newFont("fonts/narpassword.ttf",30),
       }
     },
   }
+  Menu.Setup(w)
 
   return w, nil
 end
@@ -57,10 +67,18 @@ M.updateWorld = function(world, action)
   if action.type == 'tick' then
     world.input.dt = action.dt
 
-    local estore = world.scene
+    local estore = world.estore
     DoUpdate(estore, world.input, world.resources)
 
     world.input.events = {}
+
+    estore:search(hasComps('output'), function(e)
+      effects = {}
+      for _,out in pairs(e.outputs) do
+        -- print("Effect: "..out.kind)
+        effects[#effects+1] = {type=out.kind, value=out.value}
+      end
+    end)
 
   elseif action.type == 'mouse' then
     if action.button == 1 then
@@ -74,18 +92,22 @@ M.updateWorld = function(world, action)
     end
 
   elseif action.type == 'keyboard' then
-    local estore = world.scene
+    addInputEvent(world.input, action)
+
     local key = action.key
     if key == "p" then
+      local estore = world.estore
       print("============================================================================")
       print(estore:debugString())
     elseif key == "g" then
+      local estore = world.estore
       if estore.etree then
         print("============================================================================")
         print("-- Entity tree (Estore.etree):")
         print(tdebug(estore.etree.ROOT))
       end
-    elseif key == "x" then
+    elseif key == "x" and action.state == 'pressed' then
+      print("Manual switchover")
       effects = {
         {type='exit'}
       }
@@ -99,7 +121,7 @@ end
 M.drawWorld = function(world)
   love.graphics.setBackgroundColor(unpack(world.bgcolor))
 
-  DoDraw(world.scene, nil, world.resources)
+  DoDraw(world.estore, nil, world.resources)
 end
 
 -- ---------------------------------------------------------------
@@ -133,7 +155,7 @@ function newSnowScene()
     {'parent', {parentEid=group.eid, order=2}},
   })
 
-  local menu = buildMenu(estore)
+  local menu = Menu.BuildMenuEntity(estore)
   setParentEntity(estore, menu, group, 3)
 
   buildEntity(estore, {
@@ -149,34 +171,6 @@ function newSnowScene()
   return estore
 end
 
-local ColdBlue = {36,153,204}
-local ColdBlue_Bright = {86,203,254}
 
-function buildMenu(estore)
-  local menu = buildEntity(estore, {
-    {'tag', {name='menu'}},
-  })
-
-  local y = 170
-  buildEntity(estore, {
-    {'label', {text='Arctic Cat', font="Adventure-100", color=ColdBlue, maxWidth=800, align='center'}},
-    {'pos', {x=0, y=y}},
-    {'parent', {parentEid=menu.eid, order=2}}
-  })
-  y = y + 120
-  buildEntity(estore, {
-    {'label', {text='START', font="narpassword-medium", color=ColdBlue, maxWidth=800, align='center'}},
-    {'pos', {x=0, y=y}},
-    {'parent', {parentEid=menu.eid, order=2}}
-  })
-  y = y + 50
-  buildEntity(estore, {
-    {'label', {text='CONTINUE', font="narpassword-medium", color=ColdBlue_Bright, maxWidth=800, align='center'}},
-    {'pos', {x=0, y=y}},
-    {'parent', {parentEid=menu.eid, order=2}}
-  })
-
-  return menu
-end
 
 return M

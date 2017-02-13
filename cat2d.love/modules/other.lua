@@ -6,10 +6,12 @@ require 'comps'
 
 local timerSystem = require 'systems/timer'
 local mouseSystem = require 'systems/button'
+local outputCleanupSystem = require 'systems/outputcleanup'
 local drawSystem = require 'systems/drawstuff'
 local Etree = require 'ecs/entitytree'
 
 local DoUpdate = iterateFuncs({
+  outputCleanupSystem,
   timerSystem,
   mouseSystem,
   Etree.etreeSystem,
@@ -38,18 +40,21 @@ M.newWorld = function()
 end
 
 M.updateWorld = function(world, action)
+  local effects = nil
+
   if action.type == 'tick' then
     world.input.dt = action.dt
     local estore = world.scene
     DoUpdate(estore, world.input, world.resources)
-    estore:search(hasComps('effect'), function(e)
-      for _,evt in ipairs(e.effects) do
-        print("EFFECT: "..tdebug(evt))
-      end
-    end)
-
 
     world.input.events = {}
+
+    estore:search(hasComps('output'), function(e)
+      effects = {}
+      for _,out in pairs(e.outputs) do
+        effects[#effects+1] = {type=out.kind, value=out.value}
+      end
+    end)
 
   elseif action.type == 'keyboard' then
     local estore = world.scene
@@ -63,15 +68,15 @@ M.updateWorld = function(world, action)
         print("-- Entity tree (Estore.etree):")
         print(tdebug(estore.etree.ROOT))
       end
-    elseif key == "x" then
-      return world, {{type="exit"}}
+    elseif key == "x" and action.state == 'pressed' then
+      return world, {{type="transition",value="clicker"}}
     end
 
   elseif action.type == 'mouse' then
     addInputEvent(world.input, action)
   end
 
-  return world, nil
+  return world, effects
 end
 
 M.drawWorld = function(world)

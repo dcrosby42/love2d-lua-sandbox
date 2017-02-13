@@ -37,13 +37,24 @@ function Estore:newEntity()
 end
 
 function Estore:destroyEntity(e)
-  local kills={}
-  for _,comp in pairs(self.comps) do
-    if comp.eid == e.eid then
-      table.insert(kills,comp)
+  self:destroyEntityByEid(e.eid)
+end
+
+function Estore:destroyEntityByEid(eid)
+  local node = self.etree[eid]
+  if node then
+    for _,chnode in ipairs(node.ch) do
+      self:destroyEntityByEid(chnode.eid)
     end
   end
-  for _,comp in ipairs(kills) do
+
+  local compsToRemove={}
+  for _,comp in pairs(self.comps) do
+    if comp.eid == eid then
+      table.insert(compsToRemove,comp)
+    end
+  end
+  for _,comp in ipairs(compsToRemove) do
     self:removeComp(comp)
   end
 end
@@ -235,6 +246,14 @@ end
 
 function Estore:search(matchFn,doFn)
   valsearch(self.ents, matchFn, doFn)
+end
+
+function Estore:getParent(e)
+  local node = self.etree[e.eid]
+  if node then
+    return self.ents[node.pid]
+  end
+  return nil
 end
 
 

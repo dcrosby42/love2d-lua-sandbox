@@ -2,7 +2,7 @@ require 'flags'
 local Comp = require 'ecs/component'
 
 return function(estore,input,res)
-  estore:walkEntities(Flags.Update, 
+  estore:walkEntities(Flags.Update,
     hasComps('timer'),
     function(e)
       for _,timer in pairs(e.timers) do
@@ -12,15 +12,24 @@ return function(estore,input,res)
             timer.t = timer.t - input.dt
           else
             timer.alarm =  true
-            if timer.loop then 
+            if timer.loop then
               timer.t = timer.reset
             end
           end
-        else
+        else -- countDown = false (ie, we're counting up)
           timer.t = timer.t + input.dt
+          if timer.reset and timer.reset > 0 then
+            if timer.t >= timer.reset then
+              timer.alarm = true
+              if timer.loop then
+                timer.t = 0
+              else
+                timer.t = timer.reset
+              end
+            end
+          end
         end
       end
     end
   )
-  local dt = input.dt
 end
