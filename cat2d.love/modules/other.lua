@@ -10,10 +10,18 @@ local outputCleanupSystem = require 'systems/outputcleanup'
 local drawSystem = require 'systems/drawstuff'
 local Etree = require 'ecs/entitytree'
 
+local leaveSystem = defineUpdateSystem({'event'},function(e,estore,input,res)
+  if e.events.leave then
+    estore:newComp(e, 'output', {kind='transition',value='leave'})
+    estore:removeComp(e.events.leave)
+  end
+end)
+
 local DoUpdate = iterateFuncs({
   outputCleanupSystem,
   timerSystem,
   mouseSystem,
+  leaveSystem,
   Etree.etreeSystem,
 })
 
@@ -32,6 +40,9 @@ M.newWorld = function()
     input = { dt=0, events={} },
     resources = {
       images={
+      },
+      fonts={
+        ["narpassword-medium"] = love.graphics.newFont("fonts/narpassword.ttf",30),
       }
     },
   }
@@ -69,7 +80,7 @@ M.updateWorld = function(world, action)
         print(tdebug(estore.etree.ROOT))
       end
     elseif key == "x" and action.state == 'pressed' then
-      return world, {{type="transition",value="clicker"}}
+      return world, {{type="transition",value="leave"}}
     end
 
   elseif action.type == 'mouse' then
@@ -100,16 +111,22 @@ function newOtherScene()
     {'parent', {parentEid = otherScene.eid}},
   })
 
+  local x = 0
+  local y = 0
+  local w = 200
+  local h = 50
+
   buildEntity(mystore, {
-    {'rect', {w=200,h=50, color={0,180,0}}},
-    {'pos', {x=10,y=20}},
-    {'clickable', {onreleased=''}},
+    {'rect', {w=w,h=h, color={0,180,0}}},
+    {'pos', {x=x,y=y}},
+    {'tag',{name='leaver'}},
+    {'mouse_sensor', {eventName='leave'}},
     {'parent', {parentEid = button.eid}},
   })
 
   buildEntity(mystore, {
-    {'label', {text="CLICK ME", color={255,255,255}}},
-    {'pos', {x=50,y=50}},
+    {'label', {font="narpassword-medium", text="Leave", color={0,0,0}, width=w, align='center', height=h, valign='middle'}},
+    {'pos', {x=x,y=y}},
     {'parent', {parentEid = button.eid,order=1}},
   })
 

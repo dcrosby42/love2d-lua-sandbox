@@ -23,12 +23,22 @@ return function(estore,output,res)
         local font = res.fonts[label.font]
         if font then love.graphics.setFont(font) end
       end
-      if label.maxWidth then
+      local y = e.pos.y
+      if label.height then
+        if label.valign == 'middle' then
+          local halfLineH = love.graphics.getFont():getHeight() / 2
+          y = y + (label.height/2) - halfLineH
+        elseif label.valign == 'bottom' then
+          local lineH = love.graphics.getFont():getHeight()
+          y = y + label.height - lineH
+        end
+      end
+      if label.width then
         local align = label.align
         if not align then align = 'left' end
-        love.graphics.printf(label.text, e.pos.x, e.pos.y, label.maxWidth,label.align)
+        love.graphics.printf(label.text, e.pos.x, y, label.width,label.align)
       else
-        love.graphics.print(label.text, e.pos.x, e.pos.y)
+        love.graphics.print(label.text, e.pos.x, y)
       end
 
     elseif e.circle and e.pos then

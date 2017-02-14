@@ -119,7 +119,7 @@ function buildMenu(estore)
 
   local y = 170
   buildEntity(estore, {
-    {'label', {text='Arctic Cat', font="Adventure-100", color=ColdBlue, maxWidth=800, align='center'}},
+    {'label', {text='Arctic Cat', font="Adventure-100", color=ColdBlue, width=800, align='center'}},
     {'pos', {x=0, y=y}},
     {'parent', {parentEid=menu.eid, order=2}}
   })
@@ -128,7 +128,7 @@ function buildMenu(estore)
     {'menu_item', {name='start',value='start'}},
     {'tag', {name='menu_item'}},
     {'tag', {name='start'}},
-    {'label', {text='START', font="narpassword-medium", color=ColdBlue, maxWidth=800, align='center'}},
+    {'label', {text='START', font="narpassword-medium", color=ColdBlue, width=800, align='center'}},
     {'pos', {x=0, y=y}},
     {'bounds',{x=0,y=y,w=800,h=50}},
     {'parent', {parentEid=menu.eid, order=2}}
@@ -138,7 +138,7 @@ function buildMenu(estore)
   --   {'menu_item', {name='continue',value='continue'}},
   --   {'tag', {name='menu_item'}},
   --   {'tag', {name='continue'}},
-  --   {'label', {text='CONTINUE', font="narpassword-medium", color=ColdBlue, maxWidth=800, align='center'}},
+  --   {'label', {text='CONTINUE', font="narpassword-medium", color=ColdBlue, width=800, align='center'}},
   --   {'pos', {x=0, y=y}},
   --   {'bounds',{x=0,y=y,w=800,h=50}},
   --   {'parent', {parentEid=menu.eid, order=2}},

@@ -4,12 +4,13 @@ local Modules = {
 }
 
 local StateTransitions = {
+  _start="other",
   title={
     start='other',
     continue='other',
   },
   other={
-    clicker='title'
+    leave='title'
   },
 }
 
@@ -25,7 +26,7 @@ end
 M.newWorld = function()
   local w = {
     subWorlds = {},
-    current = "title",
+    current = StateTransitions._start,
   }
 
   for name,module in pairs(Modules) do

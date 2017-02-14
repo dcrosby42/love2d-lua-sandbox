@@ -13,15 +13,14 @@ Comp.define("controller", {'id','','leftx',0,'lefty',0,})
 
 Comp.define("img", {'imgId','','offx',0,'offy',0,'sx',1,'sy',1,'r',0})
 
-Comp.define("label", {'text','Label', 'color', {0,0,0},'font',nil, 'maxWidth', nil, 'align',nilj})
-
+Comp.define("label", {'text','Label', 'color', {0,0,0},'font',nil, 'width', nil, 'align',nilj, 'height',nil,'valign',nil})
 
 Comp.define("iconAdder", {'imgId', '', 'tagName', ''})
 
 
 Comp.define("circle", {'radius',0, 'color',{0,0,0}})
-Comp.define("rect", {'w',0, 'h',0, 'color',{0,0,0}})
+Comp.define("rect", {'w',0, 'h',0, 'color',{0,0,0}, 'style','fill'})
 
-
+Comp.define("event", {'data',nil})
 
 Comp.define("output", {'kind',nil})
