@@ -107,17 +107,17 @@ function newOtherScene()
     {'filter', {bits = bit32.bor(Flags.Update, Flags.Draw)}},
   })
 
-  local button = buildEntity(mystore, {
-    {'parent', {parentEid = otherScene.eid}},
-  })
-
   local x = 0
   local y = 0
   local w = 200
   local h = 50
 
+  local button = buildEntity(mystore, {
+    {'parent', {parentEid = otherScene.eid}},
+  })
+
   buildEntity(mystore, {
-    {'rect', {w=w,h=h, color={0,180,0}}},
+    {'rect', {w=w,h=h, style="line",color={0,255,0}}},
     {'pos', {x=x,y=y}},
     {'tag',{name='leaver'}},
     {'mouse_sensor', {eventName='leave'}},
@@ -125,7 +125,7 @@ function newOtherScene()
   })
 
   buildEntity(mystore, {
-    {'label', {font="narpassword-medium", text="Leave", color={0,0,0}, width=w, align='center', height=h, valign='middle'}},
+    {'label', {font="narpassword-medium", text="Leave", color={0,255,0}, width=w, align='center', height=h, valign='middle'}},
     {'pos', {x=x,y=y}},
     {'parent', {parentEid = button.eid,order=1}},
   })

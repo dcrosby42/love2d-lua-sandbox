@@ -18,11 +18,11 @@ return function(estore,output,res)
 
     elseif e.label and e.pos then
       local label = e.label
-      love.graphics.setColor(unpack(label.color))
       if label.font then
         local font = res.fonts[label.font]
         if font then love.graphics.setFont(font) end
       end
+      love.graphics.setColor(unpack(label.color))
       local y = e.pos.y
       if label.height then
         if label.valign == 'middle' then
@@ -54,9 +54,9 @@ return function(estore,output,res)
       local pos = e.pos
       local rect = e.rect
       love.graphics.setColor(unpack(rect.color))
-      love.graphics.rectangle("fill", pos.x, pos.y, rect.w, rect.h)
-      love.graphics.setColor(0,0,0)
-      love.graphics.rectangle("line", pos.x, pos.y, rect.w, rect.h)
+      love.graphics.rectangle(rect.style, pos.x, pos.y, rect.w, rect.h)
+      --love.graphics.setColor(0,0,0)
+      -- love.graphics.rectangle("line", pos.x, pos.y, rect.w, rect.h)
     end
   end)
 
