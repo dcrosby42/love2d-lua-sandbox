@@ -113,10 +113,10 @@ end
 
 function buildMenu(estore)
   local menu = buildEntity(estore, {
-    -- {'menu', {state='selecting',selected='start', choices={'start','continue'}}}
-    {'menu', {state='selecting',selected='start', choices={'start',}}}
+    {'menu', {state='selecting',selected='start', choices={'start','continue'}}},
+    {'menu', {state='selecting',selected='start', choices={'start',}}},
   })
-
+-- 
   local y = 170
   buildEntity(estore, {
     {'label', {text='Arctic Cat', font="Adventure-100", color=ColdBlue, width=800, align='center'}},
@@ -133,16 +133,16 @@ function buildMenu(estore)
     {'bounds',{x=0,y=y,w=800,h=50}},
     {'parent', {parentEid=menu.eid, order=2}}
   })
-  -- y = y + 50
-  -- buildEntity(estore, {
-  --   {'menu_item', {name='continue',value='continue'}},
-  --   {'tag', {name='menu_item'}},
-  --   {'tag', {name='continue'}},
-  --   {'label', {text='CONTINUE', font="narpassword-medium", color=ColdBlue, width=800, align='center'}},
-  --   {'pos', {x=0, y=y}},
-  --   {'bounds',{x=0,y=y,w=800,h=50}},
-  --   {'parent', {parentEid=menu.eid, order=2}},
-  -- })
+  y = y + 50
+  buildEntity(estore, {
+    {'menu_item', {name='continue',value='continue'}},
+    {'tag', {name='menu_item'}},
+    {'tag', {name='continue'}},
+    {'label', {text='CONTINUE', font="narpassword-medium", color=ColdBlue, width=800, align='center'}},
+    {'pos', {x=0, y=y}},
+    {'bounds',{x=0,y=y,w=800,h=50}},
+    {'parent', {parentEid=menu.eid, order=2}},
+  })
 
   return menu
 end

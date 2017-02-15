@@ -1,13 +1,17 @@
 local Modules = {
   title = require 'modules/titlescreen/titlescreen',
   other = require 'modules/other',
+  room1 = require 'modules/room1/room1',
 }
 
 local StateTransitions = {
-  _start="other",
+  _start="room1",
   title={
-    start='other',
+    start='room1',
     continue='other',
+  },
+  room1={
+    leave='title'
   },
   other={
     leave='title'

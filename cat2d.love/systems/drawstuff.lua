@@ -1,6 +1,6 @@
 require 'flags'
 
-local DBG=true
+local DBG=false
 
 return function(estore,output,res)
   -- estore:updateEntityTree()

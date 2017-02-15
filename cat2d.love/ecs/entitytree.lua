@@ -1,6 +1,6 @@
 Etree = {}
 
-local function byOrder(a,b) 
+local function byOrder(a,b)
   -- if a.order == nil then print("NIL ORDER for a? eid="..a.eid.." pid="..a.pid) end
   -- if b.order == nil then print("NIL ORDER for b? eid="..b.eid.." pid="..b.pid) end
   return a.order < b.order
@@ -27,7 +27,7 @@ local function updateEntityTree(entities, t)
   for _, e in pairs(entities) do
     local eid = e.eid
     local pid, order
-    if e.parent then 
+    if e.parent then
       pid = e.parent.parentEid
       order = e.parent.order
       if not order then order = 0 end
@@ -42,14 +42,14 @@ local function updateEntityTree(entities, t)
     local prevPid = nil
     local orderUpdated = false
     local node = t[eid]
-    if node then 
+    if node then
       if node.pid == pid then
         -- no change
       elseif node.pid == nil then
         -- first time pid assigned
         node.pid = pid
         pidUpdated = true
-      else 
+      else
         -- pid has changed
         prevPid = node.pid
         node.pid = pid
@@ -61,7 +61,7 @@ local function updateEntityTree(entities, t)
       end
     else
       -- first time we've seen this eid, create a node
-      node = {eid=eid, pid=pid, order=order, ch={}} 
+      node = {eid=eid, pid=pid, order=order, ch={}}
       t[eid] = node
       pidUpdated = true
     end
@@ -114,6 +114,7 @@ end
 
 Etree.updateEntityTree = updateEntityTree
 
+-- XXX deleteme in favor of 'ecs/etreesystem'
 Etree.etreeSystem = function(estore,input,res)
   estore:updateEntityTree()
 end
