@@ -32,7 +32,7 @@ local moverSystem = defineUpdateSystem(hasComps('controller','vel','pos'),
       end
     end
 
-    local x,y = getPos(estore, e)
+    local x,y = getPos(e)
     if vel.x ~= 0 then
       e.pos.x = x + vel.dx * input.dt
     end

@@ -71,10 +71,10 @@ function buildEntity(estore, compList)
 end
 
 
-function getPos(estore, e)
+function getPos(e)
   local par = e:getParent()
   if par and par.pos then
-    local x,y = getPos(estore,par)
+    local x,y = getPos(par)
     return e.pos.x + x, e.pos.y + y
   else
     return e.pos.x, e.pos.y

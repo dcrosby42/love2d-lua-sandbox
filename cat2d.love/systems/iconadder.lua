@@ -10,7 +10,7 @@ local function createNewIcon(estore, parE, tap, adderComp, res)
     { 'tag', {name=adderComp.tagName}},
     { 'img', {imgId=imgId, sx=0.3, sy=0.3, offx=w/2, offy=h/2}},
     { 'pos', {x=tap.x, y=tap.y}},
-    { 'bounds', {x=tap.x, y=tap.y, w=256, h=256}},
+    { 'bounds', {x=w/2, y=h/2, w=256, h=256}},
     { 'parent', {parentEid = parE.eid}},
   })
 end
@@ -50,4 +50,3 @@ return defineUpdateSystem(
     end
   end
 )
-

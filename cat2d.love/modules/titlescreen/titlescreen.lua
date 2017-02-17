@@ -138,18 +138,18 @@ function newSnowScene()
   })
 
   buildEntity(estore, {
-    {'snowmachine', {large=2,small=1}},
-    {'vel', {dx=0, dy=15}},
-    {'bounds', {x=0,y=0, w=love.graphics.getWidth(), h=love.graphics.getHeight()}},
+    {'snowmachine', {large=2,small=1,dx=0,dy=15}},
+    {'pos',{x=0,y=0}},
+    {'bounds', {w=love.graphics.getWidth(), h=love.graphics.getHeight()}},
     {'timer', {name='flake', reset=0.2, loop=true}},
     {'timer', {name='acc', countDown=false}},
     {'parent', {parentEid=group.eid, order=1}},
   })
 
   buildEntity(estore, {
-    {'snowmachine', {large=3,small=1}},
-    {'vel', {dx=0, dy=30}},
-    {'bounds', {x=0,y=0, w=love.graphics.getWidth(), h=love.graphics.getHeight()}},
+    {'snowmachine', {large=3,small=1,dx=0,dy=30}},
+    {'pos',{x=0,y=0}},
+    {'bounds', {w=love.graphics.getWidth(), h=love.graphics.getHeight()}},
     {'timer', {name='flake', reset=0.2, loop=true}},
     {'timer', {name='acc', countDown=false}},
     {'parent', {parentEid=group.eid, order=2}},
@@ -159,9 +159,9 @@ function newSnowScene()
   setParentEntity(estore, menu, group, 3)
 
   buildEntity(estore, {
-    {'snowmachine', {large=5, small=3}},
-    {'vel', {dx=0, dy=60}},
-    {'bounds', {x=0,y=0, w=love.graphics.getWidth(), h=love.graphics.getHeight()}},
+    {'snowmachine', {large=5, small=3, dx=0,dy=60}},
+    {'pos',{x=0,y=0}},
+    {'bounds', {w=love.graphics.getWidth(), h=love.graphics.getHeight()}},
     {'timer', {name='flake', reset=0.2, loop=true}},
     {'timer', {name='acc', countDown=false}},
     {'parent', {parentEid=group.eid, order=4}},

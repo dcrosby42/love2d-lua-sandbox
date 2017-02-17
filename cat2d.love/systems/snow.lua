@@ -1,6 +1,6 @@
 local Comp = require 'ecs/component'
 
-Comp.define("snowmachine", {'large',1,'small',1,'init',true})
+Comp.define("snowmachine", {'large',1,'small',1,'init',true,'dx',0,'dy',0})
 
 Comp.define("snow", {'lowerbound',0})
 
@@ -10,13 +10,15 @@ local CHEAT_RNG = love.math.newRandomGenerator(1234,5678)
 
 local function addSnowflake(e,estore,y)
   -- print(entityDebugString(e))
-  local x = CHEAT_RNG:random(e.bounds.x, e.bounds.w)
+  local left = e.pos.x
+  local right = left + e.bounds.w
+  local x = CHEAT_RNG:random(left,right)
   -- local rad = CHEAT_RNG:random(e.small, e.large)
   local rad = CHEAT_RNG:random(e.snowmachine.small, e.snowmachine.large)
 
   local sflake = buildEntity(estore, {
-    {'snow', {lowerbound=e.bounds.y+e.bounds.h}},
-    {'vel', {dx=e.vel.dx, dy=e.vel.dy}},
+    {'snow', {lowerbound=e.pos.y+e.bounds.h}},
+    {'vel', {dx=e.snowmachine.dx, dy=e.snowmachine.dy}},
     {'pos', { x=x, y=y}},
     {'circle', { radius=rad, color={255,255,255}}},
     {'parent', { parentEid=e.eid }}
@@ -24,20 +26,20 @@ local function addSnowflake(e,estore,y)
 end
 
 local snowMachineSystem = defineUpdateSystem(
-  {'snowmachine'}, 
+  {'snowmachine'},
   function(e, estore,input,res)
     if e.snowmachine.init then
       -- Pre-populate the screen with proper distribution of snowflakes
       e.snowmachine.init = false
-      local top = e.bounds.y
+      local top = e.pos.y
       local bottom = top + e.bounds.h
-      local step = (e.timers.flake.reset * e.vel.dy)
-      for y = top, bottom, step do 
+      local step = (e.timers.flake.reset * e.snowmachine.dy)
+      for y = top, bottom, step do
         addSnowflake(e,estore,y)
       end
     end
     if e.timers.flake.alarm then
-      local y = e.bounds.y
+      local y = e.pos.y
       addSnowflake(e,estore,y)
     end
   end

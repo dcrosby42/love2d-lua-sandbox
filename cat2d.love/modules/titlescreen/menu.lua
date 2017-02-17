@@ -87,8 +87,9 @@ local menuItemSystem = defineUpdateSystem({'menu_item'},
     -- Check for mouse clicks / taps on this item:
     if input.events.tap then
       for _,evt in ipairs(input.events.tap) do
-        local b = e.bounds
-        if math.pointinrect(evt.x,evt.y, b.x,b.y,b.w,b.h) then
+        local b = e.bounds -- TODO see about getBounds(e)
+        local x,y = getPos(e)
+        if math.pointinrect(evt.x,evt.y, x+b.offx,y+b.offy,b.w,b.h) then
           -- set menu selection to this item
           parent.menu.selected = e.menu_item.name
           -- add visual effect (flicker color)
@@ -129,7 +130,7 @@ function buildMenu(estore)
     {'tag', {name='start'}},
     {'label', {text='START', font="narpassword-medium", color=ColdBlue, width=800, align='center'}},
     {'pos', {x=0, y=y}},
-    {'bounds',{x=0,y=y,w=800,h=50}},
+    {'bounds',{w=800,h=50}},
     {'parent', {parentEid=menu.eid, order=2}}
   })
   y = y + 50
@@ -139,7 +140,7 @@ function buildMenu(estore)
     {'tag', {name='continue'}},
     {'label', {text='CONTINUE', font="narpassword-medium", color=ColdBlue, width=800, align='center'}},
     {'pos', {x=0, y=y}},
-    {'bounds',{x=0,y=y,w=800,h=50}},
+    {'bounds',{w=800,h=50}},
     {'parent', {parentEid=menu.eid, order=2}},
   })
 

@@ -1,18 +1,35 @@
 require 'flags'
 
 local DBG=false
+local BOUNDS=true
 
 return function(estore,output,res)
   -- estore:updateEntityTree()
 
   -- estore:search(hasComps('pos'), function(e)
   estore:walkEntities(Flags.Draw, nil, function(e)
+    if BOUNDS then
+      if e.pos then
+        local x,y = getPos(e)
+        love.graphics.setColor(255,255,255)
+        love.graphics.line(x-5,y, x+5,y)
+        love.graphics.line(x,y-5, x,y+5)
+      end
+      -- if e.bounds then
+      --   local x,y = getBounds(e)
+      --   love.graphics.setColor(255,255,255)
+      --   love.graphics.line(x-5,y, x+5,y)
+      --   love.graphics.line(x,y-5, x,y+5)
+      --
+      -- end
+    end
+
     --
     -- IMG
     --
     if e.img and e.pos then
       local img = e.img
-      local x,y = getPos(estore, e)
+      local x,y = getPos(e)
       love.graphics.draw(
         res.images[img.imgId],
         x,y,
@@ -30,7 +47,7 @@ return function(estore,output,res)
         if font then love.graphics.setFont(font) end
       end
       love.graphics.setColor(unpack(label.color))
-      local x,y = getPos(estore, e)
+      local x,y = getPos(e)
       if label.height then
         if label.valign == 'middle' then
           local halfLineH = love.graphics.getFont():getHeight() / 2
@@ -52,7 +69,7 @@ return function(estore,output,res)
     -- CIRCLE
     --
     elseif e.circle and e.pos then
-      local x,y = getPos(estore,e)
+      local x,y = getPos(e)
       local circle = e.circle
       love.graphics.setColor(unpack(circle.color))
       love.graphics.circle("line", x, y, circle.radius)
@@ -65,7 +82,7 @@ return function(estore,output,res)
       if DBG then
         print("DRAWING "..e.eid)
       end
-      local x,y = getPos(estore, e)
+      local x,y = getPos(e)
       local rect = e.rect
       love.graphics.setColor(unpack(rect.color))
       love.graphics.rectangle(rect.style, x, y, rect.w, rect.h)
