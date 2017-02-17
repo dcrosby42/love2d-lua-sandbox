@@ -69,3 +69,14 @@ function buildEntity(estore, compList)
   -- print(tdebug(e))
   return e
 end
+
+
+function getPos(estore, e)
+  local par = e:getParent()
+  if par and par.pos then
+    local x,y = getPos(estore,par)
+    return e.pos.x + x, e.pos.y + y
+  else
+    return e.pos.x, e.pos.y
+  end
+end

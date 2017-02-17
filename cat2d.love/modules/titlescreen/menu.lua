@@ -47,8 +47,7 @@ local menuSystem = defineUpdateSystem({'menu'},
         elseif action.key == "return" and action.state == "pressed" then
           local time = 1.0
           estore:search(hasComps('menu_item'), function(mie)
-            local mieParent = estore:getParent(mie)
-            if mieParent.eid == e.eid then
+            if mie:getParent().eid == e.eid then
               if mie.menu_item.name == e.menu.selected then
                 estore:newComp(mie, 'timer', {name='item_selected',t=time})
                 addBlueFlicker(estore, mie, time)
@@ -76,7 +75,7 @@ local menuItemSystem = defineUpdateSystem({'menu_item'},
     end
 
     -- Check for selected:
-    local parent = estore:getParent(e)
+    local parent = e:getParent()
     if parent then
       if e.menu_item.name == parent.menu.selected then
         e.label.color = ColdBlue_Bright
@@ -116,7 +115,7 @@ function buildMenu(estore)
     {'menu', {state='selecting',selected='start', choices={'start','continue'}}},
     {'menu', {state='selecting',selected='start', choices={'start',}}},
   })
--- 
+--
   local y = 170
   buildEntity(estore, {
     {'label', {text='Arctic Cat', font="Adventure-100", color=ColdBlue, width=800, align='center'}},

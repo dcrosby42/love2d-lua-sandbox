@@ -1,4 +1,5 @@
 Comp = require 'ecs/component'
+Entity = require 'ecs/entity'
 Etree = require 'ecs/entitytree'
 
 local Estore = {
@@ -31,7 +32,7 @@ end
 
 function Estore:newEntity()
   local eid = self:nextEid()
-  local e = {eid=eid}
+  local e = Entity:new({eid=eid, _estore=self})
   self.ents[eid] = e
   return e
 end
@@ -65,7 +66,7 @@ end
 local function compName(comp, t)
   local name = comp.name
   if (not name) or (name == "") then
-    local num = #t+1
+    local num = tcount(t)
     while t[tostring(num)] do
       num = num + 1
     end
@@ -256,6 +257,17 @@ function Estore:getParent(e)
   return nil
 end
 
+function Estore:getChildren(e)
+  local node = self.etree[e.eid]
+  if node and node.ch and #node.ch > 0 then
+    local childs = {nil,nil,nil}
+    for i,chnode in ipairs(node.ch) do
+      childs[i] = self.ents[chnode.eid]
+    end
+    return self.ents[node.pid]
+  end
+  return {}
+end
 
 function compDebugString(comp)
   return Comp.debugString(comp)

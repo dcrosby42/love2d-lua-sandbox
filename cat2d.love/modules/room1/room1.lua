@@ -17,6 +17,7 @@ local catIcon = "images/black-cat-icon.png"
 local arcticCatTitle = "images/arctic_cat_title.png"
 
 
+
 local MoveSpeed = 200
 local moverSystem = defineUpdateSystem(hasComps('controller','vel','pos'),
   function(e,estore,input,res)
@@ -31,12 +32,12 @@ local moverSystem = defineUpdateSystem(hasComps('controller','vel','pos'),
       end
     end
 
-    local pos = e.pos
+    local x,y = getPos(estore, e)
     if vel.x ~= 0 then
-      pos.x = pos.x + vel.dx * input.dt
+      e.pos.x = x + vel.dx * input.dt
     end
     if vel.y ~= 0 then
-      pos.y = pos.y + vel.dy * input.dt
+      e.pos.y = y + vel.dy * input.dt
     end
   end
 )

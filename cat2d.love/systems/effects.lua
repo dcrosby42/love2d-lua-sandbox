@@ -8,7 +8,7 @@ function pathLookupEntCompKey(estore, e, path)
   local cur = e
   for i=1,#path-2 do
     if path[i] == 'PARENT' then
-      cur = estore:getParent(cur)
+      cur = cur:getParent()
     else
       cur = cur[path[i]]
     end
