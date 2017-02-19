@@ -191,35 +191,6 @@ function buildEstore()
     blue={0,0,255},
     brown={127, 95, 26},
   }
-  local tree = function(p,x,y)
-    local trunkW = 20
-    local trunkH = 100
-    local trunkX = x -- -(trunkW/2)
-    local trunkY = y -- -trunkH
-
-    box(scene, trunkX,trunkY, trunkW,trunkH, c.brown)
-    local brushW = 80
-    local brushH = 60
-    -- box(scene, x, trunkY-brushH, brushW,brushH, c.green)
-  end
-
-  local tree2 = function(p,x,y)
-    local w = 80
-    local h = 160
-    local trE = buildEntity(estore, {
-      {'pos', {x=x,y=y}},
-      {'bounds', {offx=-w/2, offy=-h/2, w=w, h=h}},
-      {'parent', {parentEid=p.eid}},
-    })
-    local trunkW = 20
-    local trunkH = 100
-    local brushW = 80
-    local brushH = 60
-    box(trE, x,y, trunkW,trunkH, c.brown)
-    box(trE, x, trunkY-brushH, brushW,brushH, c.green)
-    return treE
-  end
-
   local tree3 = function(opts)
     local fullH = opts.trunkH + opts.bushH
     local fullW = opts.bushW

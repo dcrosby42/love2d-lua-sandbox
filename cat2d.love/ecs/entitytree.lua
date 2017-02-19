@@ -114,7 +114,6 @@ end
 
 Etree.updateEntityTree = updateEntityTree
 
--- XXX deleteme in favor of 'ecs/etreesystem'
 Etree.etreeSystem = function(estore,input,res)
   estore:updateEntityTree()
 end

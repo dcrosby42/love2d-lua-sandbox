@@ -11,6 +11,7 @@ local selfDestructSystem = require 'systems/selfdestruct'
 local outputCleanupSystem = require 'systems/outputcleanup'
 local effectsSystem = require 'systems/effects'
 local drawSystem = require 'systems/drawstuff'
+local etreeSystem = require 'ecs/etreesystem'
 local Etree = require 'ecs/entitytree'
 
 -- resource name shortcuts
@@ -27,7 +28,7 @@ local DoUpdate = iterateFuncs({
   snowSystem,
   -- iconAdderSystem,
   effectsSystem,
-  Etree.etreeSystem,
+  etreeSystem,
 })
 
 local DoDraw = iterateFuncs({

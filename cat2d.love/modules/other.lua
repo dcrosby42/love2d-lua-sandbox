@@ -8,6 +8,7 @@ local timerSystem = require 'systems/timer'
 local mouseSystem = require 'systems/button'
 local outputCleanupSystem = require 'systems/outputcleanup'
 local drawSystem = require 'systems/drawstuff'
+local etreeSystem = require 'ecs/etreesystem'
 local Etree = require 'ecs/entitytree'
 
 local leaveSystem = defineUpdateSystem({'event'},function(e,estore,input,res)
@@ -22,7 +23,8 @@ local DoUpdate = iterateFuncs({
   timerSystem,
   mouseSystem,
   leaveSystem,
-  Etree.etreeSystem,
+  -- Etree.etreeSystem,
+  etreeSystem,
 })
 
 local DoDraw = iterateFuncs({
