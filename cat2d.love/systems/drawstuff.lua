@@ -1,7 +1,7 @@
 require 'flags'
 
 local DBG=false
-local BOUNDS=true
+local BOUNDS=false
 
 return function(estore,output,res)
   -- estore:updateEntityTree()
@@ -73,7 +73,7 @@ return function(estore,output,res)
       love.graphics.setColor(unpack(rect.color))
       love.graphics.rectangle(rect.style, x+rect.offx, y+rect.offy, rect.w, rect.h)
     end
-    
+
     if BOUNDS then
       if e.pos then
         local x,y = getPos(e)
