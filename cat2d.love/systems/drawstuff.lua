@@ -8,22 +8,6 @@ return function(estore,output,res)
 
   -- estore:search(hasComps('pos'), function(e)
   estore:walkEntities(Flags.Draw, nil, function(e)
-    if BOUNDS then
-      if e.pos then
-        local x,y = getPos(e)
-        love.graphics.setColor(255,255,255)
-        love.graphics.line(x-5,y, x+5,y)
-        love.graphics.line(x,y-5, x,y+5)
-      end
-      -- if e.bounds then
-      --   local x,y = getBounds(e)
-      --   love.graphics.setColor(255,255,255)
-      --   love.graphics.line(x-5,y, x+5,y)
-      --   love.graphics.line(x,y-5, x,y+5)
-      --
-      -- end
-    end
-
     --
     -- IMG
     --
@@ -69,8 +53,10 @@ return function(estore,output,res)
     -- CIRCLE
     --
     elseif e.circle and e.pos then
-      local x,y = getPos(e)
       local circle = e.circle
+      local x,y = getPos(e)
+      x = x + circle.offx
+      y = y + circle.offy
       love.graphics.setColor(unpack(circle.color))
       love.graphics.circle("line", x, y, circle.radius)
       love.graphics.circle("fill", x, y, circle.radius)
@@ -85,10 +71,22 @@ return function(estore,output,res)
       local x,y = getPos(e)
       local rect = e.rect
       love.graphics.setColor(unpack(rect.color))
-      love.graphics.rectangle(rect.style, x, y, rect.w, rect.h)
-      --love.graphics.setColor(0,0,0)
-      -- love.graphics.rectangle("line", pos.x, pos.y, rect.w, rect.h)
+      love.graphics.rectangle(rect.style, x+rect.offx, y+rect.offy, rect.w, rect.h)
     end
+    
+    if BOUNDS then
+      if e.pos then
+        local x,y = getPos(e)
+        love.graphics.setColor(255,255,255)
+        love.graphics.line(x-5,y, x+5,y)
+        love.graphics.line(x,y-5, x,y+5)
+        if e.bounds then
+          local b = e.bounds
+          love.graphics.rectangle("line", x+b.offx, y+b.offy, b.w, b.h)
+        end
+      end
+    end
+
   end)
 
   if DBG then DBG=false end

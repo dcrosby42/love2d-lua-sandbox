@@ -177,7 +177,7 @@ function buildEstore()
   local box = function(p,x,y,w,h,col)
     local ent = buildEntity(estore, {
       {'pos', {x=x,y=y}},
-      {'rect', {w=w,h=h,color=col}},
+      {'rect', {offx=-w/2, offy=-h/2, w=w,h=h,color=col}},
       {'parent', {parentEid=p.eid, order=ord}},
     })
     ord = ord + 1
@@ -194,12 +194,24 @@ function buildEstore()
   local tree = function(p,x,y)
     local trunkW = 20
     local trunkH = 100
-    local trunkX = x-(trunkW/2)
-    local trunkY = y-trunkH
+    local trunkX = x -- -(trunkW/2)
+    local trunkY = y -- -trunkH
+
     box(scene, trunkX,trunkY, trunkW,trunkH, c.brown)
     local brushW = 80
     local brushH = 60
-    box(scene, x-(brushW/2), trunkY-brushH, brushW,brushH, c.green)
+    box(scene, x, trunkY-brushH, brushW,brushH, c.green)
+  end
+
+  local tree2 = function(p,x,y)
+    local w = 80
+    local h = 160
+    local trE = buildEntity(estore, {
+      {'pos', {x=x,y=y}},
+      {'bounds', {offx=-w/2, offy=-h/2, w=w, h=h}},
+      {'parent', {parentEid=p.eid}},
+    })
+
   end
 
   -- tree(scene,0,600)
@@ -209,13 +221,14 @@ function buildEstore()
     end
   end
 
-  local player = box(scene, 400,260, 20,32, c.white)
+  local player = box(scene, 400,260, 20,32, {200,200,200})
   estore:newComp(player, 'tag', {name='player'})
   estore:newComp(player, 'name', {name='Player1'})
   estore:newComp(player, 'controller', {id='con1'})
+  estore:newComp(player, 'bounds', {offx=-10,offy=-16,w=20,h=32})
   estore:newComp(player, 'vel', {})
 
-  local item = box(player, -7,9, 10,16, {150,150,190})
+  local item = box(player, 12,-3, 13,7, {150,150,190})
 
   ------------------------------------
   estore:updateEntityTree()
