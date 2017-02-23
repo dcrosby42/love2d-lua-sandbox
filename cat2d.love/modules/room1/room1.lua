@@ -167,6 +167,7 @@ function buildEstore()
 
   local scene = buildEntity(estore, {
     {'tag', {name='room1'}},
+    {'pos', {}}
   })
 
   local ord = 0

@@ -126,11 +126,13 @@ function newSnowScene()
   local estore = Estore:new()
   local group = buildEntity(estore, {
     {'tag', {name='snowScene'}},
+    {'pos',{}},
   })
 
   buildEntity(estore, {
     {'iconAdder', {id='p1', imgId=catIcon, tagName='cattish'}},
     {'parent', {parentEid=group.eid}},
+    {'pos',{}},
   })
 
   buildEntity(estore, {

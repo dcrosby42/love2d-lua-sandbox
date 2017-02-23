@@ -4,7 +4,10 @@ local BOUNDS=false
 
 return function(estore,output,res)
   -- estore:search(hasComps('pos'), function(e)
+  -- local drewItems = 0
   estore:walkEntities(nil, function(e)
+    if not e.pos then return false end
+
     --
     -- IMG
     --
@@ -84,7 +87,9 @@ return function(estore,output,res)
       end
     end
 
+    -- drewItems = drewItems + 1
   end)
 
   if DBG then DBG=false end
+  -- print("drawstuff: visited "..drewItems.." items")
 end

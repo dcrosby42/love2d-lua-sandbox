@@ -101,6 +101,7 @@ function newOtherScene()
 
   local otherScene = buildEntity(mystore, {
     {'tag', {name='otherScene'}},
+    {'pos',{}},
   })
 
   local x = 0
@@ -110,13 +111,14 @@ function newOtherScene()
 
   local button = buildEntity(mystore, {
     {'parent', {parentEid = otherScene.eid}},
+    {'pos',{x=100,y=100}},
   })
 
   buildEntity(mystore, {
     {'rect', {w=w,h=h, style="line",color={0,255,0}}},
     {'pos', {x=x,y=y}},
     {'tag',{name='leaver'}},
-    {'mouse_sensor', {eventName='leave'}},
+    {'mouse_sensor', {on='pressed', eventName='leave'}},
     {'parent', {parentEid = button.eid}},
   })
 

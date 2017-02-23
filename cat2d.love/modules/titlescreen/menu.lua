@@ -115,6 +115,7 @@ function buildMenu(estore)
   local menu = buildEntity(estore, {
     {'menu', {state='selecting',selected='start', choices={'start','continue'}}},
     {'menu', {state='selecting',selected='start', choices={'start',}}},
+    {'pos',{}},
   })
 --
   local y = 170

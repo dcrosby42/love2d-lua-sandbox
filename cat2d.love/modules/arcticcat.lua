@@ -5,7 +5,8 @@ local Modules = {
 }
 
 local StateTransitions = {
-  _start="room1",
+  -- _start="room1",
+  _start="other",
   title={
     start='room1',
     continue='other',
