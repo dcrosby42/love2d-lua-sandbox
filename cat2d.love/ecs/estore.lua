@@ -29,18 +29,30 @@ function Estore:nextCid()
   return cid
 end
 
-function Estore:newEntity(parentEntity,parentOrder)
-  if not parentOrder then parentOrder = 0 end
+function Estore:newEntity()
   local eid = self:nextEid()
-  local e = Entity:new({eid=eid, _estore=self, _parent=nil, _children={}})
+  local e = Entity:new({
+    eid=eid,
+    _estore=self,
+    _parent=nil,
+    _children={}
+  })
   self.ents[eid] = e
-  if parentEntity then
-    self:newComp(e, 'parent', {parentEid=parentEntity.eid, order=parentOrder})
-  else
-    addChildEntityTo(self._root, e)
-  end
+  addChildEntityTo(self._root, e)
   return e
 end
+-- function Estore:newEntity(parentEntity,parentOrder)
+--   if not parentOrder then parentOrder = 0 end
+--   local eid = self:nextEid()
+--   local e = Entity:new({eid=eid, _estore=self, _parent=nil, _children={}})
+--   self.ents[eid] = e
+--   if parentEntity then
+--     self:newComp(e, 'parent', {parentEid=parentEntity.eid, order=parentOrder})
+--   else
+--     addChildEntityTo(self._root, e)
+--   end
+--   return e
+-- end
 
 function Estore:destroyEntity(e)
   for _,childEnt in ipairs(e._children) do
@@ -100,10 +112,11 @@ function Estore:addComp(e,comp)
   -- Officially relate this comp to its entity
   comp.eid = e.eid
 
-  -- Index the comp by cid
+  -- Assign the next cid:
   if not comp.cid or comp.cid == '' then
     comp.cid = self:nextCid()
   end
+  -- Index the comp by cid
   self.comps[comp.cid] = comp
 
   -- Add to this entity:
@@ -121,7 +134,23 @@ function Estore:addComp(e,comp)
         removeChildEntityFrom(e._parent, e)
       end
       e._parent = parentEntity
-      table.insert(parentEntity._children, e)
+      local chs = parentEntity._children
+      local reorder = true
+      if not comp.order then
+        local myOrder = #chs + 1
+        if #chs > 0 then
+          local lastOrder = chs[#chs].order
+          if lastOrder then
+            myOrder = lastOrder + 1
+          end
+        end
+        comp.order = myOrder
+        reorder = false
+      end
+      table.insert(chs, e)
+      if reorder then
+        resortChildren(parentEntity)
+      end
     end
   end
 
@@ -164,7 +193,7 @@ function Estore:detachComp(e,comp)
     end
 
     if key == "parent" then
-      e._parent = self._root
+      self:_deparent(e)
     end
 
     local compkeycount = 0
@@ -175,13 +204,7 @@ function Estore:detachComp(e,comp)
     end
     if compkeycount <= 1 then
       -- eid is only remaining key, meaning we have no comps... EVAPORATE THE ENTITY
-      local newp = e._parent
-      -- remove ent from its parent
-      removeChildEntityFrom(newp, e)
-      for _,childEntity in ipairs(e._children) do
-        addChildEntityTo(newp, childEntity)
-      end
-      -- remove entity from cache
+      self:_deparent(e)
       self.ents[e.eid] = nil
     end
   end
@@ -264,6 +287,33 @@ function Estore:_walkEntity(e, matchFn, doFn)
   end
 end
 
+function Estore:_deparent(e)
+  if e._parent then
+    removeChildEntityFrom(e._parent, e)
+    if e._parent.eid and e._children then
+      for _,childEntity in ipairs(e._children) do
+        self:setupParent(e._parent, childEntity)
+      end
+    end
+  else
+    if e._children then
+      for _,childEntity in ipairs(e._children) do
+        if childEntity.parent then
+          self:removeComp(childEntity.parent)
+        end
+        addChildEntityTo(self._root, childEntity)
+      end
+    end
+  end
+end
+
+function Estore:setupParent(parentEnt, childEnt)
+  if childEnt.parent then
+    self:removeComp(childEnt.parent)
+  end
+  self:newComp(childEnt, 'parent', {parentEid=parentEnt.eid})
+end
+
 function Estore:search(matchFn,doFn)
   valsearch(self.ents, matchFn, doFn)
 end
@@ -278,6 +328,50 @@ end
 
 function compDebugString(comp)
   return Comp.debugString(comp)
+end
+
+
+function Estore:debugString()
+  local s = ""
+  s = s .. "-- Estore:\n"
+  s = s .. "--- Next eid: e" .. self.eidCounter .. ", Next cid: c" .. self.cidCounter .. "\n"
+  s = s .. "--- Components (self.comps):\n"
+  for cid,comp in pairs(self.comps) do
+    s = s..cid .. ": " .. Comp.debugString(comp) .. "\n"
+  end
+  s = s .. "--- Entities (self.ents):\n"
+  for eid,e in pairs(self.ents) do
+    s = s .. entityDebugString(e)
+  end
+  s = s .. "--- Tree (self._root): TODO\n"
+  for _,ch in ipairs(self._root._children) do
+    s = s .. entityTreeDebugString(ch,"  ")
+  end
+  return s
+end
+
+local function addChildEntityTo(parEnt, chEnt)
+  assert(parEnt, "ERR addChildEntityTo nil parEnt?")
+  assert(parEnt._children, "ERR addChildEntityTo parent._children nil?")
+  assert(chEnt, "ERR addChildEntityTo nil chEnt?")
+  chEnt._parent = parEnt
+  table.insert(parEnt._children, chEnt)
+end
+
+local function removeChildEntityFrom(parEnt, chEnt)
+  chEnt._parent = nil
+  local remi = -1
+  local eid = chEnt.eid
+  local list = parEnt._children
+  for i,n in ipairs(list) do
+    if n.eid == eid then
+      remi = i
+      break
+    end
+  end
+  if remi > 0 then
+    table.remove(list,remi)
+  end
 end
 
 function entityDebugString(e)
@@ -309,25 +403,6 @@ function entityDebugString(e)
   return s
 end
 
-function Estore:debugString()
-  local s = ""
-  s = s .. "-- Estore:\n"
-  s = s .. "--- Next eid: e" .. self.eidCounter .. ", Next cid: c" .. self.cidCounter .. "\n"
-  s = s .. "--- Components (self.comps):\n"
-  for cid,comp in pairs(self.comps) do
-    s = s..cid .. ": " .. Comp.debugString(comp) .. "\n"
-  end
-  s = s .. "--- Entities (self.ents):\n"
-  for eid,e in pairs(self.ents) do
-    s = s .. entityDebugString(e)
-  end
-  s = s .. "--- Tree (self._root): TODO\n"
-  for _,ch in ipairs(self._root._children) do
-    s = s .. entityTreeDebugString(ch,"  ")
-  end
-  return s
-end
-
 function entityTreeDebugString(e,indent)
   local s = indent .. e.eid .. ": \n"
   for _,ch in ipairs(e._children) do
@@ -336,28 +411,5 @@ function entityTreeDebugString(e,indent)
   return s
 end
 
-function addChildEntityTo(parEnt, chEnt)
-  assert(parEnt, "ERR addChildEntityTo nil parEnt?")
-  assert(parEnt._children, "ERR addChildEntityTo parent._children nil?")
-  assert(chEnt, "ERR addChildEntityTo nil chEnt?")
-  chEnt._parent = parEnt
-  table.insert(parEnt._children, chEnt)
-end
-
-function removeChildEntityFrom(parEnt, chEnt)
-  chEnt._parent = nil
-  local remi = -1
-  local eid = chEnt.eid
-  local list = parEnt._children
-  for i,n in ipairs(list) do
-    if n.eid == eid then
-      remi = i
-      break
-    end
-  end
-  if remi > 0 then
-    table.remove(list,remi)
-  end
-end
 
 return Estore

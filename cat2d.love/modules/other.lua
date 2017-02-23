@@ -109,24 +109,39 @@ function newOtherScene()
   local w = 200
   local h = 50
 
-  local button = buildEntity(mystore, {
-    {'parent', {parentEid = otherScene.eid}},
+  local button = otherScene:newChild({
     {'pos',{x=100,y=100}},
-  })
-
-  buildEntity(mystore, {
-    {'rect', {w=w,h=h, style="line",color={0,255,0}}},
-    {'pos', {x=x,y=y}},
-    {'tag',{name='leaver'}},
+    {'bounds', {w=w,h=h}},
     {'mouse_sensor', {on='pressed', eventName='leave'}},
-    {'parent', {parentEid = button.eid}},
+  })
+  button:newChild({
+    {'rect', {w=w,h=h, style="line",color={0,255,0}}},
+    {'pos', {}},
+  })
+  button:newChild({
+    {'label', {font="narpassword-medium", text="Leave", color={0,255,0}, width=w, align='center', height=h, valign='middle'}},
+    {'pos', {}},
   })
 
-  buildEntity(mystore, {
-    {'label', {font="narpassword-medium", text="Leave", color={0,255,0}, width=w, align='center', height=h, valign='middle'}},
-    {'pos', {x=x,y=y}},
-    {'parent', {parentEid = button.eid,order=1}},
-  })
+  -- local button = buildEntity(mystore, {
+  --   {'parent', {parentEid = otherScene.eid}},
+  --   {'pos',{x=100,y=100}},
+  --   {'tag',{name='leaver'}},
+  --   {'mouse_sensor', {on='pressed', eventName='leave'}},
+  --   {'bounds', {w=w,h=h}}
+  -- })
+
+  -- buildEntity(mystore, {
+  --   {'rect', {w=w,h=h, style="line",color={0,255,0}}},
+  --   {'pos', {}},
+  --   {'parent', {parentEid = button.eid}},
+  -- })
+  --
+  -- buildEntity(mystore, {
+  --   {'label', {font="narpassword-medium", text="Leave", color={0,255,0}, width=w, align='center', height=h, valign='middle'}},
+  --   {'pos', {}},
+  --   {'parent', {parentEid = button.eid,order=1}},
+  -- })
 
 
   return mystore
