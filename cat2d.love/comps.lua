@@ -1,5 +1,4 @@
 local Comp = require 'ecs/component'
--- N.B. -- 'parent' and 'filter' components are BOTH DEFINED AND UTILIZED INTERNALLY BY ESTORE. (don't mess with them)
 
 Comp.define("bounds", {'offx',0,'offy',0,'w',0,'h',0})
 Comp.define("pos", {'x',0,'y',0})

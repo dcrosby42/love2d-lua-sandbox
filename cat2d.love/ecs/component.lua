@@ -130,11 +130,6 @@ Comp.debugString = compDebugString
 -- 'parent' is used to declare parent-child relationships between entities.
 Comp.define("parent", {'parentEid', '', 'order',0})
 
--- 'filter' is used to prune searches through the tree via Estore:walkEntities().
--- filter.bits is a 32-bit integer flag set. The actual definition and usage of the flags
--- are up to individual systems, but the most obvious to me are Flags.Update and Flags.Draw.
-Comp.define("filter", {'bits', 0})
-
 Comp.define("name", {})
 
 

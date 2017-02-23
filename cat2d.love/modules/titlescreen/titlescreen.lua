@@ -1,7 +1,6 @@
 require 'ecs/ecshelpers'
 local Estore = require 'ecs/estore'
 
-require 'flags'
 require 'comps'
 
 local iconAdderSystem = require 'systems/iconadder'
@@ -11,8 +10,6 @@ local selfDestructSystem = require 'systems/selfdestruct'
 local outputCleanupSystem = require 'systems/outputcleanup'
 local effectsSystem = require 'systems/effects'
 local drawSystem = require 'systems/drawstuff'
-local etreeSystem = require 'ecs/etreesystem'
-local Etree = require 'ecs/entitytree'
 
 -- resource name shortcuts
 local catIcon = "images/black-cat-icon.png"
@@ -28,7 +25,6 @@ local DoUpdate = iterateFuncs({
   snowSystem,
   -- iconAdderSystem,
   effectsSystem,
-  etreeSystem,
 })
 
 local DoDraw = iterateFuncs({
@@ -130,7 +126,6 @@ function newSnowScene()
   local estore = Estore:new()
   local group = buildEntity(estore, {
     {'tag', {name='snowScene'}},
-    {'filter', {bits = bit32.bor(Flags.Update, Flags.Draw)}},
   })
 
   buildEntity(estore, {
@@ -168,7 +163,6 @@ function newSnowScene()
     {'parent', {parentEid=group.eid, order=4}},
   })
 
-  estore:updateEntityTree()
   return estore
 end
 

@@ -1,7 +1,6 @@
 require 'ecs/ecshelpers'
 local Estore = require 'ecs/estore'
 
-require 'flags'
 require 'comps'
 
 local timerSystem = require 'systems/timer'
@@ -10,7 +9,6 @@ local outputCleanupSystem = require 'systems/outputcleanup'
 local effectsSystem = require 'systems/effects'
 local controllerSystem = require 'systems/controller'
 local drawSystem = require 'systems/drawstuff'
-local etreeSystem = require 'ecs/etreeSystem'
 
 -- resource name shortcuts
 local catIcon = "images/black-cat-icon.png"
@@ -50,7 +48,6 @@ local DoUpdate = iterateFuncs({
   moverSystem,
 
   effectsSystem,
-  etreeSystem,
 })
 
 local DoDraw = iterateFuncs({
@@ -170,7 +167,6 @@ function buildEstore()
 
   local scene = buildEntity(estore, {
     {'tag', {name='room1'}},
-    {'filter', {bits = bit32.bor(Flags.Update, Flags.Draw)}},
   })
 
   local ord = 0
@@ -245,7 +241,6 @@ function buildEstore()
   local item = box(player, 12,-3, 13,7, {150,150,190})
 
   ------------------------------------
-  estore:updateEntityTree()
   return estore
 end
 

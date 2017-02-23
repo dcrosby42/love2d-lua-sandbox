@@ -1,4 +1,3 @@
-local Flags = require 'flags'
 
 local function createNewIcon(estore, parE, tap, adderComp, res)
   local imgId = adderComp.imgId

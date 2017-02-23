@@ -53,7 +53,6 @@ function defineUpdateSystem(matchSpec,fn)
   end
   return function(estore, input, res)
     estore:walkEntities(
-      1, -- Flags.Update   FIXME I AM TEH CHEAT!!! I said the user can define flags, but this helper actually assumes that there's such a thing as the Update flag and it is 1.
       matchFn,
       function(e) fn(e, estore, input, res) end
     )

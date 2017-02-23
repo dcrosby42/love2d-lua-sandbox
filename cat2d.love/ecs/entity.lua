@@ -1,5 +1,3 @@
--- Comp = require 'ecs/component'
--- Etree = require 'ecs/entitytree'
 
 local Entity = {
 }

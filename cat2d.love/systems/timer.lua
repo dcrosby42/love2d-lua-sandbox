@@ -1,8 +1,7 @@
-require 'flags'
 local Comp = require 'ecs/component'
 
 return function(estore,input,res)
-  estore:walkEntities(Flags.Update,
+  estore:walkEntities(
     hasComps('timer'),
     function(e)
       for _,timer in pairs(e.timers) do

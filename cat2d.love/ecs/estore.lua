@@ -1,6 +1,5 @@
 Comp = require 'ecs/component'
 Entity = require 'ecs/entity'
-Etree = require 'ecs/entitytree'
 
 local Estore = {
 }
@@ -11,7 +10,7 @@ function Estore:new(o)
     cidCounter=1,
     comps={},
     ents={},
-    etree={},
+    _root={_children={}},
   }
   setmetatable(o, self)
   self.__index = self
@@ -30,23 +29,22 @@ function Estore:nextCid()
   return cid
 end
 
-function Estore:newEntity()
+function Estore:newEntity(parentEntity,parentOrder)
+  if not parentOrder then parentOrder = 0 end
   local eid = self:nextEid()
-  local e = Entity:new({eid=eid, _estore=self})
+  local e = Entity:new({eid=eid, _estore=self, _parent=nil, _children={}})
   self.ents[eid] = e
+  if parentEntity then
+    self:newComp(e, 'parent', {parentEid=parentEntity.eid, order=parentOrder})
+  else
+    addChildEntityTo(self._root, e)
+  end
   return e
 end
 
 function Estore:destroyEntity(e)
-  self:destroyEntityByEid(e.eid)
-end
-
-function Estore:destroyEntityByEid(eid)
-  local node = self.etree[eid]
-  if node then
-    for _,chnode in ipairs(node.ch) do
-      self:destroyEntityByEid(chnode.eid)
-    end
+  for _,childEnt in ipairs(e._children) do
+    self:destroyEntity(childEnt)
   end
 
   local compsToRemove={}
@@ -55,24 +53,14 @@ function Estore:destroyEntityByEid(eid)
       table.insert(compsToRemove,comp)
     end
   end
+
   for _,comp in ipairs(compsToRemove) do
     self:removeComp(comp)
   end
-end
 
--- Get the component name, for use as a key into the collection of a particular comp type in an entity.
--- Eg, comp { type="imgsprite", name="door" } could be stored in e.imgsprites.door.
--- If name is nil or empty string, use count+1 (stringified).  Eg,  e.imgsprites["3"]
-local function compName(comp, t)
-  local name = comp.name
-  if (not name) or (name == "") then
-    local num = tcount(t)
-    while t[tostring(num)] do
-      num = num + 1
-    end
-    name = tostring(num)
+  if e._parent then
+    removeChildEntityFrom(e._parent, e)
   end
-  return name
 end
 
 -- Claim a comp from its object pool and (optionally) initialize with values from given data.
@@ -121,14 +109,30 @@ function Estore:addComp(e,comp)
   -- Add to this entity:
   local key = comp.type
   local keyp = key .. "s"
+
+  if key == "parent" then
+    if e.parent then
+      error("UNACCEPTABLE! only one 'parent' Component per Entity please! comp="..tdebug(comp).." entity="..entityDebugString(e))
+    end
+    local pid = comp.parentEid
+    local parentEntity = self.ents[pid]
+    if parentEntity then
+      if e._parent then
+        removeChildEntityFrom(e._parent, e)
+      end
+      e._parent = parentEntity
+      table.insert(parentEntity._children, e)
+    end
+  end
+
   if not e[key] then
     -- First component of this type
     e[key] = comp
     e[keyp] = {}
-    e[keyp][compName(comp,e[keyp])] = comp
+    e[keyp][comp.name or comp.cid] = comp
   else
     -- This entity already has some of this comp type
-    e[keyp][compName(comp,e[keyp])] = comp
+    e[keyp][comp.name or comp.cid] = comp
   end
 
   return comp
@@ -159,11 +163,25 @@ function Estore:detachComp(e,comp)
       end
     end
 
-    local keycount = 0
-    for k,v in pairs(e) do keycount = keycount + 1 end
-    if keycount <= 1 then
-      -- eid is only remaining key, meaning we have no comps
-      -- remove e from ents
+    if key == "parent" then
+      e._parent = self._root
+    end
+
+    local compkeycount = 0
+    for k,v in pairs(e) do
+      if k:byte(1) ~= 95 then  -- k doesn't start with _
+        compkeycount = compkeycount + 1
+      end
+    end
+    if compkeycount <= 1 then
+      -- eid is only remaining key, meaning we have no comps... EVAPORATE THE ENTITY
+      local newp = e._parent
+      -- remove ent from its parent
+      removeChildEntityFrom(newp, e)
+      for _,childEntity in ipairs(e._children) do
+        addChildEntityTo(newp, childEntity)
+      end
+      -- remove entity from cache
       self.ents[e.eid] = nil
     end
   end
@@ -212,37 +230,38 @@ function valsearchfirst(t,matchFn,callbackFn)
   end
 end
 
-function Estore:eachEntity(fn)
+function Estore:_eachEntity(fn)
   for _,ent in pairs(self.ents) do
     fn(ent)
   end
 end
 
-function Estore:_walkEntitiesFromNode(node, flags, matchFn, doFn)
-  local e = self:getEntity(node.eid)
-  if e then
-    if (not e.filter) or (e.filter and bit32.btest(e.filter.bits, flags)) then
-      if (not matchFn) or matchFn(e) then -- execute doFn if either a) no matcher, or b) matcher provided and returns true
-        doFn(e)
-      end
-      for _,chnode in ipairs(node.ch) do
-        self:_walkEntitiesFromNode(chnode, flags, matchFn, doFn)
-      end
+function Estore:walkEntities(matchFn, doFn)
+  for _,e in pairs(self._root._children) do
+    self:_walkEntity(e, matchFn, doFn)
+  end
+end
+
+function Estore:_walkEntity(e, matchFn, doFn)
+  -- if not e._children then
+  --   print(self:debugString())
+  --   print(debug.traceback())
+  --   error("ERR _walkEntity no childs. "..entityDebugString(e))
+  -- end
+  local proceed = true
+  if matchFn and type(matchFn) == "number" then
+    print("WUT?")
+    print(debug.traceback())
+  end
+  if (not matchFn) or matchFn(e) then -- execute doFn if either a) no matcher, or b) matcher provided and returns true
+    local out = doFn(e)
+    if out == false then proceed = false end
+  end
+  if proceed then
+    for _,ch in ipairs(e._children) do
+      self:_walkEntity(ch, matchFn, doFn)
     end
   end
-  -- else
-  --   print("!! ERR Estore:walkEntitiesFromNode: no entity for node.eid="..node.eid.."; node:"..tdebug(node,' '))
-  -- end
-end
-
-function Estore:walkEntities(flags, matchFn, doFn)
-  for _,node in pairs(self.etree.ROOT.ch) do
-    self:_walkEntitiesFromNode(node, flags, matchFn, doFn)
-  end
-end
-
-function Estore:updateEntityTree()
-  Etree.updateEntityTree(self.ents, self.etree)
 end
 
 function Estore:search(matchFn,doFn)
@@ -250,23 +269,11 @@ function Estore:search(matchFn,doFn)
 end
 
 function Estore:getParent(e)
-  local node = self.etree[e.eid]
-  if node then
-    return self.ents[node.pid]
-  end
-  return nil
+  return e._parent
 end
 
 function Estore:getChildren(e)
-  local node = self.etree[e.eid]
-  if node and node.ch and #node.ch > 0 then
-    local childs = {nil,nil,nil}
-    for i,chnode in ipairs(node.ch) do
-      childs[i] = self.ents[chnode.eid]
-    end
-    return self.ents[node.pid]
-  end
-  return {}
+  return e._children
 end
 
 function compDebugString(comp)
@@ -274,21 +281,27 @@ function compDebugString(comp)
 end
 
 function entityDebugString(e)
-  s = e.eid .. ": " .. "\n"
+  local eid = e.eid
+  if not eid then
+    eid = "NO_EID"
+  end
+  s = eid .. ": " .. "\n"
   for k,v in pairs(e) do
-    if v.cid and v.eid then
-      keyp = k.."s"
-      if tcount(e[keyp]) == 1 then
-        s = s.."  "..k..": "..Comp.debugString(v) .. "\n"
-      else
-        s = s.."  "..keyp..": \n"
-        for name,comp in pairs(e[keyp]) do
-          s = s.."    "..name..": "
-          if v.cid == comp.cid then
-            s = s .. "*"
+    if tostring(k):byte(1) ~= 95 then
+      if v.cid and v.eid then
+        keyp = tostring(k).."s"
+        if tcount(e[keyp]) == 1 then
+          s = s.."  "..tostring(k)..": "..Comp.debugString(v) .. "\n"
+        else
+          s = s.."  "..tostring(keyp)..": \n"
+          for name,comp in pairs(e[keyp]) do
+            s = s.."    "..tostring(name)..": "
+            if v.cid == comp.cid then
+              s = s .. "*"
+            end
+            s = s..Comp.debugString(comp)
+            s = s .."\n"
           end
-          s = s..Comp.debugString(comp)
-          s = s .."\n"
         end
       end
     end
@@ -308,9 +321,43 @@ function Estore:debugString()
   for eid,e in pairs(self.ents) do
     s = s .. entityDebugString(e)
   end
+  s = s .. "--- Tree (self._root): TODO\n"
+  for _,ch in ipairs(self._root._children) do
+    s = s .. entityTreeDebugString(ch,"  ")
+  end
   return s
 end
 
+function entityTreeDebugString(e,indent)
+  local s = indent .. e.eid .. ": \n"
+  for _,ch in ipairs(e._children) do
+    s = s .. entityTreeDebugString(ch,indent.."  ")
+  end
+  return s
+end
 
+function addChildEntityTo(parEnt, chEnt)
+  assert(parEnt, "ERR addChildEntityTo nil parEnt?")
+  assert(parEnt._children, "ERR addChildEntityTo parent._children nil?")
+  assert(chEnt, "ERR addChildEntityTo nil chEnt?")
+  chEnt._parent = parEnt
+  table.insert(parEnt._children, chEnt)
+end
+
+function removeChildEntityFrom(parEnt, chEnt)
+  chEnt._parent = nil
+  local remi = -1
+  local eid = chEnt.eid
+  local list = parEnt._children
+  for i,n in ipairs(list) do
+    if n.eid == eid then
+      remi = i
+      break
+    end
+  end
+  if remi > 0 then
+    table.remove(list,remi)
+  end
+end
 
 return Estore

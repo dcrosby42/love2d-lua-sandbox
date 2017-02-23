@@ -1,15 +1,12 @@
 require 'ecs/ecshelpers'
 local Estore = require 'ecs/estore'
 
-require 'flags'
 require 'comps'
 
 local timerSystem = require 'systems/timer'
 local mouseSystem = require 'systems/button'
 local outputCleanupSystem = require 'systems/outputcleanup'
 local drawSystem = require 'systems/drawstuff'
-local etreeSystem = require 'ecs/etreesystem'
-local Etree = require 'ecs/entitytree'
 
 local leaveSystem = defineUpdateSystem({'event'},function(e,estore,input,res)
   if e.events.leave then
@@ -23,8 +20,6 @@ local DoUpdate = iterateFuncs({
   timerSystem,
   mouseSystem,
   leaveSystem,
-  -- Etree.etreeSystem,
-  etreeSystem,
 })
 
 local DoDraw = iterateFuncs({
@@ -106,7 +101,6 @@ function newOtherScene()
 
   local otherScene = buildEntity(mystore, {
     {'tag', {name='otherScene'}},
-    {'filter', {bits = bit32.bor(Flags.Update, Flags.Draw)}},
   })
 
   local x = 0
@@ -133,7 +127,6 @@ function newOtherScene()
   })
 
 
-  mystore:updateEntityTree()
   return mystore
 end
 

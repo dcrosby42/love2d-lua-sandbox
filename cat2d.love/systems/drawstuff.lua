@@ -1,13 +1,10 @@
-require 'flags'
 
 local DBG=false
 local BOUNDS=false
 
 return function(estore,output,res)
-  -- estore:updateEntityTree()
-
   -- estore:search(hasComps('pos'), function(e)
-  estore:walkEntities(Flags.Draw, nil, function(e)
+  estore:walkEntities(nil, function(e)
     --
     -- IMG
     --

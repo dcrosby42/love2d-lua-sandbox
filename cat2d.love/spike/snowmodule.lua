@@ -1,7 +1,6 @@
 require 'ecs/ecshelpers'
 local Estore = require 'ecs/estore'
 
-require 'flags'
 require 'comps'
 
 local controllerSystem = require 'systems/controller'
@@ -10,10 +9,9 @@ local iconAdderSystem = require 'systems/iconadder'
 local timerSystem = require 'systems/timer'
 local snowSystem = require 'systems/snow'
 local drawSystem = require 'systems/drawstuff'
-local Etree = require 'ecs/entitytree'
 -- local gravitySystem = require 'systems/gravity'
 
--- resource name shortcuts 
+-- resource name shortcuts
 local catIcon = "images/black-cat-icon.png"
 local arcticCatTitle = "images/arctic_cat_title.png"
 
@@ -21,7 +19,6 @@ local DoUpdate = iterateFuncs({
   timerSystem,
   snowSystem,
   iconAdderSystem,
-  Etree.etreeSystem,
 })
 
 local DoDraw = iterateFuncs({
@@ -34,7 +31,7 @@ local newSnowScene, newOtherScene
 
 M.newWorld = function()
   local w = {
-    bgcolor = {0,0,100}, 
+    bgcolor = {0,0,100},
     currentScene = "snow",
     scenes = {
       snow=newSnowScene(),
@@ -101,7 +98,6 @@ function newSnowScene()
   local estore = Estore:new()
   local group = buildEntity(estore, {
     {'tag', {name='snowScene'}},
-    {'filter', {bits = bit32.bor(Flags.Update, Flags.Draw)}},
   })
 
   buildEntity(estore, {
@@ -143,8 +139,7 @@ function newSnowScene()
     {'timer', {name='acc', countDown=false}},
     {'parent', {parentEid=group.eid, order=4}},
   })
-  
-  estore:updateEntityTree()
+
   return estore
 end
 
@@ -153,7 +148,6 @@ function newOtherScene()
 
   local otherScene = buildEntity(mystore, {
     {'tag', {name='otherScene'}},
-    {'filter', {bits = bit32.bor(Flags.Update, Flags.Draw)}},
   })
 
   buildEntity(mystore, {
@@ -162,7 +156,6 @@ function newOtherScene()
     {'parent', {parentEid = otherScene.eid}},
   })
 
-  mystore:updateEntityTree()
   return mystore
 end
 
