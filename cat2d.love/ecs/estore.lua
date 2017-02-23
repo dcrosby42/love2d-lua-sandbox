@@ -411,5 +411,15 @@ function entityTreeDebugString(e,indent)
   return s
 end
 
+local function resortChildren(e)
+  if e._children then
+    table.sort(e._children, byOrder)
+  end
+end
+
+local function byOrder(a,b)
+  return a.order < b.order
+end
+
 
 return Estore
