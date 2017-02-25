@@ -350,7 +350,7 @@ function Estore:debugString()
   return s
 end
 
-local function addChildEntityTo(parEnt, chEnt)
+function addChildEntityTo(parEnt, chEnt)
   assert(parEnt, "ERR addChildEntityTo nil parEnt?")
   assert(parEnt._children, "ERR addChildEntityTo parent._children nil?")
   assert(chEnt, "ERR addChildEntityTo nil chEnt?")
@@ -358,7 +358,7 @@ local function addChildEntityTo(parEnt, chEnt)
   table.insert(parEnt._children, chEnt)
 end
 
-local function removeChildEntityFrom(parEnt, chEnt)
+function removeChildEntityFrom(parEnt, chEnt)
   chEnt._parent = nil
   local remi = -1
   local eid = chEnt.eid
@@ -411,14 +411,17 @@ function entityTreeDebugString(e,indent)
   return s
 end
 
-local function resortChildren(e)
+function resortChildren(e)
   if e._children then
     table.sort(e._children, byOrder)
   end
 end
 
-local function byOrder(a,b)
-  return a.order < b.order
+function byOrder(a,b)
+  local aval,bval
+  if a.parent and a.parent.order then aval = a.parent.order else aval = 0 end
+  if b.parent and b.parent.order then bval = b.parent.order else bval = 0 end
+  return aval < bval
 end
 
 
