@@ -154,7 +154,8 @@ function newSnowScene()
   })
 
   local menu = Menu.BuildMenuEntity(estore)
-  setParentEntity(estore, menu, group, 3)
+  group:addChild(menu)
+  -- setParentEntity(estore, menu, group, 3)
 
   buildEntity(estore, {
     {'snowmachine', {large=5, small=3, dx=0,dy=60}},

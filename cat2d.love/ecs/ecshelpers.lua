@@ -60,12 +60,12 @@ function defineUpdateSystem(matchSpec,fn)
 end
 
 function buildEntity(estore, compList)
+  print("-- DEPRECATED: ecs/ecshelpers.lua:buildEntity(), use estore:buildEntity() or entity:newChild() instead")
   local e = estore:newEntity()
   for _,cinfo in ipairs(compList) do
     local ctype, data = unpack(cinfo)
     estore:newComp(e, ctype, data)
   end
-  -- print(tdebug(e))
   return e
 end
 

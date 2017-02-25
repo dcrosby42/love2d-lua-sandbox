@@ -192,22 +192,19 @@ function buildEstore()
     local fullH = opts.trunkH + opts.bushH
     local fullW = opts.bushW
 
-    local tree = buildEntity(estore, {
+    return opts.parent:newChild({
       {'pos', {x=opts.x, y=opts.y}},
       {'bounds', {offx=-fullW/2,offy=-fullW,w=fullW,h=fullH}},
-      {'parent', {parentEid=opts.parent.eid, order=opts.order}},
+    }, {
+      {
+        {'pos', {x=0,y=0}},
+        {'rect', {offx=-opts.trunkW/2, offy=-opts.trunkH, w=opts.trunkW,h=opts.trunkH,color=opts.trunkCol}},
+      },
+      {
+        {'pos', {x=0,y=-opts.trunkH}},
+        {'rect', {offx=-opts.bushW/2, offy=-opts.bushH, w=opts.bushW,h=opts.bushH,color=opts.bushCol}},
+      },
     })
-    buildEntity(estore, {
-      {'pos', {x=0,y=0}},
-      {'rect', {offx=-opts.trunkW/2, offy=-opts.trunkH, w=opts.trunkW,h=opts.trunkH,color=opts.trunkCol}},
-      {'parent', {parentEid=tree.eid, order=0}},
-    })
-    buildEntity(estore, {
-      {'pos', {x=0,y=-opts.trunkH}},
-      {'rect', {offx=-opts.bushW/2, offy=-opts.bushH, w=opts.bushW,h=opts.bushH,color=opts.bushCol}},
-      {'parent', {parentEid=tree.eid, order=1}},
-    })
-    return tree
   end
 
   local opts = {
@@ -232,19 +229,32 @@ function buildEstore()
     end
   end
 
-  local player = box(scene, 400,260, 20,32, {200,200,200})
-  estore:newComp(player, 'tag', {name='player'})
-  estore:newComp(player, 'name', {name='Player1'})
-  estore:newComp(player, 'controller', {id='con1'})
-  estore:newComp(player, 'bounds', {offx=-10,offy=-16,w=20,h=32})
-  estore:newComp(player, 'vel', {})
-
-  local item = box(player, 12,-3, 13,7, {150,150,190})
-
+  local player = scene:newChild({
+    { 'tag', {name='player'}},
+    { 'name', {name='Player1'}},
+    { 'controller', {id='con1'}},
+    { 'pos', {x=400,y=260}},
+    { 'vel', {}},
+    { 'rect', offsetBounds({color={200,200,200}}, 20,32, 0.5, 0.5)},
+    { 'bounds', offsetBounds({},20,32, 0.5, 0.5)},
+  }, {
+    {
+      { 'name', {name='Weapon'}},
+      { 'pos', {x=12,y=-3}},
+      { 'rect', offsetBounds({color={150,150,190}}, 13, 7, 0.5, 0.5)},
+    }
+  })
   ------------------------------------
+  -- print(estore:debugString())
   return estore
 end
 
-
+function offsetBounds(t, w,h, wr, hr)
+  t.w = w
+  t.h = h
+  t.offx = -wr * w
+  t.offy = -hr * h
+  return t
+end
 
 return M
