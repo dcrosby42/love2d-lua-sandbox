@@ -110,16 +110,6 @@ local function releaseComp(comp)
   t.release(comp)
 end
 
--- local function define(typeName, proto, poolOpts)
---   if not proto.type then
---     proto.type = typeName
---   end
---
---   local c = mkComp(proto,poolOpts)
---   Comp[typeName] = c
---   return c
--- end
-
 Comp.define = define
 Comp.release = releaseComp
 Comp.debugString = compDebugString
@@ -128,7 +118,7 @@ Comp.debugString = compDebugString
 -- BUILT-IN COMPONENTS (these are used internally by Estore)
 --
 -- 'parent' is used to declare parent-child relationships between entities.
-Comp.define("parent", {'parentEid', '', 'order',0})
+Comp.define("parent", {'parentEid', '', 'order',''})
 
 Comp.define("name", {})
 

@@ -41,6 +41,21 @@ function Estore:newEntity()
   addChildEntityTo(self._root, e)
   return e
 end
+
+function Estore:buildEntity(compList, subs)
+  local e = self:newEntity()
+  for _,cinfo in ipairs(compList) do
+    local ctype, data = unpack(cinfo)
+    self:newComp(e, ctype, data)
+  end
+  if subs then
+    for _, childComps in ipairs(subs) do
+      e:newChild(childComps)
+    end
+  end
+  return e
+end
+
 -- function Estore:newEntity(parentEntity,parentOrder)
 --   if not parentOrder then parentOrder = 0 end
 --   local eid = self:nextEid()
@@ -136,7 +151,7 @@ function Estore:addComp(e,comp)
       e._parent = parentEntity
       local chs = parentEntity._children
       local reorder = true
-      if not comp.order then
+      if not comp.order or comp.order == '' then
         local myOrder = #chs + 1
         if #chs > 0 then
           local lastOrder = chs[#chs].order
@@ -266,11 +281,6 @@ function Estore:walkEntities(matchFn, doFn)
 end
 
 function Estore:_walkEntity(e, matchFn, doFn)
-  -- if not e._children then
-  --   print(self:debugString())
-  --   print(debug.traceback())
-  --   error("ERR _walkEntity no childs. "..entityDebugString(e))
-  -- end
   local proceed = true
   if matchFn and type(matchFn) == "number" then
     print("WUT?")
@@ -343,7 +353,7 @@ function Estore:debugString()
   for eid,e in pairs(self.ents) do
     s = s .. entityDebugString(e)
   end
-  s = s .. "--- Tree (self._root): TODO\n"
+  s = s .. "--- Tree (self._root):\n"
   for _,ch in ipairs(self._root._children) do
     s = s .. entityTreeDebugString(ch,"  ")
   end
@@ -404,7 +414,12 @@ function entityDebugString(e)
 end
 
 function entityTreeDebugString(e,indent)
-  local s = indent .. e.eid .. ": \n"
+  local s = indent
+  if e.name and e.name.name then
+    s = s .. e.name.name .. " (" .. e.eid .. "): \n"
+  else
+    s = s .. e.eid .. ": \n"
+  end
   for _,ch in ipairs(e._children) do
     s = s .. entityTreeDebugString(ch,indent.."  ")
   end

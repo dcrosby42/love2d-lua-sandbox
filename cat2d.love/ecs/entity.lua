@@ -33,7 +33,7 @@ function Entity:getChildren()
 end
 
 function Entity:newChild(compInfos)
-  parentInfo = {'parent', {parentEid=self.eid, order=0}}
+  parentInfo = {'parent', {parentEid=self.eid}}
   if compInfos then
     local parentInfoFound = false
     for i,info in ipairs(compInfos) do
@@ -53,7 +53,11 @@ function Entity:newChild(compInfos)
     compInfos = { parentInfo }
   end
 
-  return buildEntity(self._estore, compInfos)
+  return self._estore:buildEntity(compInfos)
+end
+
+function Entity:addEntity(childEnt)
+  self._estore:setupParent(self, childEnt)
 end
 
 return Entity
