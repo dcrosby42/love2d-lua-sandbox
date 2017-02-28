@@ -99,7 +99,7 @@ end
 function newOtherScene()
   local mystore = Estore:new()
 
-  local otherScene = buildEntity(mystore, {
+  local otherScene = mystore:newEntity({
     {'tag', {name='otherScene'}},
     {'pos',{}},
   })
@@ -122,27 +122,6 @@ function newOtherScene()
     {'label', {font="narpassword-medium", text="Leave", color={0,255,0}, width=w, align='center', height=h, valign='middle'}},
     {'pos', {}},
   })
-
-  -- local button = buildEntity(mystore, {
-  --   {'parent', {parentEid = otherScene.eid}},
-  --   {'pos',{x=100,y=100}},
-  --   {'tag',{name='leaver'}},
-  --   {'mouse_sensor', {on='pressed', eventName='leave'}},
-  --   {'bounds', {w=w,h=h}}
-  -- })
-
-  -- buildEntity(mystore, {
-  --   {'rect', {w=w,h=h, style="line",color={0,255,0}}},
-  --   {'pos', {}},
-  --   {'parent', {parentEid = button.eid}},
-  -- })
-  --
-  -- buildEntity(mystore, {
-  --   {'label', {font="narpassword-medium", text="Leave", color={0,255,0}, width=w, align='center', height=h, valign='middle'}},
-  --   {'pos', {}},
-  --   {'parent', {parentEid = button.eid,order=1}},
-  -- })
-
 
   return mystore
 end

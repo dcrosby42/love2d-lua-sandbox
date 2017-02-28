@@ -165,20 +165,17 @@ end
 function buildEstore()
   local estore = Estore:new()
 
-  local scene = buildEntity(estore, {
+  local scene = estore:newEntity({
     {'tag', {name='room1'}},
     {'pos', {}}
   })
 
   local ord = 0
   local box = function(p,x,y,w,h,col)
-    local ent = buildEntity(estore, {
+    return p:newChild({
       {'pos', {x=x,y=y}},
       {'rect', {offx=-w/2, offy=-h/2, w=w,h=h,color=col}},
-      {'parent', {parentEid=p.eid, order=ord}},
     })
-    ord = ord + 1
-    return ent
   end
   local c = {
     white={255,255,255},

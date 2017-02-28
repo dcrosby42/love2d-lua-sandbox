@@ -53,7 +53,7 @@ function Entity:newChild(compInfos, subs)
     compInfos = { parentInfo }
   end
 
-  return self._estore:buildEntity(compInfos, subs)
+  return self._estore:newEntity(compInfos, subs)
 end
 
 function Entity:addChild(childEnt)

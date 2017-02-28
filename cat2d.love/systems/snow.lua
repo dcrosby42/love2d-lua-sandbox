@@ -9,19 +9,16 @@ Comp.define("snow", {'lowerbound',0})
 local CHEAT_RNG = love.math.newRandomGenerator(1234,5678)
 
 local function addSnowflake(e,estore,y)
-  -- print(entityDebugString(e))
   local left = e.pos.x
   local right = left + e.bounds.w
   local x = CHEAT_RNG:random(left,right)
-  -- local rad = CHEAT_RNG:random(e.small, e.large)
   local rad = CHEAT_RNG:random(e.snowmachine.small, e.snowmachine.large)
 
-  local sflake = buildEntity(estore, {
+  e:newChild({
     {'snow', {lowerbound=e.pos.y+e.bounds.h}},
     {'vel', {dx=e.snowmachine.dx, dy=e.snowmachine.dy}},
     {'pos', { x=x, y=y}},
     {'circle', { radius=rad, color={255,255,255}}},
-    {'parent', { parentEid=e.eid }}
   })
 end
 

@@ -21,16 +21,15 @@ function cycleMenuDown(e)
   e.menu.selected = chs[index]
 end
 
-function addBlueFlicker(estore, e,time)
-  buildEntity(estore, {
+function addBlueFlicker(e,time)
+  e:newChild({
+    {'name', {name='BlueFlicker effect'}},
     {'timer', {name='flicker', t=0, reset=0.16, countDown=false, loop=true}},
     {'effect', {
       path={'PARENT','label','color'},
       data={0,ColdBlue, 0.08, ColdBlue_Bright}}},
     {'tag', {name='self_destruct'}},
     {'timer', {name='self_destruct', t=time}},
-
-    {'parent', {parentEid=e.eid}},
   })
 end
 
@@ -49,8 +48,8 @@ local menuSystem = defineUpdateSystem({'menu'},
           estore:search(hasComps('menu_item'), function(mie)
             if mie:getParent().eid == e.eid then
               if mie.menu_item.name == e.menu.selected then
-                estore:newComp(mie, 'timer', {name='item_selected',t=time})
-                addBlueFlicker(estore, mie, time)
+                local c = mie:newComp('timer', {name='item_selected',t=time})
+                addBlueFlicker(mie, time)
               end
             end
           end)
@@ -69,13 +68,16 @@ local menuItemSystem = defineUpdateSystem({'menu_item'},
     if e.timers then
       local selTimer = e.timers.item_selected
       if selTimer and selTimer.alarm then
-        estore:newComp(e, 'output', {kind='transition',value=e.menu_item.value})
-        estore:removeComp(selTimer)
+        e:newComp('output', {kind='transition',value=e.menu_item.value})
+        e:removeComp(selTimer)
       end
     end
 
     -- Check for selected:
     local parent = e:getParent()
+    -- print(estore:debugString())
+    -- print(entityDebugString(e))
+    -- print(entityDebugString(parent))
     if parent then
       if e.menu_item.name == parent.menu.selected then
         e.label.color = ColdBlue_Bright
@@ -94,7 +96,7 @@ local menuItemSystem = defineUpdateSystem({'menu_item'},
           parent.menu.selected = e.menu_item.name
           -- add visual effect (flicker color)
           local time = 1.0
-          addBlueFlicker(estore, e,time)
+          addBlueFlicker(e,time)
           -- Set the timeout:
           estore:newComp(e, 'timer', {name='item_selected',t=time})
         end
@@ -112,37 +114,36 @@ M.Setup = function(world)
 end
 
 function buildMenu(estore)
-  local menu = buildEntity(estore, {
+  local menu = estore:newEntity({
     {'menu', {state='selecting',selected='start', choices={'start','continue'}}},
-    {'menu', {state='selecting',selected='start', choices={'start',}}},
+    {'name',{name='Menu'}},
     {'pos',{}},
   })
---
   local y = 170
-  buildEntity(estore, {
+  menu:newChild({
     {'label', {text='Arctic Cat', font="Adventure-100", color=ColdBlue, width=800, align='center'}},
     {'pos', {x=0, y=y}},
-    {'parent', {parentEid=menu.eid, order=2}}
+    {'name',{name='ArcticCat title'}},
   })
   y = y + 120
-  buildEntity(estore, {
+  menu:newChild({
+    {'name',{name='MenuItem: Start'}},
     {'menu_item', {name='start',value='start'}},
     {'tag', {name='menu_item'}},
     {'tag', {name='start'}},
     {'label', {text='START', font="narpassword-medium", color=ColdBlue, width=800, align='center'}},
     {'pos', {x=0, y=y}},
     {'bounds',{w=800,h=50}},
-    {'parent', {parentEid=menu.eid, order=2}}
   })
   y = y + 50
-  buildEntity(estore, {
+  menu:newChild({
+    {'name',{name='MenuItem: Continue'}},
     {'menu_item', {name='continue',value='continue'}},
     {'tag', {name='menu_item'}},
     {'tag', {name='continue'}},
     {'label', {text='CONTINUE', font="narpassword-medium", color=ColdBlue, width=800, align='center'}},
     {'pos', {x=0, y=y}},
     {'bounds',{w=800,h=50}},
-    {'parent', {parentEid=menu.eid, order=2}},
   })
 
   return menu

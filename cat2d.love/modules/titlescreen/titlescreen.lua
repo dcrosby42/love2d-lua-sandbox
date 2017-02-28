@@ -124,46 +124,41 @@ end
 -- ---------------------------------------------------------------
 function newSnowScene()
   local estore = Estore:new()
-  local group = buildEntity(estore, {
+
+  local group = estore:buildEntity({
     {'tag', {name='snowScene'}},
     {'pos',{}},
   })
 
-  buildEntity(estore, {
-    {'iconAdder', {id='p1', imgId=catIcon, tagName='cattish'}},
-    {'parent', {parentEid=group.eid}},
+  group:newChild({
     {'pos',{}},
+    {'iconAdder', {id='p1', imgId=catIcon, tagName='cattish'}},
   })
 
-  buildEntity(estore, {
+  group:newChild({
     {'snowmachine', {large=2,small=1,dx=0,dy=15}},
     {'pos',{x=0,y=0}},
     {'bounds', {w=love.graphics.getWidth(), h=love.graphics.getHeight()}},
     {'timer', {name='flake', reset=0.2, loop=true}},
     {'timer', {name='acc', countDown=false}},
-    {'parent', {parentEid=group.eid, order=1}},
   })
 
-  buildEntity(estore, {
+  group:newChild({
     {'snowmachine', {large=3,small=1,dx=0,dy=30}},
     {'pos',{x=0,y=0}},
     {'bounds', {w=love.graphics.getWidth(), h=love.graphics.getHeight()}},
     {'timer', {name='flake', reset=0.2, loop=true}},
     {'timer', {name='acc', countDown=false}},
-    {'parent', {parentEid=group.eid, order=2}},
   })
 
-  local menu = Menu.BuildMenuEntity(estore)
-  group:addChild(menu)
-  -- setParentEntity(estore, menu, group, 3)
+  group:addChild(Menu.BuildMenuEntity(estore))
 
-  buildEntity(estore, {
+  group:newChild({
     {'snowmachine', {large=5, small=3, dx=0,dy=60}},
     {'pos',{x=0,y=0}},
     {'bounds', {w=love.graphics.getWidth(), h=love.graphics.getHeight()}},
     {'timer', {name='flake', reset=0.2, loop=true}},
     {'timer', {name='acc', countDown=false}},
-    {'parent', {parentEid=group.eid, order=4}},
   })
 
   return estore

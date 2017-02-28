@@ -29,7 +29,7 @@ function Estore:nextCid()
   return cid
 end
 
-function Estore:newEntity()
+function Estore:newEntity(compList, subs)
   local eid = self:nextEid()
   local e = Entity:new({
     eid=eid,
@@ -39,15 +39,14 @@ function Estore:newEntity()
   })
   self.ents[eid] = e
   addChildEntityTo(self._root, e)
-  return e
-end
 
-function Estore:buildEntity(compList, subs)
-  local e = self:newEntity()
-  for _,cinfo in ipairs(compList) do
-    local ctype, data = unpack(cinfo)
-    self:newComp(e, ctype, data)
+  if compList then
+    for _,cinfo in ipairs(compList) do
+      local ctype, data = unpack(cinfo)
+      self:newComp(e, ctype, data)
+    end
   end
+
   if subs then
     for _, childComps in ipairs(subs) do
       e:newChild(childComps)
@@ -56,18 +55,9 @@ function Estore:buildEntity(compList, subs)
   return e
 end
 
--- function Estore:newEntity(parentEntity,parentOrder)
---   if not parentOrder then parentOrder = 0 end
---   local eid = self:nextEid()
---   local e = Entity:new({eid=eid, _estore=self, _parent=nil, _children={}})
---   self.ents[eid] = e
---   if parentEntity then
---     self:newComp(e, 'parent', {parentEid=parentEntity.eid, order=parentOrder})
---   else
---     addChildEntityTo(self._root, e)
---   end
---   return e
--- end
+function Estore:buildEntity(compList, subs)
+  return self:newEntity(compList, subs)
+end
 
 function Estore:destroyEntity(e)
   for _,childEnt in ipairs(e._children) do

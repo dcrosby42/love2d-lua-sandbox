@@ -6,7 +6,7 @@ Comp.define("vel", {'dx',0,'dy',0})
 
 Comp.define("tag", {})
 
-Comp.define("timer", {'t',0, 'reset',0, 'countDown',true, 'loop',false})
+Comp.define("timer", {'t',0, 'reset',0, 'countDown',true, 'loop',false, 'alarm',false})
 
 Comp.define("controller", {'id','','leftx',0,'lefty',0,})
 
