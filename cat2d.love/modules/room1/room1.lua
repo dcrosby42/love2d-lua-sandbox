@@ -41,8 +41,8 @@ local moverSystem = defineUpdateSystem(hasComps('controller','vel','pos'),
   end
 )
 
-Comp.define("z", {})
-local zSystem = defineUpdateSystem(hasComps('z'),
+Comp.define("zChildren", {})
+local zChildrenSystem = defineUpdateSystem(hasComps('zChildren'),
   function(e,estore,input,res)
     for _, ch in ipairs(e:getChildren()) do
       if ch.pos then
@@ -60,7 +60,7 @@ local DoUpdate = iterateFuncs({
   selfDestructSystem,
   controllerSystem,
   moverSystem,
-  zSystem,
+  zChildrenSystem,
 
   effectsSystem,
 })
@@ -182,7 +182,7 @@ function buildEstore()
 
   local scene = estore:newEntity({
     {'tag', {name='room1'}},
-    {'z', {}},
+    {'zChildren', {}},
     {'pos', {}}
   })
 
