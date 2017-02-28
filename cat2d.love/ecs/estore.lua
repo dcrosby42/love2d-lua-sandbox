@@ -154,7 +154,7 @@ function Estore:addComp(e,comp)
       end
       table.insert(chs, e)
       if reorder then
-        resortChildren(parentEntity)
+        parentEntity:resort()
       end
     end
   end
@@ -416,18 +416,6 @@ function entityTreeDebugString(e,indent)
   return s
 end
 
-function resortChildren(e)
-  if e._children then
-    table.sort(e._children, byOrder)
-  end
-end
-
-function byOrder(a,b)
-  local aval,bval
-  if a.parent and a.parent.order then aval = a.parent.order else aval = 0 end
-  if b.parent and b.parent.order then bval = b.parent.order else bval = 0 end
-  return aval < bval
-end
 
 
 return Estore

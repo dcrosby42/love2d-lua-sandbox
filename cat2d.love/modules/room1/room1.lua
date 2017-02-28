@@ -2,6 +2,7 @@ require 'ecs/ecshelpers'
 local Estore = require 'ecs/estore'
 
 require 'comps'
+Comp = require 'ecs/component'
 
 local timerSystem = require 'systems/timer'
 local selfDestructSystem = require 'systems/selfdestruct'
@@ -40,12 +41,26 @@ local moverSystem = defineUpdateSystem(hasComps('controller','vel','pos'),
   end
 )
 
+Comp.define("z", {})
+local zSystem = defineUpdateSystem(hasComps('z'),
+  function(e,estore,input,res)
+    for _, ch in ipairs(e:getChildren()) do
+      if ch.pos then
+        x,y = getPos(ch)
+        ch.parent.order = y
+      end
+    end
+    e:resortChildren()
+  end
+)
+
 local DoUpdate = iterateFuncs({
   outputCleanupSystem,
   timerSystem,
   selfDestructSystem,
   controllerSystem,
   moverSystem,
+  zSystem,
 
   effectsSystem,
 })
@@ -167,16 +182,10 @@ function buildEstore()
 
   local scene = estore:newEntity({
     {'tag', {name='room1'}},
+    {'z', {}},
     {'pos', {}}
   })
 
-  local ord = 0
-  local box = function(p,x,y,w,h,col)
-    return p:newChild({
-      {'pos', {x=x,y=y}},
-      {'rect', {offx=-w/2, offy=-h/2, w=w,h=h,color=col}},
-    })
-  end
   local c = {
     white={255,255,255},
     black={0,0,0},
@@ -191,11 +200,14 @@ function buildEstore()
 
     return opts.parent:newChild({
       {'pos', {x=opts.x, y=opts.y}},
-      {'bounds', {offx=-fullW/2,offy=-fullW,w=fullW,h=fullH}},
+      {'name', {name='tree'}},
+      -- {'bounds', {offx=-fullW/2,offy=-fullW,w=fullW,h=fullH}},
+      {'bounds', offsetBounds({},fullW,fullH, 0.5, 1.0)},
     }, {
       {
         {'pos', {x=0,y=0}},
-        {'rect', {offx=-opts.trunkW/2, offy=-opts.trunkH, w=opts.trunkW,h=opts.trunkH,color=opts.trunkCol}},
+        -- {'rect', {offx=-opts.trunkW/2, offy=-opts.trunkH, w=opts.trunkW,h=opts.trunkH,color=opts.trunkCol}},
+        {'rect', offsetBounds({color=opts.trunkCol}, opts.trunkW, opts.trunkH, 0.5, 1.0)},
       },
       {
         {'pos', {x=0,y=-opts.trunkH}},
@@ -206,7 +218,6 @@ function buildEstore()
 
   local opts = {
     parent=scene,
-    order=1,
     x=100,
     y=100,
     trunkW=30,
@@ -221,7 +232,6 @@ function buildEstore()
     for j = 100,600,200 do
       opts.x = i
       opts.y = j
-      opts.order = opts.order + 1
       tree3(opts)
     end
   end
@@ -232,8 +242,8 @@ function buildEstore()
     { 'controller', {id='con1'}},
     { 'pos', {x=400,y=260}},
     { 'vel', {}},
-    { 'rect', offsetBounds({color={200,200,200}}, 20,32, 0.5, 0.5)},
-    { 'bounds', offsetBounds({},20,32, 0.5, 0.5)},
+    { 'rect', offsetBounds({color={200,200,200}}, 20,32, 0.5, 1)},
+    { 'bounds', offsetBounds({},20,32, 0.5, 1)},
   }, {
     {
       { 'name', {name='Weapon'}},
@@ -241,8 +251,6 @@ function buildEstore()
       { 'rect', offsetBounds({color={150,150,190}}, 13, 7, 0.5, 0.5)},
     }
   })
-  ------------------------------------
-  -- print(estore:debugString())
   return estore
 end
 
