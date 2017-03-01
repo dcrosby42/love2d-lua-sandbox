@@ -1,8 +1,11 @@
+local here = (...):match("(.*/)[^%/]+$")
+
 require 'ecs/ecshelpers'
 local Estore = require 'ecs/estore'
-
+local Comp = require 'ecs/component'
+local Cat = require(here..'/cat')
 require 'comps'
-Comp = require 'ecs/component'
+
 
 local timerSystem = require 'systems/timer'
 local selfDestructSystem = require 'systems/selfdestruct'
@@ -235,31 +238,12 @@ function buildEstore()
     end
   end
 
-  local player = scene:newChild({
-    { 'tag', {name='player'}},
-    { 'name', {name='Player1'}},
-    { 'controller', {id='con1'}},
-    { 'pos', {x=400,y=260}},
-    { 'vel', {}},
-    { 'rect', offsetBounds({color={200,200,200}}, 20,32, 0.5, 1)},
-    { 'bounds', offsetBounds({},20,32, 0.5, 1)},
-  }, {
-    {
-      { 'name', {name='leftear'}},
-      { 'pos', {x=-5,y=-32}},
-      { 'rect', offsetBounds({color={150,150,190}}, 5, 8, 0.5, 1)},
-    },
-    {
-      { 'name', {name='rightear'}},
-      { 'pos', {x=5,y=-32}},
-      { 'rect', offsetBounds({color={150,150,190}}, 5, 8, 0.5, 1)},
-    },
-    {
-      { 'name', {name='tail'}},
-      { 'pos', {x=10,y=0}},
-      { 'rect', offsetBounds({color={150,150,190}}, 17, 6, 0.5, 1)},
-    }
-  })
+  local cat = Cat.newEntity(estore)
+  cat:newComp('controller', {id='con1'})
+  cat:newComp('name', {name='Player1'})
+
+  scene:addChild(cat)
+
   return estore
 end
 
