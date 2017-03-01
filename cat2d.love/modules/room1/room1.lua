@@ -16,7 +16,6 @@ local catIcon = "images/black-cat-icon.png"
 local arcticCatTitle = "images/arctic_cat_title.png"
 
 
-
 local MoveSpeed = 200
 local moverSystem = defineUpdateSystem(hasComps('controller','vel','pos'),
   function(e,estore,input,res)
@@ -246,9 +245,19 @@ function buildEstore()
     { 'bounds', offsetBounds({},20,32, 0.5, 1)},
   }, {
     {
-      { 'name', {name='Weapon'}},
-      { 'pos', {x=12,y=-3}},
-      { 'rect', offsetBounds({color={150,150,190}}, 13, 7, 0.5, 0.5)},
+      { 'name', {name='leftear'}},
+      { 'pos', {x=-5,y=-32}},
+      { 'rect', offsetBounds({color={150,150,190}}, 5, 8, 0.5, 1)},
+    },
+    {
+      { 'name', {name='rightear'}},
+      { 'pos', {x=5,y=-32}},
+      { 'rect', offsetBounds({color={150,150,190}}, 5, 8, 0.5, 1)},
+    },
+    {
+      { 'name', {name='tail'}},
+      { 'pos', {x=10,y=0}},
+      { 'rect', offsetBounds({color={150,150,190}}, 17, 6, 0.5, 1)},
     }
   })
   return estore
