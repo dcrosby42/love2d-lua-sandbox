@@ -335,15 +335,15 @@ function Estore:debugString()
   local s = ""
   s = s .. "-- Estore:\n"
   s = s .. "--- Next eid: e" .. self.eidCounter .. ", Next cid: c" .. self.cidCounter .. "\n"
-  s = s .. "--- Components (self.comps):\n"
-  for cid,comp in pairs(self.comps) do
-    s = s..cid .. ": " .. Comp.debugString(comp) .. "\n"
-  end
-  s = s .. "--- Entities (self.ents):\n"
+  -- s = s .. "--- Components (self.comps):\n"
+  -- for cid,comp in pairs(self.comps) do
+  --   s = s..cid .. ": " .. Comp.debugString(comp) .. "\n"
+  -- end
+  s = s .. "--- Entities:\n"
   for eid,e in pairs(self.ents) do
     s = s .. entityDebugString(e)
   end
-  s = s .. "--- Tree (self._root):\n"
+  s = s .. "--- Entity Tree:\n"
   for _,ch in ipairs(self._root._children) do
     s = s .. entityTreeDebugString(ch,"  ")
   end
@@ -375,11 +375,7 @@ function removeChildEntityFrom(parEnt, chEnt)
 end
 
 function entityDebugString(e)
-  local eid = e.eid
-  if not eid then
-    eid = "NO_EID"
-  end
-  s = eid .. ": " .. "\n"
+  local s = entityName(e) .. ": " .. "\n"
   for k,v in pairs(e) do
     if tostring(k):byte(1) ~= 95 then
       if v.cid and v.eid then
@@ -389,7 +385,7 @@ function entityDebugString(e)
         else
           s = s.."  "..tostring(keyp)..": \n"
           for name,comp in pairs(e[keyp]) do
-            s = s.."    "..tostring(name)..": "
+            s = s .. "    " .. tostring(name) .. ": "
             if v.cid == comp.cid then
               s = s .. "*"
             end
@@ -403,13 +399,17 @@ function entityDebugString(e)
   return s
 end
 
-function entityTreeDebugString(e,indent)
-  local s = indent
+function entityName(e)
   if e.name and e.name.name then
-    s = s .. e.name.name .. " (" .. e.eid .. "): \n"
+    return e.name.name .. " (" .. tostring(e.eid) .. ")"
   else
-    s = s .. e.eid .. ": \n"
+    return tostring(e.eid)
   end
+end
+
+
+function entityTreeDebugString(e,indent)
+  local s = indent .. entityName(e) .. ": \n"
   for _,ch in ipairs(e._children) do
     s = s .. entityTreeDebugString(ch,indent.."  ")
   end

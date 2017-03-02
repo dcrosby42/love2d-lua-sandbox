@@ -3,7 +3,8 @@ local here = (...):match("(.*/)[^%/]+$")
 require 'ecs/ecshelpers'
 require 'comps'
 
-local buildEstore = require(here.."/buildEstore")
+local buildEstore = require(here.."buildestore")
+local Resources = require(here.."resources")
 
 local timerSystem = require 'systems/timer'
 local selfDestructSystem = require 'systems/selfdestruct'
@@ -14,8 +15,6 @@ local drawSystem = require 'systems/drawstuff'
 local zChildrenSystem = require 'systems/zchildren'
 local moverSystem = require(here..'/moversystem')
 
-local catIcon = "images/black-cat-icon.png"
-local arcticCatTitle = "images/arctic_cat_title.png"
 
 local DoUpdate = iterateFuncs({
   outputCleanupSystem,
@@ -38,20 +37,10 @@ local newSnowScene
 
 M.newWorld = function()
   local w = {
-    bgcolor = {0,0,100},
+    bgcolor = {0,0,0},
     estore = buildEstore(),
     input = { dt=0, events={} },
-    resources = {
-      images={
-        [catIcon] = love.graphics.newImage(catIcon),
-        -- [arcticCatTitle] = love.graphics.newImage(arcticCatTitle),
-      },
-      fonts={
-        -- ["Adventure-100"] = love.graphics.newFont("fonts/Adventure.ttf",100),
-        -- ["AdventureOutline-50"] = love.graphics.newFont("fonts/Adventure Outline.ttf",50),
-        -- ["narpassword-medium"] = love.graphics.newFont("fonts/narpassword.ttf",30),
-      }
-    },
+    resources = Resources.load(),
   }
 
   return w, nil

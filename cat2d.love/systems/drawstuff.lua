@@ -14,6 +14,7 @@ return function(estore,output,res)
     if e.img and e.pos then
       local img = e.img
       local x,y = getPos(e)
+      love.graphics.setColor(unpack(img.color))
       love.graphics.draw(
         res.images[img.imgId],
         x,y,
