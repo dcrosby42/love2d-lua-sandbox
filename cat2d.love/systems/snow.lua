@@ -4,11 +4,32 @@ Comp.define("snowmachine", {'large',1,'small',1,'init',true,'dx',0,'dy',0})
 
 Comp.define("snow", {'lowerbound',0})
 
+Snow = {}
 
 -- TODO see this about managing rng state more directly: https://love2d.org/wiki/RandomGenerator:getState
 local CHEAT_RNG = love.math.newRandomGenerator(1234,5678)
 
-local function addSnowflake(e,estore,y)
+Snow.Defaults = {
+  large=3,
+  small=1,
+  dx=0,
+  dy=30,
+  interval=0.2,
+}
+
+Snow.newSnowMachine = function(estore, opts)
+  local opts = tcopy(opts,Snow.Defaults)
+  -- local opts = Snow.Defaults
+  return estore:newEntity({
+    {'snowmachine', {large=opts.large,small=opts.small,dx=opts.dx,dy=opts.dy}},
+    {'pos',{x=0,y=0}},
+    {'bounds', {w=love.graphics.getWidth(), h=love.graphics.getHeight()}},
+    {'timer', {name='flake', reset=opts.interval, loop=true}},
+    {'timer', {name='acc', countDown=false}},
+  })
+end
+
+local function addSnowflake(e,y)
   local left = e.pos.x
   local right = left + e.bounds.w
   local x = CHEAT_RNG:random(left,right)
@@ -22,6 +43,9 @@ local function addSnowflake(e,estore,y)
   })
 end
 
+--
+-- SnowMachine system: Generate snow flakes
+--
 local snowMachineSystem = defineUpdateSystem(
   {'snowmachine'},
   function(e, estore,input,res)
@@ -32,28 +56,33 @@ local snowMachineSystem = defineUpdateSystem(
       local bottom = top + e.bounds.h
       local step = (e.timers.flake.reset * e.snowmachine.dy)
       for y = top, bottom, step do
-        addSnowflake(e,estore,y)
+        addSnowflake(e,y)
       end
     end
     if e.timers.flake.alarm then
       local y = e.pos.y
-      addSnowflake(e,estore,y)
+      addSnowflake(e,y)
     end
   end
 )
 
+--
+-- Snow system: float each snowflake downward, then remove
+--
 local snowSystem = defineUpdateSystem(
   {'snow'},
   function(e, estore, input, res)
     e.pos.y = e.pos.y + e.vel.dy * input.dt
     if e.pos.y > e.snow.lowerbound then
-      -- print("Snow system: removing snow "..e.eid)
       estore:destroyEntity(e)
     end
   end
 )
 
-return iterateFuncs({
+Snow.System = iterateFuncs({
   snowMachineSystem,
   snowSystem,
 })
+
+
+return Snow

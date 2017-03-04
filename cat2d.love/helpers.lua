@@ -19,13 +19,20 @@ function tcount(t)
   return ct
 end
 
-function tcopy(orig)
+function tcopy(orig, defaults)
   local orig_type = type(orig)
   local copy
   if orig_type == 'table' then
     copy = {}
     for orig_key, orig_value in pairs(orig) do
       copy[orig_key] = orig_value
+    end
+    if defaults then
+      for def_key, def_value in pairs(defaults) do
+        if copy[def_key] == nil then
+          copy[def_key] = def_value
+        end
+      end
     end
   else -- number, string, boolean, etc
     copy = orig

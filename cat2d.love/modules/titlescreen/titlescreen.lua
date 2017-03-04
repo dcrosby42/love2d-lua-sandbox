@@ -5,7 +5,7 @@ require 'comps'
 
 local iconAdderSystem = require 'systems/iconadder'
 local timerSystem = require 'systems/timer'
-local snowSystem = require 'systems/snow'
+local Snow = require 'systems/snow'
 local selfDestructSystem = require 'systems/selfdestruct'
 local outputCleanupSystem = require 'systems/outputcleanup'
 local effectsSystem = require 'systems/effects'
@@ -22,7 +22,7 @@ local DoUpdate = iterateFuncs({
   timerSystem,
   selfDestructSystem,
   Menu.System,
-  snowSystem,
+  Snow.System,
   -- iconAdderSystem,
   effectsSystem,
 })
@@ -135,31 +135,12 @@ function newSnowScene()
     {'iconAdder', {id='p1', imgId=catIcon, tagName='cattish'}},
   })
 
-  group:newChild({
-    {'snowmachine', {large=2,small=1,dx=0,dy=15}},
-    {'pos',{x=0,y=0}},
-    {'bounds', {w=love.graphics.getWidth(), h=love.graphics.getHeight()}},
-    {'timer', {name='flake', reset=0.2, loop=true}},
-    {'timer', {name='acc', countDown=false}},
-  })
-
-  group:newChild({
-    {'snowmachine', {large=3,small=1,dx=0,dy=30}},
-    {'pos',{x=0,y=0}},
-    {'bounds', {w=love.graphics.getWidth(), h=love.graphics.getHeight()}},
-    {'timer', {name='flake', reset=0.2, loop=true}},
-    {'timer', {name='acc', countDown=false}},
-  })
+  group:addChild(Snow.newSnowMachine(estore, {large=2, small=1, dy=15}))
+  group:addChild(Snow.newSnowMachine(estore, {large=3, small=1, dy=30}))
 
   group:addChild(Menu.BuildMenuEntity(estore))
 
-  group:newChild({
-    {'snowmachine', {large=5, small=3, dx=0,dy=60}},
-    {'pos',{x=0,y=0}},
-    {'bounds', {w=love.graphics.getWidth(), h=love.graphics.getHeight()}},
-    {'timer', {name='flake', reset=0.2, loop=true}},
-    {'timer', {name='acc', countDown=false}},
-  })
+  group:addChild(Snow.newSnowMachine(estore, {large=5, small=3, dy=60}))
 
   return estore
 end

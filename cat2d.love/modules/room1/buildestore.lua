@@ -1,4 +1,5 @@
 local here = (...):match("(.*/)[^%/]+$")
+local Snow = require 'systems/snow'
 local Cat = require(here..'/cat')
 
 local Estore = require 'ecs/estore'
@@ -106,6 +107,10 @@ return function(res)
   cat:newComp('controller', {id='con1'})
   cat:newComp('name', {name='Player1'})
   scene:addChild(cat)
+
+  base:addChild(Snow.newSnowMachine(estore, {large=2, small=1, dy=15}))
+  base:addChild(Snow.newSnowMachine(estore, {large=3, small=1, dy=30}))
+  base:addChild(Snow.newSnowMachine(estore, {large=5, small=3, dy=60}))
 
   return estore
 end

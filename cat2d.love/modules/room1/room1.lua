@@ -3,6 +3,8 @@ local here = (...):match("(.*/)[^%/]+$")
 require 'ecs/ecshelpers'
 require 'comps'
 
+local Snow = require 'systems/snow'
+
 local buildEstore = require(here.."buildestore")
 local Resources = require(here.."resources")
 
@@ -19,6 +21,7 @@ local moverSystem = require(here..'/moversystem')
 local DoUpdate = iterateFuncs({
   outputCleanupSystem,
   timerSystem,
+  Snow.System,
   selfDestructSystem,
   controllerSystem,
   moverSystem,
