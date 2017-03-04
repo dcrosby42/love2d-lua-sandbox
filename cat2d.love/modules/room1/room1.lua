@@ -4,9 +4,10 @@ require 'ecs/ecshelpers'
 require 'comps'
 
 local Snow = require 'systems/snow'
-
-local buildEstore = require(here.."buildestore")
+local Estore = require 'ecs/estore'
 local Resources = require(here.."resources")
+local Cat = require(here..'/cat')
+local Field = require(here..'/field')
 
 local timerSystem = require 'systems/timer'
 local selfDestructSystem = require 'systems/selfdestruct'
@@ -17,8 +18,12 @@ local drawSystem = require 'systems/drawstuff'
 local zChildrenSystem = require 'systems/zchildren'
 local moverSystem = require(here..'/moversystem')
 
+local M ={}
 
-local DoUpdate = iterateFuncs({
+local buildEstore
+local kbdDpadInput
+
+local runSystems = iterateFuncs({
   outputCleanupSystem,
   timerSystem,
   Snow.System,
@@ -26,17 +31,9 @@ local DoUpdate = iterateFuncs({
   controllerSystem,
   moverSystem,
   zChildrenSystem,
-
   effectsSystem,
 })
 
-local DoDraw = iterateFuncs({
-  drawSystem,
-})
-
-local M ={}
-
-local newSnowScene
 
 M.newWorld = function()
   local res = Resources.load()
@@ -50,32 +47,6 @@ M.newWorld = function()
   return w, nil
 end
 
-local function kbdDpadInput(world, map, targetId, action)
-  local key = action.key
-  if key == map.up then
-    local mag = -1
-    if action.state == 'released' then mag = 0 end
-    addInputEvent(world.input, {type='controller', id=targetId, input="lefty", action=mag})
-    return true
-  elseif key == map.down then
-    local mag = 1
-    if action.state == 'released' then mag = 0 end
-    addInputEvent(world.input, {type='controller', id=targetId, input="lefty", action=mag})
-    return true
-  elseif key == map.left then
-    local mag = -1
-    if action.state == 'released' then mag = 0 end
-    addInputEvent(world.input, {type='controller', id=targetId, input="leftx", action=mag})
-    return true
-  elseif key == map.right then
-    local mag = 1
-    if action.state == 'released' then mag = 0 end
-    addInputEvent(world.input, {type='controller', id=targetId, input="leftx", action=mag})
-    return true
-  end
-  return false
-end
-
 M.updateWorld = function(world, action)
   local effects = nil
 
@@ -83,7 +54,7 @@ M.updateWorld = function(world, action)
     world.input.dt = action.dt
 
     local estore = world.estore
-    DoUpdate(estore, world.input, world.resources)
+    runSystems(estore, world.input, world.resources)
 
     world.input.events = {}
 
@@ -141,8 +112,74 @@ end
 M.drawWorld = function(world)
   love.graphics.setBackgroundColor(unpack(world.bgcolor))
 
-  DoDraw(world.estore, nil, world.resources)
+  drawSystem(world.estore, nil, world.resources)
 end
+
+function kbdDpadInput(world, map, targetId, action)
+  local key = action.key
+  if key == map.up then
+    local mag = -1
+    if action.state == 'released' then mag = 0 end
+    addInputEvent(world.input, {type='controller', id=targetId, input="lefty", action=mag})
+    return true
+  elseif key == map.down then
+    local mag = 1
+    if action.state == 'released' then mag = 0 end
+    addInputEvent(world.input, {type='controller', id=targetId, input="lefty", action=mag})
+    return true
+  elseif key == map.left then
+    local mag = -1
+    if action.state == 'released' then mag = 0 end
+    addInputEvent(world.input, {type='controller', id=targetId, input="leftx", action=mag})
+    return true
+  elseif key == map.right then
+    local mag = 1
+    if action.state == 'released' then mag = 0 end
+    addInputEvent(world.input, {type='controller', id=targetId, input="leftx", action=mag})
+    return true
+  end
+  return false
+end
+
+
+buildEstore = function(res)
+  local estore = Estore:new()
+
+  estore:newEntity({
+    {'tag', {name='debug'}},
+    {'debug', {name='drawBounds',value=false}}
+  })
+
+  local base = estore:newEntity({
+    {'pos', {}},
+  })
+
+  -- terrain image
+  base:newChild({
+    { 'name', {name='name'}},
+    { 'img', {imgId='snowField'}},
+    { 'pos', {0,0}},
+  })
+
+  -- Add the field and trees
+  local field = Field.newFieldEntity(estore, res)
+  base:addChild(field)
+
+  -- Create a cat
+  local cat = Cat.newCatEntity_boxy(estore, res)
+  -- take control of cat
+  cat:newComp('controller', {id='con1'})
+  cat:newComp('name', {name='Player1'})
+  field:addChild(cat)
+
+  -- Add snow
+  base:addChild(Snow.newSnowMachine(estore, {large=2, small=1, dy=15}))
+  base:addChild(Snow.newSnowMachine(estore, {large=3, small=1, dy=30}))
+  base:addChild(Snow.newSnowMachine(estore, {large=5, small=3, dy=60}))
+
+  return estore
+end
+
 
 
 

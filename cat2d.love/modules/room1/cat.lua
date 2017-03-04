@@ -1,11 +1,12 @@
 local Cat = {}
 
-Cat.newEntity = function(estore)
+Cat.newCatEntity_boxy = function(estore, res)
   return estore:newEntity({
     { 'pos', {x=400,y=260}},
     { 'vel', {}},
     { 'rect', offsetBounds({color={200,200,200}}, 20,32, 0.5, 1)},
     { 'bounds', offsetBounds({},20,32, 0.5, 1)},
+    { 'tag', {name='bounded'}}
   }, {
     {
       { 'name', {name='leftear'}},

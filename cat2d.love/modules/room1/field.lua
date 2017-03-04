@@ -1,8 +1,4 @@
-local here = (...):match("(.*/)[^%/]+$")
-local Snow = require 'systems/snow'
-local Cat = require(here..'/cat')
-
-local Estore = require 'ecs/estore'
+local Field = {}
 
 local c = {
   white={255,255,255},
@@ -50,29 +46,13 @@ local function mkTreeImg(estore, opts, res)
   })
 end
 
-return function(res)
-  local estore = Estore:new()
-  estore:newEntity({
-    {'tag', {name='debug'}},
-    {'debug', {name='drawBounds',value=false}}
-  })
-
-  local base = estore:newEntity({
-    {'pos', {}},
-  })
-
-  -- terrain image
-  base:newChild({
-    { 'name', {name='name'}},
-    { 'img', {imgId='snowField'}},
-    { 'pos', {0,0}},
-  })
-
-  -- scene root
-  local scene = base:newChild({
-    {'tag', {name='room1'}},
+Field.newFieldEntity = function(estore, res)
+  -- field
+  local field = estore:newEntity({
+    {'tag', {name='room1-field'}},
     {'zChildren', {}},
-    {'pos', {}},
+    {'pos', {x=100, y=300}},
+    {'bounds', {w=300,h=300}},
     {'vel', {}},
     {'controller', {id='con2'}},
   })
@@ -97,20 +77,12 @@ return function(res)
       opts.y = j
       local tr = mkTreeImg(estore, opts, res)
       -- local tr = mkTree(estore, opts)
-      scene:addChild(tr)
+      field:addChild(tr)
     end
   end
 
-  -- Create a cat
-  local cat = Cat.newEntity(estore)
-  -- take control of cat
-  cat:newComp('controller', {id='con1'})
-  cat:newComp('name', {name='Player1'})
-  scene:addChild(cat)
-
-  base:addChild(Snow.newSnowMachine(estore, {large=2, small=1, dy=15}))
-  base:addChild(Snow.newSnowMachine(estore, {large=3, small=1, dy=30}))
-  base:addChild(Snow.newSnowMachine(estore, {large=5, small=3, dy=60}))
-
-  return estore
+  return field
 end
+
+
+return Field
