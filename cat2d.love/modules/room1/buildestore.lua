@@ -33,8 +33,29 @@ local function mkTree(estore, opts)
   })
 end
 
-return function()
+local function mkTreeImg(estore, opts, res)
+  local fullH = opts.trunkH + opts.bushH
+  local fullW = opts.bushW
+  local tree1 = res.images.tree1
+  local w = tree1:getWidth()
+  local h = tree1:getHeight()
+  local sx = opts.scalex
+  local sy = opts.scaley
+  return estore:newEntity({
+    {'pos', {x=opts.x, y=opts.y}},
+    {'name', {name='tree'}},
+    {'img', {imgId='tree1', sx=sx, sy=sy, offx=w/2, offy=h}},
+    {'bounds', offsetBounds({},w*sx,h*sy, 0.5, 1.0)},
+  })
+end
+
+return function(res)
   local estore = Estore:new()
+  estore:newEntity({
+    {'tag', {name='debug'}},
+    {'debug', {name='drawBounds',value=false}}
+  })
+
   local base = estore:newEntity({
     {'pos', {}},
   })
@@ -59,6 +80,8 @@ return function()
   local opts = {
     x=100,
     y=100,
+    scalex=0.5,
+    scaley=0.5,
     trunkW=30,
     trunkH=60,
     bushW=100,
@@ -71,7 +94,8 @@ return function()
     for j = 100,600,200 do
       opts.x = i
       opts.y = j
-      local tr = mkTree(estore, opts)
+      local tr = mkTreeImg(estore, opts, res)
+      -- local tr = mkTree(estore, opts)
       scene:addChild(tr)
     end
   end
@@ -81,7 +105,6 @@ return function()
   -- take control of cat
   cat:newComp('controller', {id='con1'})
   cat:newComp('name', {name='Player1'})
-
   scene:addChild(cat)
 
   return estore

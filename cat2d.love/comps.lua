@@ -19,6 +19,8 @@ Comp.define("iconAdder", {'imgId', '', 'tagName', ''})
 Comp.define("circle", {'offx',0,'offy',0,'radius',0, 'color',{0,0,0}})
 Comp.define("rect", {'offx',0,'offy',0,'w',0, 'h',0, 'color',{0,0,0}, 'style','fill'})
 
-Comp.define("event", {'data',nil})
+Comp.define("event", {'data',''})
 
-Comp.define("output", {'kind',nil})
+Comp.define("output", {'kind',''})
+
+Comp.define("debug", {'value',''})

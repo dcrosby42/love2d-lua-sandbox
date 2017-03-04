@@ -4,6 +4,7 @@ local ImageConfig = {
   catIcon        = {file="images/black-cat-icon.png"},
   arcticCatTitle = {file="images/arctic_cat_title.png"},
   snowField      = {file="images/simple-snow-field.png"},
+  tree1          = {file="images/snowy-evergreen-1.png"},
 }
 
 local FontConfig = {

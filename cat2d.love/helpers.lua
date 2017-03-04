@@ -129,10 +129,20 @@ function forEach(list,fn)
   end
 end
 
+function forEachMatching(list, key, val, fn)
+  if list then
+    for _,element in ipairs(list) do
+      if element[key] == val then
+        fn(element)
+      end
+    end
+  end
+end
+
 function offsetBounds(t, w,h, wr, hr)
   t.w = w
   t.h = h
-  t.offx = -wr * w
-  t.offy = -hr * h
+  t.offx = wr * w
+  t.offy = hr * h
   return t
 end

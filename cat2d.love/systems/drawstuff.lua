@@ -3,8 +3,16 @@ local DBG=false
 local BOUNDS=false
 
 return function(estore,output,res)
-  -- estore:search(hasComps('pos'), function(e)
-  -- local drewItems = 0
+  local drawBounds = false
+  estore:search(hasComps('tag','debug'), function(e)
+    if e.tags.debug then
+      if e.debugs.drawBounds then
+        drawBounds = e.debugs.drawBounds.value
+        return false -- stop searching
+      end
+    end
+  end)
+
   estore:walkEntities(nil, function(e)
     if not e.pos then return false end
 
@@ -72,10 +80,10 @@ return function(estore,output,res)
       local x,y = getPos(e)
       local rect = e.rect
       love.graphics.setColor(unpack(rect.color))
-      love.graphics.rectangle(rect.style, x+rect.offx, y+rect.offy, rect.w, rect.h)
+      love.graphics.rectangle(rect.style, x-rect.offx, y-rect.offy, rect.w, rect.h)
     end
 
-    if BOUNDS then
+    if BOUNDS or drawBounds then
       if e.pos then
         local x,y = getPos(e)
         love.graphics.setColor(255,255,255)
@@ -83,7 +91,7 @@ return function(estore,output,res)
         love.graphics.line(x,y-5, x,y+5)
         if e.bounds then
           local b = e.bounds
-          love.graphics.rectangle("line", x+b.offx, y+b.offy, b.w, b.h)
+          love.graphics.rectangle("line", x-b.offx, y-b.offy, b.w, b.h)
         end
       end
     end

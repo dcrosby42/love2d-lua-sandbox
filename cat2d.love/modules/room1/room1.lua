@@ -36,11 +36,12 @@ local M ={}
 local newSnowScene
 
 M.newWorld = function()
+  local res = Resources.load()
   local w = {
     bgcolor = {0,0,0},
-    estore = buildEstore(),
+    estore = buildEstore(res),
     input = { dt=0, events={} },
-    resources = Resources.load(),
+    resources = res,
   }
 
   return w, nil

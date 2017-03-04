@@ -272,10 +272,6 @@ end
 
 function Estore:_walkEntity(e, matchFn, doFn)
   local proceed = true
-  if matchFn and type(matchFn) == "number" then
-    print("WUT?")
-    print(debug.traceback())
-  end
   if (not matchFn) or matchFn(e) then -- execute doFn if either a) no matcher, or b) matcher provided and returns true
     local out = doFn(e)
     if out == false then proceed = false end
