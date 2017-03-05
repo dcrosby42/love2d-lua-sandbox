@@ -71,15 +71,15 @@ Field.newFieldEntity = function(estore, res)
     bushCol=c.green
   }
 
-  for i = 0,800,120 do
-    for j = 100,600,200 do
-      opts.x = i
-      opts.y = j
-      local tr = mkTreeImg(estore, opts, res)
-      -- local tr = mkTree(estore, opts)
-      field:addChild(tr)
-    end
-  end
+  -- for i = 0,800,120 do
+  --   for j = 100,600,200 do
+  --     opts.x = i
+  --     opts.y = j
+  --     local tr = mkTreeImg(estore, opts, res)
+  --     -- local tr = mkTree(estore, opts)
+  --     field:addChild(tr)
+  --   end
+  -- end
 
   return field
 end

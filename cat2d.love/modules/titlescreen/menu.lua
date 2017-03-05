@@ -26,6 +26,7 @@ function addBlueFlicker(e,time)
     {'name', {name='BlueFlicker effect'}},
     {'timer', {name='flicker', t=0, reset=0.16, countDown=false, loop=true}},
     {'effect', {
+      timer='flicker',
       path={'PARENT','label','color'},
       data={0,ColdBlue, 0.08, ColdBlue_Bright}}},
     {'tag', {name='self_destruct'}},
