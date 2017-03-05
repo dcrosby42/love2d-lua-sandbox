@@ -50,7 +50,7 @@ return defineUpdateSystem(hasComps('controller','vel','pos'),
     pos.x = pos.x + vel.dx * input.dt
     pos.y = pos.y + vel.dy * input.dt
 
-    if e.tags.bounded then
+    if e.tags and e.tags.bounded then
       local par = e:getParent()
       if par and par.bounds then
         local px,py = getPos(par)

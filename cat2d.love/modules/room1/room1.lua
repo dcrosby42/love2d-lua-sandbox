@@ -48,6 +48,27 @@ M.newWorld = function()
   return w, nil
 end
 
+local ControllerState = {
+  leftAxes = {
+    x = 0,
+    y = 0,
+  },
+  buttons = {
+    ['1'] = 0,
+    ['2'] = 0,
+    ['3'] = 0,
+    ['4'] = 0,
+    start=0,
+    select=0,
+    leftBumper=0,
+    leftTrigger=0,
+    rightBumper=0,
+    rightTrigger=0,
+  },
+}
+
+local controllerState = {}
+
 M.updateWorld = function(world, action)
   local effects = nil
 
@@ -67,32 +88,24 @@ M.updateWorld = function(world, action)
       end
     end)
 
-  elseif action.type == 'mouse' then
-    if action.button == 1 then
-      if action.state == "pressed" then
-        addInputEvent(world.input, {type='tap', id='p1', x=action.x, y=action.y})
-      end
-    elseif action.button == 2 then
-      if action.state == "pressed" then
-        addInputEvent(world.input, {type='untap', id='p1', x=action.x, y=action.y})
-      end
-    end
+  -- elseif action.type == 'mouse' then
+  --   if action.button == 1 then
+  --     if action.state == "pressed" then
+  --       addInputEvent(world.input, {type='tap', id='p1', x=action.x, y=action.y})
+  --     end
+  --   elseif action.button == 2 then
+  --     if action.state == "pressed" then
+  --       addInputEvent(world.input, {type='untap', id='p1', x=action.x, y=action.y})
+  --     end
+  --   end
 
   elseif action.type == 'keyboard' then
     addInputEvent(world.input, action)
 
     local key = action.key
     if key == "p" then
-      local estore = world.estore
       print("============================================================================")
-      print(estore:debugString())
-    elseif key == "g" then
-      local estore = world.estore
-      if estore.etree then
-        print("============================================================================")
-        print("-- Entity tree (Estore.etree):")
-        print(tdebug(estore.etree.ROOT))
-      end
+      print(world.estore:debugString())
     elseif key == "x" and action.state == 'pressed' then
       print("Manual switchover")
       effects = {
@@ -103,9 +116,9 @@ M.updateWorld = function(world, action)
         e.debugs.drawBounds.value = not e.debugs.drawBounds.value
       end)
     else
-      local hit = kbdDpadInput(world, { up='w', left='a', down='s', right='d' }, 'con1', action)
+      local hit = kbdDpadInput(world, { up='w', left='a', down='s', right='d' }, 'con1', action, controllerState)
       if not hit then
-        kbdDpadInput(world, { up='k', left='h', down='j', right='l' }, 'con2', action)
+        kbdDpadInput(world, { up='k', left='h', down='j', right='l' }, 'con2', action, controllerState)
       end
     end
 
@@ -120,28 +133,55 @@ M.drawWorld = function(world)
   drawSystem(world.estore, nil, world.resources)
 end
 
-function kbdDpadInput(world, map, targetId, action)
+function kbdDpadInput(world, map, targetId, action, controllerState)
   local key = action.key
   if key == map.up then
-    local mag = -1
-    if action.state == 'released' then mag = 0 end
+    local mag = 0
+    if action.state == 'pressed' then
+      controllerState.up = true
+      mag = -1
+    else
+      controllerState.up = false
+      if controllerState.down then mag = 1 end
+    end
     addInputEvent(world.input, {type='controller', id=targetId, input="lefty", action=mag})
     return true
+
   elseif key == map.down then
-    local mag = 1
-    if action.state == 'released' then mag = 0 end
+    local mag = 0
+    if action.state == 'pressed' then
+      controllerState.down = true
+      mag = 1
+    else
+      controllerState.down = false
+      if controllerState.up then mag = -1 end
+    end
     addInputEvent(world.input, {type='controller', id=targetId, input="lefty", action=mag})
     return true
+
   elseif key == map.left then
-    local mag = -1
-    if action.state == 'released' then mag = 0 end
+    local mag = 0
+    if action.state == 'pressed' then
+      controllerState.left = true
+      mag = -1
+    else
+      controllerState.left = false
+      if controllerState.right then mag = 1 end
+    end
     addInputEvent(world.input, {type='controller', id=targetId, input="leftx", action=mag})
     return true
   elseif key == map.right then
-    local mag = 1
-    if action.state == 'released' then mag = 0 end
+    local mag = 0
+    if action.state == 'pressed' then
+      controllerState.right = true
+      mag = 1
+    else
+      controllerState.right = false
+      if controllerState.left then mag = -1 end
+    end
     addInputEvent(world.input, {type='controller', id=targetId, input="leftx", action=mag})
     return true
+
   end
   return false
 end

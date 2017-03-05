@@ -1,6 +1,16 @@
 M = {}
 
-local Defaults = {
+eg = {'avatar_control', {
+  hdir="left",  -- left | right
+  vdir="down",  -- up | down
+  tryMove="right",  -- up | down | left | right
+  tryRun=false,
+  tryJump=false,
+}}
+
+
+
+local CatDefaults = {
   x = 0,
   y = 0,
   sx = 0.5,
@@ -22,7 +32,7 @@ end
 
 M.newEntity = function(estore,res,opts)
   if not opts then opts = {} end
-  opts = tcopy(opts,Defaults)
+  opts = tcopy(opts,CatDefaults)
   imgId = "cat-Idle-1"
   local w = res.images[imgId]:getWidth()
   local h = res.images[imgId]:getHeight()
@@ -30,7 +40,7 @@ M.newEntity = function(estore,res,opts)
     {'name', {name='Animated Cat'}},
     {'pos', {x=opts.x, y=opts.y}},
     {'vel', {}},
-    {'tag', {name='bounded'}},
+    -- {'tag', {name='bounded'}},
     {'img', {imgId=imgId, sx=opts.sx, sy=opts.sy, offx=w/2, offy=h}},
     {'bounds', offsetBounds({}, w * opts.sx, h * opts.sy, 0.5, 1.0)},
   })
@@ -42,10 +52,7 @@ M.newEntity = function(estore,res,opts)
   cat:newChild({
     {'name', {name='Cat Idle animation'}},
     {'timer', {name='anim', t=0, reset=(numFrames*frameInt), countDown=false, loop=true}},
-    {'effect', {
-      timer='anim',
-      path={'PARENT','img','imgId'},
-      data=edata}},
+    {'effect', {timer='anim', path={'PARENT','img','imgId'}, data=edata}},
     -- {'tag', {name='self_destruct'}},
     -- {'timer', {name='self_destruct', t=2}},
   })
