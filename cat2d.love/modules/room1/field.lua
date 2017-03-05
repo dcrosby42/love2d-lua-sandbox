@@ -52,7 +52,7 @@ Field.newFieldEntity = function(estore, res)
     {'tag', {name='room1-field'}},
     {'zChildren', {}},
     {'pos', {x=100, y=300}},
-    {'bounds', {w=300,h=300}},
+    {'bounds', {w=600,h=300}},
     {'vel', {}},
     {'controller', {id='con2'}},
   })
@@ -61,8 +61,8 @@ Field.newFieldEntity = function(estore, res)
   local opts = {
     x=100,
     y=100,
-    scalex=0.5,
-    scaley=0.5,
+    scalex=0.6,
+    scaley=0.6,
     trunkW=30,
     trunkH=60,
     bushW=100,

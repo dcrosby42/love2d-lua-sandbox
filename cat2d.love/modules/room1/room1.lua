@@ -98,6 +98,10 @@ M.updateWorld = function(world, action)
       effects = {
         {type='transition', value='leave'}
       }
+    elseif key == "b" and action.state == 'pressed' then
+      world.estore:seekEntity(hasTag('debug'), function(e)
+        e.debugs.drawBounds.value = not e.debugs.drawBounds.value
+      end)
     else
       local hit = kbdDpadInput(world, { up='w', left='a', down='s', right='d' }, 'con1', action)
       if not hit then
@@ -148,7 +152,7 @@ buildEstore = function(res)
 
   estore:newEntity({
     {'tag', {name='debug'}},
-    {'debug', {name='drawBounds',value=true}}
+    {'debug', {name='drawBounds',value=false}}
   })
 
   local base = estore:newEntity({

@@ -46,7 +46,7 @@ R.load = function()
     res.fonts[key] = love.graphics.newFont(cfg.file, cfg.size)
   end
 
-  print(tdebug(res))
+  -- print(tdebug(res))
   return res
 end
 

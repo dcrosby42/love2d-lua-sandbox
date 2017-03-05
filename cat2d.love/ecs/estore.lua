@@ -245,36 +245,45 @@ function Estore:getComp(cid)
   return self.comps[cid]
 end
 
--- function valsearch(t,matchFn,callbackFn)
---   for _,v in pairs(t) do
---     if matchFn(v) then callbackFn(v) end
---   end
--- end
-
--- function Estore:_eachEntity(fn)
---   for _,ent in pairs(self.ents) do
---     fn(ent)
---   end
--- end
-
+-- Iterate all Entities by walking the parent-child tree in preorder fashion.
+-- (Ie, match/process the given node, then the child nodes from first to last)
+-- IF a node IS matched AND the processing of that node returns false (explicitly), the children are NOT processed.
 function Estore:walkEntities(matchFn, doFn)
   for _,e in pairs(self._root._children) do
     self:_walkEntity(e, matchFn, doFn)
   end
 end
 
+-- Match/process the given node, then the child nodes from first to last).
+-- IF a node IS matched AND the processing of that node returns explicitly false, the children are NOT processed.
+-- (If children nodes supress processing their own children, this does not prevent processing of their own peers.)
 function Estore:_walkEntity(e, matchFn, doFn)
-  local proceed = true
   if (not matchFn) or matchFn(e) then -- execute doFn if either a) no matcher, or b) matcher provided and returns true
-    local out = doFn(e)
-    if out == false then proceed = false end
+    if doFn(e) == false then return end
   end
-  if proceed then
-    for _,ch in ipairs(e._children) do
-      self:_walkEntity(ch, matchFn, doFn)
-    end
+  for _,ch in ipairs(e._children) do
+    self:_walkEntity(ch, matchFn, doFn)
   end
 end
+
+-- Similar to walkEntities, but with the purpose of finding a particular result then exiting the search immediately.
+-- If the doFn() is applied to an Entity and returns explicitly tree, the traversal exits and returns true.
+function Estore:seekEntity(matchFn, doFn)
+  for _,e in pairs(self._root._children) do
+    if self:_seekEntity(e, matchFn, doFn) == true then return true end
+  end
+end
+
+-- (recursive step of seekEntity)
+function Estore:_seekEntity(e, matchFn, doFn)
+  if (not matchFn) or matchFn(e) then -- execute doFn if either a) no matcher, or b) matcher provided and returns true
+    if doFn(e) == true then return true end
+  end
+  for _,ch in ipairs(e._children) do
+    if self:_seekEntity(ch, matchFn, doFn) == true then return true end
+  end
+end
+
 
 function Estore:_deparent(e)
   if e._parent then

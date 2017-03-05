@@ -30,6 +30,25 @@ function hasComps(...)
   end
 end
 
+function hasTag(tagname)
+  return function(e)
+    return e.tags and e.tags[tagname]
+  end
+end
+
+function allOf(...)
+  local matchers = {...}
+  return function(e)
+    for _,matchFn in ipairs(matchers) do
+      if not matchFn(e) then
+        return false
+      end
+    end
+    return true
+  end
+end
+
+
 function addInputEvent(input, evt)
   if not input.events[evt.type] then
     input.events[evt.type] = {}
