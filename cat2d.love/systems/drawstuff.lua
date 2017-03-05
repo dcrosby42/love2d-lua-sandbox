@@ -4,7 +4,7 @@ local BOUNDS=false
 
 return function(estore,output,res)
   local drawBounds = false
-  estore:search(hasComps('tag','debug'), function(e)
+  estore:walkEntities(hasComps('tag','debug'), function(e)
     if e.tags.debug then
       if e.debugs.drawBounds then
         drawBounds = e.debugs.drawBounds.value
@@ -22,6 +22,10 @@ return function(estore,output,res)
     if e.img and e.pos then
       local img = e.img
       local x,y = getPos(e)
+      local imgRes = res.images[img.imgId]
+      if not imgRes then
+        error("No image resource '"..img.imgId.."'")
+      end
       love.graphics.setColor(unpack(img.color))
       love.graphics.draw(
         res.images[img.imgId],

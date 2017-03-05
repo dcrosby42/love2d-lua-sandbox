@@ -6,7 +6,8 @@ require 'comps'
 local Snow = require 'systems/snow'
 local Estore = require 'ecs/estore'
 local Resources = require(here.."resources")
-local Cat = require(here..'/cat')
+local BoxyCat = require(here..'/boxcat')
+local AnimCat = require(here..'/animcat')
 local Field = require(here..'/field')
 
 local timerSystem = require 'systems/timer'
@@ -147,7 +148,7 @@ buildEstore = function(res)
 
   estore:newEntity({
     {'tag', {name='debug'}},
-    {'debug', {name='drawBounds',value=false}}
+    {'debug', {name='drawBounds',value=true}}
   })
 
   local base = estore:newEntity({
@@ -166,7 +167,8 @@ buildEstore = function(res)
   base:addChild(field)
 
   -- Create a cat
-  local cat = Cat.newCatEntity_boxy(estore, res)
+  -- local cat = BoxyCat.newCatEntity_boxy(estore, res)
+  local cat = AnimCat.newEntity(estore, res)
   -- take control of cat
   cat:newComp('controller', {id='con1'})
   cat:newComp('name', {name='Player1'})

@@ -1,8 +1,12 @@
 Comp = require 'ecs/component'
 Entity = require 'ecs/entity'
+require 'ecs/debug'
 
 local Estore = {
 }
+
+local removeChildEntityFrom -- defined below
+local addChildEntityTo -- defined below
 
 function Estore:new(o)
   local o = o or {
@@ -55,6 +59,7 @@ function Estore:newEntity(compList, subs)
   return e
 end
 
+-- Alias for Estore:newEntity
 function Estore:buildEntity(compList, subs)
   return self:newEntity(compList, subs)
 end
@@ -240,29 +245,17 @@ function Estore:getComp(cid)
   return self.comps[cid]
 end
 
-function keyvalsearch(t,matchFn,callbackFn)
-  for _,v in pairs(t) do
-    if fn(k,v) then callbackFn(k,v) end
-  end
-end
+-- function valsearch(t,matchFn,callbackFn)
+--   for _,v in pairs(t) do
+--     if matchFn(v) then callbackFn(v) end
+--   end
+-- end
 
-function valsearch(t,matchFn,callbackFn)
-  for _,v in pairs(t) do
-    if matchFn(v) then callbackFn(v) end
-  end
-end
-
-function valsearchfirst(t,matchFn,callbackFn)
-  for _,v in pairs(t) do
-    if fn(v) then return callbackFn(v) end
-  end
-end
-
-function Estore:_eachEntity(fn)
-  for _,ent in pairs(self.ents) do
-    fn(ent)
-  end
-end
+-- function Estore:_eachEntity(fn)
+--   for _,ent in pairs(self.ents) do
+--     fn(ent)
+--   end
+-- end
 
 function Estore:walkEntities(matchFn, doFn)
   for _,e in pairs(self._root._children) do
@@ -311,7 +304,7 @@ function Estore:setupParent(parentEnt, childEnt)
 end
 
 function Estore:search(matchFn,doFn)
-  valsearch(self.ents, matchFn, doFn)
+  self:walkEntities(matchFn, doFn)
 end
 
 function Estore:getParent(e)
@@ -331,10 +324,6 @@ function Estore:debugString()
   local s = ""
   s = s .. "-- Estore:\n"
   s = s .. "--- Next eid: e" .. self.eidCounter .. ", Next cid: c" .. self.cidCounter .. "\n"
-  -- s = s .. "--- Components (self.comps):\n"
-  -- for cid,comp in pairs(self.comps) do
-  --   s = s..cid .. ": " .. Comp.debugString(comp) .. "\n"
-  -- end
   s = s .. "--- Entities:\n"
   for eid,e in pairs(self.ents) do
     s = s .. entityDebugString(e)
@@ -370,47 +359,6 @@ function removeChildEntityFrom(parEnt, chEnt)
   end
 end
 
-function entityDebugString(e)
-  local s = entityName(e) .. ": " .. "\n"
-  for k,v in pairs(e) do
-    if tostring(k):byte(1) ~= 95 then
-      if v.cid and v.eid then
-        keyp = tostring(k).."s"
-        if tcount(e[keyp]) == 1 then
-          s = s.."  "..tostring(k)..": "..Comp.debugString(v) .. "\n"
-        else
-          s = s.."  "..tostring(keyp)..": \n"
-          for name,comp in pairs(e[keyp]) do
-            s = s .. "    " .. tostring(name) .. ": "
-            if v.cid == comp.cid then
-              s = s .. "*"
-            end
-            s = s..Comp.debugString(comp)
-            s = s .."\n"
-          end
-        end
-      end
-    end
-  end
-  return s
-end
-
-function entityName(e)
-  if e.name and e.name.name then
-    return e.name.name .. " (" .. tostring(e.eid) .. ")"
-  else
-    return tostring(e.eid)
-  end
-end
-
-
-function entityTreeDebugString(e,indent)
-  local s = indent .. entityName(e) .. ": \n"
-  for _,ch in ipairs(e._children) do
-    s = s .. entityTreeDebugString(ch,indent.."  ")
-  end
-  return s
-end
 
 
 
