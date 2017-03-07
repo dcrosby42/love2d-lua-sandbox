@@ -19,8 +19,8 @@ Field.newFieldEntity = function(estore, res)
   local field = estore:newEntity({
     {'tag', {name='room1-field'}},
     {'zChildren', {}},
-    {'pos', {x=100, y=300}},
-    {'bounds', {w=600,h=300}},
+    {'pos', {x=0, y=0}},
+    {'bounds', {w=800,h=600}},
     {'vel', {}},
     {'controller', {id='con2'}},
   })
@@ -29,8 +29,8 @@ Field.newFieldEntity = function(estore, res)
   local opts = {
     x=100,
     y=100,
-    scalex=0.7,
-    scaley=0.7,
+    scalex=0.6,
+    scaley=0.6,
   }
 
   for i = 0,800,120 do

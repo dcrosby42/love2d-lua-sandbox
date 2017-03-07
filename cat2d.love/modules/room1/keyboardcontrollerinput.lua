@@ -1,5 +1,5 @@
 
-return function(world, map, targetId, action, controllerState)
+return function(input, map, targetId, action, controllerState)
   local key = action.key
   if key == map.up then
     local mag = 0
@@ -10,7 +10,7 @@ return function(world, map, targetId, action, controllerState)
       controllerState.up = false
       if controllerState.down then mag = 1 end
     end
-    addInputEvent(world.input, {type='controller', id=targetId, input="lefty", action=mag})
+    addInputEvent(input, {type='controller', id=targetId, input="lefty", action=mag})
     return true
 
   elseif key == map.down then
@@ -22,7 +22,7 @@ return function(world, map, targetId, action, controllerState)
       controllerState.down = false
       if controllerState.up then mag = -1 end
     end
-    addInputEvent(world.input, {type='controller', id=targetId, input="lefty", action=mag})
+    addInputEvent(input, {type='controller', id=targetId, input="lefty", action=mag})
     return true
 
   elseif key == map.left then
@@ -34,7 +34,7 @@ return function(world, map, targetId, action, controllerState)
       controllerState.left = false
       if controllerState.right then mag = 1 end
     end
-    addInputEvent(world.input, {type='controller', id=targetId, input="leftx", action=mag})
+    addInputEvent(input, {type='controller', id=targetId, input="leftx", action=mag})
     return true
   elseif key == map.right then
     local mag = 0
@@ -45,7 +45,7 @@ return function(world, map, targetId, action, controllerState)
       controllerState.right = false
       if controllerState.left then mag = -1 end
     end
-    addInputEvent(world.input, {type='controller', id=targetId, input="leftx", action=mag})
+    addInputEvent(input, {type='controller', id=targetId, input="leftx", action=mag})
     return true
 
   end

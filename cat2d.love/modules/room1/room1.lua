@@ -21,6 +21,7 @@ local avatarControlSystem = require(here..'/avatarcontrolsystem')
 local moverSystem = require(here..'/moversystem')
 
 local keyboardControllerInput = require(here..'/keyboardcontrollerinput')
+local ScreenPad = require(here..'/screenpad')
 
 local M ={}
 
@@ -46,6 +47,7 @@ M.newWorld = function()
     estore = buildEstore(res),
     input = { dt=0, events={} },
     resources = res,
+    screenPad = ScreenPad.initialize({controllerId="con1"})
   }
 
   return w, nil
@@ -72,16 +74,12 @@ M.updateWorld = function(world, action)
       end
     end)
 
-  -- elseif action.type == 'mouse' then
-  --   if action.button == 1 then
-  --     if action.state == "pressed" then
-  --       addInputEvent(world.input, {type='tap', id='p1', x=action.x, y=action.y})
-  --     end
-  --   elseif action.button == 2 then
-  --     if action.state == "pressed" then
-  --       addInputEvent(world.input, {type='untap', id='p1', x=action.x, y=action.y})
-  --     end
-  --   end
+
+  elseif action.type == 'mouse' then
+    ScreenPad.handleMouse(world.screenPad, action, world.input)
+
+  elseif action.type == 'touch' then
+    ScreenPad.handleTouch(world.screenPad, action, world.input)
 
   elseif action.type == 'keyboard' then
     addInputEvent(world.input, action)
@@ -100,8 +98,8 @@ M.updateWorld = function(world, action)
         e.debugs.drawBounds.value = not e.debugs.drawBounds.value
       end)
     else
-      keyboardControllerInput(world, { up='w', left='a', down='s', right='d' }, 'con1', action, controllerState)
-      keyboardControllerInput(world, { up='k', left='h', down='j', right='l' }, 'con2', action, controllerState)
+      keyboardControllerInput(world.input, { up='w', left='a', down='s', right='d' }, 'con1', action, controllerState)
+      keyboardControllerInput(world.input, { up='k', left='h', down='j', right='l' }, 'con2', action, controllerState)
     end
 
   end
@@ -151,8 +149,5 @@ buildEstore = function(res)
 
   return estore
 end
-
-
-
 
 return M

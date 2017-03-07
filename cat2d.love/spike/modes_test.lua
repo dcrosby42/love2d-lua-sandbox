@@ -57,22 +57,27 @@ function love.mousereleased(x,y, button, isTouch)
   Mod.updateWorld(world, toMouseAction("released",x,y,button,isTouch))
 end
 
--- function love.mousemoved(x,y, dx,dy, isTouch)
---   Mod.updateWorld(world, toMouseAction("moved",x,y,nil,isTouch,dx,dy))
--- end
+function love.mousemoved(x,y, dx,dy, isTouch)
+  Mod.updateWorld(world, toMouseAction("moved",x,y,nil,isTouch,dx,dy))
+end
 
-local touchAction = {type="touch", state=nil, x=0, y=0, dx=0, dy=0}
+local touchAction = {type="touch", state=nil, id='', x=0, y=0, dx=0, dy=0}
+function toTouchAction(s,id,x,y,dx,dy)
+  touchAction.state= s
+  touchAction.id = id
+  touchAction.x=x
+  touchAction.y=y
+  touchAction.dx=dx
+  touchAction.dy=dy
+  return touchAction
+end
+
 function love.touchpressed(id, x,y, dx,dy, pressure)
-  mouseAction.state="pressed"
-  mouseAction.x=x
-  mouseAction.y=y
-  mouseAction.dx=dx
-  mouseAction.dy=dy
-  mouseAction.button=button
-  mouseAction.isTouch=isTouch
-  Mod.updateWorld(world, mouseAction)
+  Mod.updateWorld(world, toTouchAction("pressed",id,x,y,dx,dy))
 end
 function love.touchmoved(id, x,y, dx,dy, pressure)
+  Mod.updateWorld(world, toTouchAction("moved",id,x,y,dx,dy))
 end
 function love.touchreleased(id, x,y, dx,dy, pressure)
+  Mod.updateWorld(world, toTouchAction("released",id,x,y,dx,dy))
 end

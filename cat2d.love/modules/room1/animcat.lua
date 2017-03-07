@@ -20,7 +20,7 @@ M.newEntity = function(estore,res,opts)
     {'name', {name='Animated Cat'}},
     {'pos', {x=opts.x, y=opts.y}},
     {'vel', {}},
-    -- {'tag', {name='bounded'}},
+    {'tag', {name='bounded'}},
     {'img', {imgId=imgId, sx=opts.sx, sy=opts.sy, offx=w/2, offy=h}},
     {'bounds', offsetBounds({}, w * opts.sx, h * opts.sy, 0.5, 1.0)},
     {'timer', {name='anim', t=0, reset=0.7, countDown=false, loop=true}},

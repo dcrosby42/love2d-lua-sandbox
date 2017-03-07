@@ -128,6 +128,16 @@ function math.pointinrect(x1,y1, rx,ry,rw,rh)
   return x1 >= rx and x1 < rx+rw and y1 >= ry and y1 < ry + rh
 end
 
+function math.clamp(val, min, max)
+  if val < min then
+    return min, true
+  elseif val > max then
+    return max, true
+  else
+    return val, false
+  end
+end
+
 function forEach(list,fn)
   if list then
     for i,x in ipairs(list) do
