@@ -23,6 +23,7 @@ local moverSystem = require(here..'/moversystem')
 local keyboardControllerInput = require(here..'/keyboardcontrollerinput')
 -- local ScreenPad = require(here..'/screenpad')
 local ScreenPad = require(here..'/screenpad2')
+local Waypoint = require(here..'/waypoint')
 
 local M ={}
 
@@ -33,6 +34,7 @@ local runSystems = iterateFuncs({
   timerSystem,
   Snow.System,
   selfDestructSystem,
+  Waypoint.System,
   controllerSystem,
   avatarControlSystem,
   moverSystem,
@@ -70,13 +72,15 @@ M.updateWorld = function(world, action)
     estore:search(hasComps('output'), function(e)
       effects = {}
       for _,out in pairs(e.outputs) do
-        -- print("Effect: "..out.kind)
         effects[#effects+1] = {type=out.kind, value=out.value}
       end
     end)
 
 
   elseif action.type == 'mouse' then
+    if love.keyboard.isDown("lshift") then
+      Waypoint.handleMouse(action, world.screenPad.controllerId, world.input)
+    end
     ScreenPad.handleMouse(world.screenPad, action, world.input)
 
   elseif action.type == 'touch' then

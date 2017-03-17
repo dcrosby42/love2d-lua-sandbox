@@ -42,7 +42,7 @@ return defineUpdateSystem(hasComps('avatar','controller'),
       e.effects.anim.animFunc = 'cat_walk'
     end
 
-    -- Update the animation:
+    -- Update the velocity:
     e.vel.dx = MoveSpeed * e.controller.leftx
     e.vel.dy = MoveSpeed * e.controller.lefty
   end
