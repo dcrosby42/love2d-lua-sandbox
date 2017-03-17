@@ -1,6 +1,6 @@
 
 local StickDefaults = {
-  radius = 200
+  radius = 100
 }
 
 local function newState()
@@ -29,19 +29,23 @@ local function newStick(opts)
     x=x,
     y=y,
     bounds=bounds,
-    radius = opts.radius
+    radius = opts.radius,
+    draw={
+      debug=false,
+      knob=true,
+    }
   }
 end
 
 local function addMotionEvents(stick, list)
   local s = stick.state
   local xdist = s.lastx - stick.x
-  local xmag = math.clamp(xdist / stick.radius, -1, 1)
-  table.insert(list, {input='x',action=xmag})
+  s.magx = math.clamp(xdist / stick.radius, -1, 1)
+  table.insert(list, {input='x',action=s.magx})
 
   local ydist = s.lasty - stick.y
-  local ymag = math.clamp(ydist / stick.radius, -1, 1)
-  table.insert(list, {input='y',action=ymag})
+  s.magy = math.clamp(ydist / stick.radius, -1, 1)
+  table.insert(list, {input='y',action=s.magy})
 
   return list
 end
@@ -62,6 +66,8 @@ local function start(stick, id, x,y)
       s.starty = y
       s.lastx = x
       s.lasty = y
+      s.magx = 0
+      s.magy = 0
       return addMotionEvents(stick, {})
     end
   end
@@ -81,9 +87,32 @@ local function done(stick, id, x,y)
   if s.on and s.id == id then
     s.lastx = 0
     s.lastx = 0
+    s.magx = 0
+    s.magy = 0
     s.on = false
     s.id = false
     return addStopEvents(stick,{})
+  end
+end
+
+local function draw(stick)
+  if stick.draw.debug then
+    love.graphics.setColor(255, 255, 255)
+    love.graphics.rectangle("line", unpack(stick.bounds))
+    love.graphics.circle("fill", stick.x, stick.y, 1, 5)
+    love.graphics.circle("fill", stick.state.lastx, stick.state.lasty, 1, 5)
+    love.graphics.circle("line", stick.x, stick.y, stick.radius)
+  end
+
+  if stick.draw.knob then
+    love.graphics.setColor(255, 255, 255, 100)
+    local knobx = stick.x
+    local knoby = stick.y
+    if stick.state.on then
+      knobx = knobx + (stick.state.magx * stick.radius)
+      knoby = knoby + (stick.state.magy * stick.radius)
+    end
+    love.graphics.circle("fill", knobx,knoby, 35)
   end
 end
 
@@ -92,4 +121,5 @@ return {
   start=start,
   move=move,
   done=done,
+  draw=draw,
 }

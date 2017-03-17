@@ -59,4 +59,8 @@ M.handleTouch = function(sp, action, worldInput)
   end
 end
 
+M.draw = function(sp)
+  TouchStick.draw(sp.leftStick)
+end
+
 return M

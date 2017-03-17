@@ -112,6 +112,8 @@ M.drawWorld = function(world)
   love.graphics.setBackgroundColor(unpack(world.bgcolor))
 
   drawSystem(world.estore, nil, world.resources)
+
+  ScreenPad.draw(world.screenPad)
 end
 
 buildEstore = function(res)
