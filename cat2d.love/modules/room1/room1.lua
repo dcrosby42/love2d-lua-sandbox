@@ -85,6 +85,7 @@ M.updateWorld = function(world, action)
 
   elseif action.type == 'touch' then
     ScreenPad.handleTouch(world.screenPad, action, world.input)
+    Waypoint.handleTouch(action, world.screenPad.controllerId, world.input)
 
   elseif action.type == 'keyboard' then
     addInputEvent(world.input, action)
