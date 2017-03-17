@@ -21,7 +21,8 @@ local avatarControlSystem = require(here..'/avatarcontrolsystem')
 local moverSystem = require(here..'/moversystem')
 
 local keyboardControllerInput = require(here..'/keyboardcontrollerinput')
-local ScreenPad = require(here..'/screenpad')
+-- local ScreenPad = require(here..'/screenpad')
+local ScreenPad = require(here..'/screenpad2')
 
 local M ={}
 
