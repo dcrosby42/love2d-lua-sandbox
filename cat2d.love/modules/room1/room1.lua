@@ -23,6 +23,7 @@ local moverSystem = require(here..'/moversystem')
 local keyboardControllerInput = require(here..'/keyboardcontrollerinput')
 -- local ScreenPad = require(here..'/screenpad')
 local ScreenPad = require(here..'/screenpad2')
+local Joystick = require(here..'/joystick')
 local Waypoint = require(here..'/waypoint')
 
 local M ={}
@@ -42,6 +43,7 @@ local runSystems = iterateFuncs({
   effectsSystem,
 })
 
+local estoreCountup, printCountup
 
 M.newWorld = function()
   local res = Resources.load()
@@ -87,11 +89,15 @@ M.updateWorld = function(world, action)
     ScreenPad.handleTouch(world.screenPad, action, world.input)
     Waypoint.handleTouch(action, world.screenPad.controllerId, world.input)
 
+  elseif action.type == 'joystick' then
+    Joystick.handleJoystick(action, world.screenPad.controllerId, world.input)
   elseif action.type == 'keyboard' then
     addInputEvent(world.input, action)
 
     local key = action.key
-    if key == "p" then
+    if key == "c" and action.state == 'pressed' then
+      printCountup(estoreCountup(world.estore))
+    elseif key == "p" and action.state == 'pressed' then
       print("============================================================================")
       print(world.estore:debugString())
     elseif key == "x" and action.state == 'pressed' then
@@ -156,6 +162,21 @@ buildEstore = function(res)
   base:addChild(Snow.newSnowMachine(estore, {large=5, small=3, dy=60}))
 
   return estore
+end
+
+function estoreCountup(estore)
+  local compCounts,ccount = tcountby(estore.comps, 'type')
+  local ecount = tcount(estore.ents)
+  return {
+    compCounts = compCounts,
+    numComps = ccount,
+    numEnts = ecount,
+    eid = estore.eidCounter,
+    cid = estore.cidCounter,
+  }
+end
+function printCountup(c)
+  print("ents="..c.numEnts.." comps="..c.numComps.." eid="..c.eid.." cid="..c.cid..tdebug(c.compCounts,'  '))
 end
 
 return M

@@ -69,15 +69,16 @@ local snowMachineSystem = defineUpdateSystem(
 --
 -- Snow system: float each snowflake downward, then remove
 --
-local snowSystem = defineUpdateSystem(
-  {'snow'},
+local snowSystem = defineUpdateSystem({'snow'},
   function(e, estore, input, res)
     e.pos.y = e.pos.y + e.vel.dy * input.dt
     if e.pos.y > e.snow.lowerbound then
       estore:destroyEntity(e)
+      return false
     end
   end
 )
+
 
 Snow.System = iterateFuncs({
   snowMachineSystem,

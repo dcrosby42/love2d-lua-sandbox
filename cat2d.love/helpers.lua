@@ -19,6 +19,18 @@ function tcount(t)
   return ct
 end
 
+function tcountby(t,key)
+  local total = 0
+  local counts = {}
+  for _,item in pairs(t) do
+    total = total + 1
+    local k = item[key]
+    if not counts[k] then counts[k] = 0 end
+    counts[k] = counts[k] + 1
+  end
+  return counts,total
+end
+
 function tcopy(orig, defaults)
   local orig_type = type(orig)
   local copy
@@ -137,6 +149,20 @@ function math.clamp(val, min, max)
     return val, false
   end
 end
+
+function math.round0(num)
+  return math.floor(num + 0.5)
+end
+
+function math.round1(num)
+  return math.floor(num * 10 + 0.5) / 10
+end
+
+function math.round(num, numDecimalPlaces)
+  local mult = 10^(numDecimalPlaces or 0)
+  return math.floor(num * mult + 0.5) / mult
+end
+
 
 function forEach(list,fn)
   if list then

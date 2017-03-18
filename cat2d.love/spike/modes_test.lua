@@ -5,8 +5,13 @@ local Mod = require 'modules/arcticcat'
 
 local world
 
+local js
 function love.load()
   world = Mod.newWorld(world)
+
+  local jss = love.joystick.getJoysticks()
+  js = jss[1]
+  print(js:getName())
 end
 
 
@@ -15,6 +20,15 @@ local dtAction = {type="tick", dt=0}
 function love.update(dt)
   dtAction.dt = dt
   Mod.updateWorld(world, dtAction)
+
+  -- if js then
+  --   local leftx = js:getAxis(1)
+  --   local lefty = js:getAxis(2)
+  --   local rightx = js:getAxis(4)
+  --   local righty = js:getAxis(3)
+  --   local huh = js:getAxis(5)
+  --   print(""..leftx.." "..lefty.." "..rightx.." "..righty.." ?"..huh)
+  -- end
 end
 
 function love.draw()
@@ -80,4 +94,25 @@ function love.touchmoved(id, x,y, dx,dy, pressure)
 end
 function love.touchreleased(id, x,y, dx,dy, pressure)
   Mod.updateWorld(world, toTouchAction("released",id,x,y,dx,dy))
+end
+
+local joystickAction = {type="joystick", id='TODO', controlType='', control='', value=0}
+function toJoystickAction(controlType, control, value)
+  joystickAction.id = 'TODO'
+  joystickAction.controlType=controlType
+  joystickAction.control=control
+  joystickAction.value=(value or 0)
+  return joystickAction
+end
+
+function love.joystickaxis( joystick, axis, value )
+  Mod.updateWorld(world, toJoystickAction("axis", axis, value))
+end
+
+function love.joystickpressed( joystick, button )
+  Mod.updateWorld(world, toJoystickAction("button",button,1))
+end
+
+function love.joystickreleased( joystick, button )
+  Mod.updateWorld(world, toJoystickAction("button", button,0))
 end
