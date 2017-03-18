@@ -11,7 +11,7 @@ function love.load()
 
   local jss = love.joystick.getJoysticks()
   js = jss[1]
-  print(js:getName())
+  -- print(js:getName())
 end
 
 
