@@ -71,12 +71,13 @@ function Estore:destroyEntity(e)
 
   local compsToRemove={}
   for _,comp in pairs(self.comps) do
-    if comp.eid == eid then
+    if comp.eid == e.eid then
       table.insert(compsToRemove,comp)
     end
   end
 
   for _,comp in ipairs(compsToRemove) do
+    -- print("removing comp "..tflatten(comp))
     self:removeComp(comp)
   end
 
@@ -214,7 +215,7 @@ function Estore:detachComp(e,comp)
     end
     if compkeycount <= 1 then
       -- eid is only remaining key, meaning we have no comps... EVAPORATE THE ENTITY
-      self:_deparent(e)
+      -- self:_deparent(e) -- shouldn't need this since the parent comp would be gone already
       self.ents[e.eid] = nil
     end
   end
@@ -287,12 +288,12 @@ end
 
 function Estore:_deparent(e)
   if e._parent then
-    removeChildEntityFrom(e._parent, e)
     if e._parent.eid and e._children then
       for _,childEntity in ipairs(e._children) do
         self:setupParent(e._parent, childEntity)
       end
     end
+    removeChildEntityFrom(e._parent, e)
   else
     if e._children then
       for _,childEntity in ipairs(e._children) do
