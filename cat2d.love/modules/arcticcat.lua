@@ -1,7 +1,11 @@
+local here = (...):match("(.*/)[^%/]+$")
+
+local Field = require(here..'/field')
 local Modules = {
-  title = require 'modules/titlescreen/titlescreen',
-  other = require 'modules/other',
-  room1 = require 'modules/room1/room1',
+  title = require(here..'/titlescreen/titlescreen'),
+  other = require(here..'/other'),
+  room1 = require(here..'/room1/room1'),
+  room1 = require(here..'/tiledtest'),
 }
 
 local StateTransitions = {

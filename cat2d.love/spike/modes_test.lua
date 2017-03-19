@@ -1,34 +1,20 @@
 require 'helpers'
 
 -- local Snow = require 'spike/snowmodule'
-local Mod = require 'modules/arcticcat'
+-- local Mod = require 'modules/arcticcat'
+local Mod = require 'modules/tiledtest'
 
 local world
 
-local js
 function love.load()
   world = Mod.newWorld(world)
-
-  local jss = love.joystick.getJoysticks()
-  js = jss[1]
-  -- print(js:getName())
 end
 
 
 local dtAction = {type="tick", dt=0}
-
 function love.update(dt)
   dtAction.dt = dt
   Mod.updateWorld(world, dtAction)
-
-  -- if js then
-  --   local leftx = js:getAxis(1)
-  --   local lefty = js:getAxis(2)
-  --   local rightx = js:getAxis(4)
-  --   local righty = js:getAxis(3)
-  --   local huh = js:getAxis(5)
-  --   print(""..leftx.." "..lefty.." "..rightx.." "..righty.." ?"..huh)
-  -- end
 end
 
 function love.draw()
