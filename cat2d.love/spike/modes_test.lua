@@ -7,6 +7,7 @@ local Mod = require 'modules/tiledtest'
 local world
 
 function love.load()
+  love.window.setMode(1024,768)
   world = Mod.newWorld(world)
 end
 
