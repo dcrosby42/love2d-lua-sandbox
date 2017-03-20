@@ -106,6 +106,17 @@ function tdebug(t,ind)
   end
 end
 
+function tdebug1(t,ind)
+  local s = ''
+  if not ind then
+    ind = '  '
+  end
+  for k,v in pairs(t) do
+    s = s .. ind ..tostring(k)..": "..tostring(v).."\n"
+  end
+  return s
+end
+
 function keyvalsearch(t,matchFn,callbackFn)
   for _,v in pairs(t) do
     if fn(k,v) then callbackFn(k,v) end
@@ -122,6 +133,39 @@ function valsearchfirst(t,matchFn,callbackFn)
   for _,v in pairs(t) do
     if fn(v) then return callbackFn(v) end
   end
+end
+
+function tfind(t, fn)
+  for k,v in pairs(t) do
+    if fn(v,k) == true then
+      return v
+    end
+  end
+end
+function tfindby(t,key,val)
+  for _,v in pairs(t) do
+    if v[key] == val then
+      return v
+    end
+  end
+end
+function tfindall(t,fn)
+  local res = {}
+  for k,v in pairs(t) do
+    if fn(v,k) == true then
+      table.insert(res, v)
+    end
+  end
+  return res
+end
+function tfindallby(t,key,val)
+  local res = {}
+  for _,v in pairs(t) do
+    if v[key] == val then
+      table.insert(res, v)
+    end
+  end
+  return res
 end
 
 function iterateFuncs(funcs)
