@@ -85,7 +85,21 @@ return function(estore,output,res)
       local rect = e.rect
       love.graphics.setColor(unpack(rect.color))
       love.graphics.rectangle(rect.style, x-rect.offx, y-rect.offy, rect.w, rect.h)
+
+    --
+    -- MAP
+    --
+    elseif e.map then
+      local mapid = e.map.id
+      local map = res.maps[mapid]
+      if map then
+        map():draw()
+      else
+        error("Drawing: no map registered with id="..mapid)
+      end
     end
+
+
 
     if BOUNDS or drawBounds then
       if e.pos then

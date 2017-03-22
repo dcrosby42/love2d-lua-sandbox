@@ -3,9 +3,11 @@ local here = (...):match("(.*/)[^%/]+$")
 require 'ecs/ecshelpers'
 require 'comps'
 
--- local Snow = require 'systems/snow'
+local KeyboardController = require 'input/keyboardcontroller'
+
 local Estore = require 'ecs/estore'
--- local Resources = require(here.."resources")
+
+local Resources = require(here.."/resources")
 
 local timerSystem = require 'systems/timer'
 local selfDestructSystem = require 'systems/selfdestruct'
@@ -13,106 +15,86 @@ local outputCleanupSystem = require 'systems/outputcleanup'
 local effectsSystem = require 'systems/effects'
 local controllerSystem = require 'systems/controller'
 local drawSystem = require 'systems/drawstuff'
--- local zChildrenSystem = require 'systems/zchildren'
--- local avatarControlSystem = require(here..'/avatarcontrolsystem')
--- local moverSystem = require(here..'/moversystem')
-
--- local keyboardControllerInput = require(here..'/keyboardcontrollerinput')
--- local ScreenPad = require(here..'/screenpad2')
--- local Joystick = require(here..'/joystick')
--- local Waypoint = require(here..'/waypoint')
 
 local M ={}
 
 local buildEstore
+local mapSystem
 
 local runSystems = iterateFuncs({
   outputCleanupSystem,
   timerSystem,
-  -- Snow.System,
   selfDestructSystem,
-  -- Waypoint.System,
+  -- mapSystem,
   controllerSystem,
-  -- avatarControlSystem,
-  -- moverSystem,
-  -- zChildrenSystem,
   effectsSystem,
 })
 
-local estoreCountup, printCountup
+DefaultKeybdControls = { up='w', left='a', down='s', right='d' }
 
 M.newWorld = function()
-  local res = Resources.load()
-  local w = {
+  local world = {
     bgcolor = {0,0,0},
     estore = buildEstore(res),
     input = { dt=0, events={} },
-    resources = res,
-    screenPad = ScreenPad.initialize({controllerId="con1"})
+    resources = Resources.load(),
+    screenPad = {}, -- ScreenPad.initialize({controllerId="con1"})
+    keyboardController = KeyboardController.initialize({controllerId="con1", bindings=DefaultKeybdControls}),
   }
-
-  return w, nil
+  return world, nil
 end
 
-local controllerState = {}
+local Updaters = {}
+
+Updaters.tick = function(world,action)
+  world.input.dt = action.dt
+
+  runSystems(world.estore, world.input, world.resources)
+
+  world.input.events = {} -- clear the events that happened leading up to this tick
+
+  effects = {}
+  world.estore:search(hasComps('output'), function(e)
+    for _,out in pairs(e.outputs) do
+      table.insert(effects,{type=out.kind, value=out.value})
+    end
+  end)
+  return world, effects
+end
+
+-- Updaters.mouse = function(world,action)
+--   ScreenPad.handleMouse(world.screenPad, action, world.input)
+--   return world, nil
+-- end
+
+-- Updaters.touch = function(world,action)
+--   ScreenPad.handleTouch(world.screenPad, action, world.input)
+--   return world, nil
+-- end
+
+-- Updaters.joystick = function(world,action)
+--   Joystick.handleJoystick(action, world.screenPad.controllerId, world.input)
+--   return world, nil
+-- end
+
+Updaters.keyboard = function(world,action)
+  KeyboardController.handleKeyAction(world.keyboardController, action, world.input)
+  if action.state == 'pressed' then
+    if action.key == '1' or action.key == '2' then
+      world.estore:walkEntities(hasComps('map'),function(e)
+        e.map.id = 'town'..action.key
+      end)
+    end
+  end
+  return world, nil
+end
 
 M.updateWorld = function(world, action)
-  local effects = nil
-
-  if action.type == 'tick' then
-    world.input.dt = action.dt
-
-    local estore = world.estore
-    runSystems(estore, world.input, world.resources)
-
-    world.input.events = {}
-
-    estore:search(hasComps('output'), function(e)
-      effects = {}
-      for _,out in pairs(e.outputs) do
-        effects[#effects+1] = {type=out.kind, value=out.value}
-      end
-    end)
-
-
-  elseif action.type == 'mouse' then
-    if love.keyboard.isDown("lshift") then
-      Waypoint.handleMouse(action, world.screenPad.controllerId, world.input)
-    end
-    ScreenPad.handleMouse(world.screenPad, action, world.input)
-
-  elseif action.type == 'touch' then
-    ScreenPad.handleTouch(world.screenPad, action, world.input)
-    Waypoint.handleTouch(action, world.screenPad.controllerId, world.input)
-
-  elseif action.type == 'joystick' then
-    Joystick.handleJoystick(action, world.screenPad.controllerId, world.input)
-  elseif action.type == 'keyboard' then
-    addInputEvent(world.input, action)
-    if action.state == 'pressed' then
-      local key = action.key
-    -- if key == "c" and action.state == 'pressed' then
-      -- printCountup(estoreCountup(world.estore))
-    if key == "p" and action.state == 'pressed' then
-      print("============================================================================")
-      print(world.estore:debugString())
-    elseif key == "x" and action.state == 'pressed' then
-      print("Manual switchover")
-      effects = {
-        {type='transition', value='leave'}
-      }
-    elseif key == "b" and action.state == 'pressed' then
-      world.estore:seekEntity(hasTag('debug'), function(e)
-        e.debugs.drawBounds.value = not e.debugs.drawBounds.value
-      end)
-    else
-      keyboardControllerInput(world.input, { up='w', left='a', down='s', right='d' }, 'con1', action, controllerState)
-      keyboardControllerInput(world.input, { up='k', left='h', down='j', right='l' }, 'con2', action, controllerState)
-    end
-
+  local fn = Updaters[action.type]
+  if fn then
+    return fn(world,action)
   end
-
-  return world, effects
+  return world, nil
 end
 
 M.drawWorld = function(world)
@@ -127,37 +109,33 @@ buildEstore = function(res)
   local estore = Estore:new()
 
   estore:newEntity({
-    {'tag', {name='debug'}},
-    {'debug', {name='drawBounds',value=false}}
-  })
-
-  local base = estore:newEntity({
     {'pos', {}},
+    {'map', {id="town2"}},
   })
-
-  -- terrain image
-  base:newChild({
-    { 'name', {name='name'}},
-    { 'img', {imgId='snowField'}},
-    { 'pos', {0,0}},
-  })
-
-  -- Add the field and trees
-  local field = Field.newFieldEntity(estore, res)
-  base:addChild(field)
-
-  -- Create a cat
-  local cat = AnimCat.newEntity(estore, res)
-  -- take control of cat
-  cat:newComp('controller', {id='con1'})
-  field:addChild(cat)
-
-  -- Add snow
-  base:addChild(Snow.newSnowMachine(estore, {large=2, small=1, dy=15}))
-  base:addChild(Snow.newSnowMachine(estore, {large=3, small=1, dy=30}))
-  base:addChild(Snow.newSnowMachine(estore, {large=5, small=3, dy=60}))
-
   return estore
+  --
+  -- estore:newEntity({
+  --   {'tag', {name='debug'}},
+  --   {'debug', {name='drawBounds',value=false}}
+  -- })
+  --
+  -- local base = estore:newEntity({
+  --   {'pos', {}},
+  -- })
+  --
+  -- -- terrain image
+  -- base:newChild({
+  --   { 'name', {name='name'}},
+  --   { 'img', {imgId='snowField'}},
+  --   { 'pos', {0,0}},
+  -- })
+  --
+  -- -- Add the field and trees
+  -- local field = Field.newFieldEntity(estore, res)
+  -- base:addChild(field)
 end
+
+mapSystem = defineUpdateSystem({'map'}, function(e,estore,input,res)
+end)
 
 return M

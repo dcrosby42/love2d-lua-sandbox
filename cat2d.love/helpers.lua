@@ -233,3 +233,24 @@ function offsetBounds(t, w,h, wr, hr)
   t.offy = hr * h
   return t
 end
+
+function lazy(fn)
+  local called = false
+  local value
+  return function()
+    if not called then
+      value = fn()
+      called = true
+    end
+    return value
+  end
+end
+
+function lazytable(list, mapper)
+  local m = {}
+  for _,item in ipairs(list) do
+    local k = item
+    m[k] = lazy(function() return mapper(k) end)
+  end
+  return m
+end

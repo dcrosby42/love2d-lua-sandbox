@@ -24,3 +24,5 @@ Comp.define("event", {'data',''})
 Comp.define("output", {'kind',''})
 
 Comp.define("debug", {'value',''})
+
+Comp.define("map",{'id',''})
