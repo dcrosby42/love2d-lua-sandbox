@@ -33,11 +33,12 @@ local runSystems = iterateFuncs({
 DefaultKeybdControls = { up='w', left='a', down='s', right='d' }
 
 M.newWorld = function()
+  local res = Resources.load()
   local world = {
     bgcolor = {0,0,0},
     estore = buildEstore(res),
     input = { dt=0, events={} },
-    resources = Resources.load(),
+    resources = res,
     screenPad = {}, -- ScreenPad.initialize({controllerId="con1"})
     keyboardController = KeyboardController.initialize({controllerId="con1", bindings=DefaultKeybdControls}),
   }
@@ -108,10 +109,17 @@ end
 buildEstore = function(res)
   local estore = Estore:new()
 
+  local mapid = 'town1'
+  local map = res.maps[mapid]()
+  for _,obj in ipairs(map.objects) do
+    print(tdebug1(obj))
+  end
+
   estore:newEntity({
     {'pos', {}},
-    {'map', {id="town2"}},
+    {'map', {id=mapid}},
   })
+
   return estore
   --
   -- estore:newEntity({
