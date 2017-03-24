@@ -19,7 +19,7 @@ return function(estore,output,res)
     --
     -- IMG
     --
-    if e.img and e.pos then
+    if e.img then
       local img = e.img
       local x,y = getPos(e)
       local imgRes = res.images[img.imgId]
@@ -35,9 +35,34 @@ return function(estore,output,res)
         img.offx, img.offy)
 
     --
+    -- SPRITES
+    --
+    elseif e.sprite then
+      local sprite = e.sprite
+      local x,y = getPos(e)
+      local sres = res.sprites[e.sprite.spriteId]
+      assert(sres,"no sprite res for "..e.sprite.spriteId)
+      local frame = sres.frames[e.sprite.frame]
+      assert(frame,"no frame="..tostring(e.sprite.frame).." for sprite="..tostring(e.sprite.spriteId))
+      love.graphics.draw(
+        sres.image,
+        sres.frames[e.sprite.frame],
+        x,y,
+        sprite.r,
+        sprite.sx, sprite.sy,
+        sprite.offx, sprite.offy)
+
+
+
+
+
+
+      -- love.graphics.draw(spritesheet.image, spritesheet.quads.dude, 400,200, 0, 2,2)
+
+    --
     -- LABEL
     --
-    elseif e.label and e.pos then
+    elseif e.label then
       local label = e.label
       if label.font then
         local font = res.fonts[label.font]

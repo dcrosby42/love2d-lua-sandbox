@@ -16,6 +16,10 @@ local effectsSystem = require 'systems/effects'
 local controllerSystem = require 'systems/controller'
 local drawSystem = require 'systems/drawstuff'
 
+local avatarControlSystem = require(here.."/avatarcontrolsystem")
+local moverSystem = require(here.."/moversystem")
+local animSystem = require(here.."/animsystem")
+
 local M ={}
 
 local buildEstore
@@ -27,10 +31,15 @@ local runSystems = iterateFuncs({
   selfDestructSystem,
   -- mapSystem,
   controllerSystem,
+  avatarControlSystem,
+  moverSystem,
+  animSystem,
   effectsSystem,
 })
 
 DefaultKeybdControls = { up='w', left='a', down='s', right='d' }
+
+
 
 M.newWorld = function()
   local res = Resources.load()
@@ -103,6 +112,9 @@ M.drawWorld = function(world)
 
   drawSystem(world.estore, nil, world.resources)
 
+
+  -- love.graphics.draw(spritesheet.image, spritesheet.quads.dude, 400,200, 0, 2,2)
+
   -- ScreenPad.draw(world.screenPad)
 end
 
@@ -119,6 +131,25 @@ buildEstore = function(res)
     {'pos', {}},
     {'map', {id=mapid}},
   })
+  estore:newEntity({
+    {'sprite', {spriteId='jeff', frame="down_2", sx=2, sy=2, offx=16, offy=32}},
+    {'pos', {x=100,y=100}},
+    {'vel', {}},
+    {'avatar', {}},
+    {'controller', {id='con1'}},
+    {'timer', {name='animtimer', t=0, reset=0.7, countDown=false, loop=true}},
+    {'effect', {name='anim', timer='animtimer', path={'sprite','frame'}, animFunc='rpg_idle'}},
+  })
+
+    -- {'avatar',{}},
+    -- {'name', {name='Animated Cat'}},
+    -- {'pos', {x=opts.x, y=opts.y}},
+    -- {'vel', {}},
+    -- {'tag', {name='bounded'}},
+    -- {'img', {imgId=imgId, sx=opts.sx, sy=opts.sy, offx=w/2, offy=h}},
+    -- {'bounds', offsetBounds({}, w * opts.sx, h * opts.sy, 0.5, 1.0)},
+    -- {'timer', {name='anim', t=0, reset=0.7, countDown=false, loop=true}},
+    -- {'effect', {name='anim', timer='anim', path={'img','imgId'}, animFunc='cat_idle'}},
 
   return estore
   --
