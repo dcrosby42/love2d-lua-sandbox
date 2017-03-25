@@ -32,6 +32,7 @@ function tcountby(t,key)
 end
 
 function tcopy(orig, defaults)
+  if orig == nil then orig = {} end
   local orig_type = type(orig)
   local copy
   if orig_type == 'table' then

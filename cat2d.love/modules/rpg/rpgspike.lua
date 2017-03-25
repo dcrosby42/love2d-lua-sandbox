@@ -132,12 +132,12 @@ buildEstore = function(res)
     {'map', {id=mapid}},
   })
   estore:newEntity({
-    {'sprite', {spriteId='jeff', frame="down_2", sx=2, sy=2, offx=16, offy=32}},
+    {'sprite', {spriteId='lea', frame="down_2", sx=2, sy=2, offx=16, offy=32}},
     {'pos', {x=100,y=100}},
     {'vel', {}},
     {'avatar', {}},
     {'controller', {id='con1'}},
-    {'timer', {name='animtimer', t=0, reset=0.7, countDown=false, loop=true}},
+    {'timer', {name='animtimer', t=0, reset=1, countDown=false, loop=true}},
     {'effect', {name='anim', timer='animtimer', path={'sprite','frame'}, animFunc='rpg_idle'}},
   })
 

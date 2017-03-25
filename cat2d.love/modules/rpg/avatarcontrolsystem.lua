@@ -10,18 +10,18 @@ return defineUpdateSystem(hasComps('avatar','controller'),
 
     -- Standing still or walking?
     local walking = false
-    if c.leftx < 0 then
-      av.dir = 'left'
-      walking = true
-    elseif c.leftx > 0 then
-      av.dir = 'right'
-      walking = true
-    end
     if c.lefty < 0 then
       av.dir = 'up'
       walking = true
     elseif c.lefty > 0 then
       av.dir = 'down'
+      walking = true
+    end
+    if c.leftx < 0 then
+      av.dir = 'left'
+      walking = true
+    elseif c.leftx > 0 then
+      av.dir = 'right'
       walking = true
     end
     if walking then
