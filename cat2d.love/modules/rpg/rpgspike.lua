@@ -23,7 +23,7 @@ local animSystem = require(here.."/animsystem")
 local M ={}
 
 local buildEstore
-local mapSystem
+-- local mapSystem
 
 local runSystems = iterateFuncs({
   outputCleanupSystem,
@@ -43,14 +43,23 @@ DefaultKeybdControls = { up='w', left='a', down='s', right='d' }
 
 M.newWorld = function()
   local res = Resources.load()
+  local estore = buildEstore(res)
+
   local world = {
     bgcolor = {0,0,0},
-    estore = buildEstore(res),
+    estore = estore,
     input = { dt=0, events={} },
     resources = res,
     screenPad = {}, -- ScreenPad.initialize({controllerId="con1"})
     keyboardController = KeyboardController.initialize({controllerId="con1", bindings=DefaultKeybdControls}),
   }
+
+  estore:walkEntities(hasComps('player'), function(e)
+    if e.player.name == 'dcrosby' then
+      world.localPlayerEid = e.eid
+    end
+  end)
+
   return world, nil
 end
 
@@ -110,6 +119,9 @@ end
 M.drawWorld = function(world)
   love.graphics.setBackgroundColor(unpack(world.bgcolor))
 
+  local pent = world.estore:getEntity(world.localPlayerEid)
+  love.graphics.translate(512 - math.floor(pent.pos.x), 384 - math.floor(pent.pos.y))
+
   drawSystem(world.estore, nil, world.resources)
 
 
@@ -121,60 +133,39 @@ end
 buildEstore = function(res)
   local estore = Estore:new()
 
+  -- Find the start position as defined by the map data:
   local mapid = 'town1'
   local map = res.maps[mapid]()
+  local startObj = {x=0,y=0}
   for _,obj in ipairs(map.objects) do
-    print(tdebug1(obj))
+    if obj.type == 'StartPosition' and obj.name == 'Player1' then
+      startObj = obj
+    end
   end
+  -- print(tdebug1(startObj))
 
-  estore:newEntity({
+
+  local map = estore:newEntity({
     {'pos', {}},
     {'map', {id=mapid}},
   })
-  estore:newEntity({
-    {'sprite', {spriteId='lea', frame="down_2", sx=2, sy=2, offx=16, offy=32}},
-    {'pos', {x=100,y=100}},
-    {'vel', {}},
+
+  -- estore:newEntity({
+  map:newChild({
     {'avatar', {}},
+    {'pos', {x=startObj.x+(startObj.width/2),y=startObj.y+startObj.height}},
+    {'vel', {}},
     {'controller', {id='con1'}},
+    {'player', {name="dcrosby"}},
+    {'sprite', {spriteId='jeff', frame="down_2", sx=2, sy=2, offx=16, offy=32}},
     {'timer', {name='animtimer', t=0, reset=1, countDown=false, loop=true}},
     {'effect', {name='anim', timer='animtimer', path={'sprite','frame'}, animFunc='rpg_idle'}},
   })
 
-    -- {'avatar',{}},
-    -- {'name', {name='Animated Cat'}},
-    -- {'pos', {x=opts.x, y=opts.y}},
-    -- {'vel', {}},
-    -- {'tag', {name='bounded'}},
-    -- {'img', {imgId=imgId, sx=opts.sx, sy=opts.sy, offx=w/2, offy=h}},
-    -- {'bounds', offsetBounds({}, w * opts.sx, h * opts.sy, 0.5, 1.0)},
-    -- {'timer', {name='anim', t=0, reset=0.7, countDown=false, loop=true}},
-    -- {'effect', {name='anim', timer='anim', path={'img','imgId'}, animFunc='cat_idle'}},
-
   return estore
-  --
-  -- estore:newEntity({
-  --   {'tag', {name='debug'}},
-  --   {'debug', {name='drawBounds',value=false}}
-  -- })
-  --
-  -- local base = estore:newEntity({
-  --   {'pos', {}},
-  -- })
-  --
-  -- -- terrain image
-  -- base:newChild({
-  --   { 'name', {name='name'}},
-  --   { 'img', {imgId='snowField'}},
-  --   { 'pos', {0,0}},
-  -- })
-  --
-  -- -- Add the field and trees
-  -- local field = Field.newFieldEntity(estore, res)
-  -- base:addChild(field)
 end
 
-mapSystem = defineUpdateSystem({'map'}, function(e,estore,input,res)
-end)
+-- mapSystem = defineUpdateSystem({'map'}, function(e,estore,input,res)
+-- end)
 
 return M

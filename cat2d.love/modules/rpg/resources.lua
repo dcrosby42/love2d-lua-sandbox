@@ -22,14 +22,14 @@ local function prepImages()
 end
 
 local RpgSheetCharacters = {
-  {
-    name="jeff",
-    startAt={row=1,col=1},
-  },
-  {
-    name="lea",
-    startAt={row=1,col=4},
-  },
+  { name="jeff", startAt={row=1,col=1}, },
+  { name="ardin", startAt={row=5,col=1}, },
+  { name="lea", startAt={row=1,col=4}, },
+  { name="jane", startAt={row=5,col=4}, },
+  { name="reb", startAt={row=1,col=7}, },
+  { name="wuf", startAt={row=5,col=7}, },
+  { name="oko", startAt={row=1,col=10}, },
+  { name="kile", startAt={row=5,col=10}, },
 }
 
 local function rpgFrames(image, char)
@@ -51,8 +51,6 @@ end
 
 local function prepSprites(res)
   res.sprites = {}
-  -- local rpgSheet = buildSpritesheet({file="images/generic-rpg-chars.png", tilew=32, tileh=32})
-  -- local image = love.graphics.newImage("images/generic-rpg-chars.png")
   local image = res.images[rpg_chars_png]()
   local imgw,imgh = image:getDimensions()
 
@@ -62,42 +60,6 @@ local function prepSprites(res)
       frames=rpgFrames(image, char)
     }
   end
-
-  -- local xstart = 0
-  -- local ystart = 0
-  -- local sname = "jeff"
-  -- local fw = 32
-  -- local fh = 32
-  -- local frames = {}
-  -- for i,dir in ipairs({"down", "left", "right", "up"}) do
-  --   local y = ystart + (fh * (i-1))
-  --   for j,fnum in ipairs({"1","2","3"}) do
-  --     local x = xstart + (fw * (j-1))
-  --     frames[dir..'_'..fnum] = love.graphics.newQuad(x,y,fw,fh, imgw, imgh)
-  --   end
-  -- end
-  -- res.sprites[sname] = {
-  --   image=image,
-  --   frames=frames
-  -- }
-
-  -- res.sprites.jeff = {
-  --   image = image,
-  --   frames = {
-  --     down_1=love.graphics.newQuad(0,0,32,32, imgw,imgh),
-  --     down_2=love.graphics.newQuad(32,0,32,32, imgw,imgh),
-  --     down_3=love.graphics.newQuad(64,0,32,32, imgw,imgh),
-  --     left_1=love.graphics.newQuad(0,32,32,32, imgw,imgh),
-  --     left_2=love.graphics.newQuad(32,32,32,32, imgw,imgh),
-  --     left_3=love.graphics.newQuad(64,32,32,32, imgw,imgh),
-  --     right_1=love.graphics.newQuad(0,64,32,32, imgw,imgh),
-  --     right_2=love.graphics.newQuad(32,64,32,32, imgw,imgh),
-  --     right_3=love.graphics.newQuad(64,64,32,32, imgw,imgh),
-  --     up_1=love.graphics.newQuad(0,96,32,32, imgw,imgh),
-  --     up_2=love.graphics.newQuad(32,96,32,32, imgw,imgh),
-  --     up_3=love.graphics.newQuad(64,96,32,32, imgw,imgh),
-  --   }
-  -- }
 end
 
 local function mkTimeLookupFunc(data,opts)
@@ -158,19 +120,6 @@ local function prepAnims(res)
     return mkTimeLookupFunc(mkIntervalSeries(interval, fnames))
   end)()
 end
-
--- function buildSpritesheet(opts)
---   -- TODO - err check opts file, tilew, tileh
---   local img = love.graphics.newImage(opts.file)
---   local w = opts.tilew
---   local h = opts.tileh
---   local imgw,imgh = img:getDimensions()
---   for x = 0, imgw, w do
---     print(x)
---   end
---   return {
---   }
--- end
 
 local R = {}
 
