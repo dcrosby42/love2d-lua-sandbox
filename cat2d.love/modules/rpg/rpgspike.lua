@@ -133,16 +133,17 @@ end
 buildEstore = function(res)
   local estore = Estore:new()
 
+  local playerCharName = 'lea'
+
   -- Find the start position as defined by the map data:
   local mapid = 'town1'
   local map = res.maps[mapid]()
-  local startObj = {x=0,y=0}
+  local starts = {}
   for _,obj in ipairs(map.objects) do
-    if obj.type == 'StartPosition' and obj.name == 'Player1' then
-      startObj = obj
+    if obj.type == 'StartPosition' then
+      starts[obj.name] = obj
     end
   end
-  -- print(tdebug1(startObj))
 
 
   local map = estore:newEntity({
@@ -150,17 +151,20 @@ buildEstore = function(res)
     {'map', {id=mapid}},
   })
 
-  -- estore:newEntity({
-  map:newChild({
-    {'avatar', {}},
-    {'pos', {x=startObj.x+(startObj.width/2),y=startObj.y+startObj.height}},
-    {'vel', {}},
-    {'controller', {id='con1'}},
-    {'player', {name="dcrosby"}},
-    {'sprite', {spriteId='jeff', frame="down_2", sx=2, sy=2, offx=16, offy=32}},
-    {'timer', {name='animtimer', t=0, reset=1, countDown=false, loop=true}},
-    {'effect', {name='anim', timer='animtimer', path={'sprite','frame'}, animFunc='rpg_idle'}},
-  })
+  for _,charStart in pairs(starts) do
+    local char = map:newChild({
+      {'avatar', {}},
+      {'pos', {x=charStart.x+(charStart.width/2),y=charStart.y+charStart.height}},
+      {'vel', {}},
+      {'sprite', {spriteId=charStart.name, frame="down_2", sx=2, sy=2, offx=16, offy=32}},
+      {'timer', {name='animtimer', t=0, reset=1, countDown=false, loop=true}},
+      {'effect', {name='anim', timer='animtimer', path={'sprite','frame'}, animFunc='rpg_idle'}},
+    })
+    if playerCharName == charStart.name then
+      char:newComp('player',{name='dcrosby'})
+      char:newComp('controller', {id='con1'})
+    end
+  end
 
   return estore
 end

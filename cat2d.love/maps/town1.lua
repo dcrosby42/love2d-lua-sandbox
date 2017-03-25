@@ -8,7 +8,7 @@ return {
   height = 25,
   tilewidth = 64,
   tileheight = 64,
-  nextobjectid = 2,
+  nextobjectid = 3,
   properties = {},
   tilesets = {
     {
@@ -331,11 +331,24 @@ return {
       objects = {
         {
           id = 1,
-          name = "Player1",
+          name = "jeff",
           type = "StartPosition",
           shape = "rectangle",
           x = 1088,
           y = 640,
+          width = 64,
+          height = 64,
+          rotation = 0,
+          visible = true,
+          properties = {}
+        },
+        {
+          id = 2,
+          name = "lea",
+          type = "StartPosition",
+          shape = "rectangle",
+          x = 768,
+          y = 576,
           width = 64,
           height = 64,
           rotation = 0,
