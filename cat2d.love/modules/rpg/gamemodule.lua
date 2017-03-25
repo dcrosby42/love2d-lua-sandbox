@@ -20,7 +20,7 @@ local drawSystem = require 'systems/drawstuff'
 local avatarControlSystem = require(here.."/avatarcontrolsystem")
 local moverSystem = require(here.."/moversystem")
 local animSystem = require(here.."/animsystem")
-local controllerScriptSystem = require(here.."/controllerscriptsystem")
+local scriptSystem = require(here.."/scriptsystem")
 
 local M ={}
 
@@ -33,7 +33,7 @@ local runSystems = iterateFuncs({
   selfDestructSystem,
   -- mapSystem,
   controllerSystem,
-  controllerScriptSystem,
+  scriptSystem,
   avatarControlSystem,
   moverSystem,
   animSystem,
@@ -169,12 +169,9 @@ buildEstore = function(res)
       char:newComp('player',{name='dcrosby'})
       char:newComp('controller', {id='con1'})
     else
-      char:newComp('controller', {name='bot'})
-      char:newChild({
-        {'tag', {name='Idling Townsman Behavior'}},
-        {'timer', {name='cscript', t=0, countDown=false}},
-        {'controllerScript', {script='idlingTownsman', timerName='cscript', controllerPath={'PARENT','controllers','bot','name'}}},
-      })
+      char:newComp('script', {scriptId='idlingTownsman', params={timer='mope'}})
+      char:newComp('controller',{})
+      char:newComp('timer', {name='mope', countDown=false})
     end
   end
 

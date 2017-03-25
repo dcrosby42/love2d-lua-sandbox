@@ -1,3 +1,5 @@
+local here = (...):match("(.*/)[^%/]+$")
+
 require 'helpers'
 local sti = require "sti"
 
@@ -112,6 +114,15 @@ local function prepAnims(res)
   end)()
 end
 
+function prepScripts()
+  local names = {'idlingTownsman'}
+  local s = {}
+  for _,name in ipairs(names) do
+    s[name] = require(here.."scripts/"..name)
+  end
+  return s
+end
+
 local R = {}
 
 R.load = function()
@@ -120,6 +131,7 @@ R.load = function()
     fonts={},
     anims={},
     maps=prepMaps(),
+    scripts=prepScripts(),
   }
   prepSprites(res)
   prepAnims(res)
