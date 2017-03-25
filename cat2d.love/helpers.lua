@@ -255,3 +255,21 @@ function lazytable(list, mapper)
   end
   return m
 end
+
+function makeTimeLookupFunc(data,opts)
+  opts = tcopy(opts,{loop=true})
+  return function(t)
+    local newVal = nil
+    if opts.loop then
+      t = t % data[#data-1]
+    end
+    for i=1, #data, 2 do
+      if t >= data[i] then
+        newVal = data[i+1]
+      else
+        return newVal
+      end
+    end
+    return newVal
+  end
+end

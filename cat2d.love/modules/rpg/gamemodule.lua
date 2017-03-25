@@ -14,11 +14,13 @@ local selfDestructSystem = require 'systems/selfdestruct'
 local outputCleanupSystem = require 'systems/outputcleanup'
 local effectsSystem = require 'systems/effects'
 local controllerSystem = require 'systems/controller'
+local zChildrenSystem = require 'systems/zchildren'
 local drawSystem = require 'systems/drawstuff'
 
 local avatarControlSystem = require(here.."/avatarcontrolsystem")
 local moverSystem = require(here.."/moversystem")
 local animSystem = require(here.."/animsystem")
+local controllerScriptSystem = require(here.."/controllerscriptsystem")
 
 local M ={}
 
@@ -31,9 +33,11 @@ local runSystems = iterateFuncs({
   selfDestructSystem,
   -- mapSystem,
   controllerSystem,
+  controllerScriptSystem,
   avatarControlSystem,
   moverSystem,
   animSystem,
+  zChildrenSystem,
   effectsSystem,
 })
 
@@ -119,8 +123,8 @@ end
 M.drawWorld = function(world)
   love.graphics.setBackgroundColor(unpack(world.bgcolor))
 
-  local pent = world.estore:getEntity(world.localPlayerEid)
-  love.graphics.translate(512 - math.floor(pent.pos.x), 384 - math.floor(pent.pos.y))
+  -- local pent = world.estore:getEntity(world.localPlayerEid)
+  -- love.graphics.translate(512 - math.floor(pent.pos.x), 384 - math.floor(pent.pos.y))
 
   drawSystem(world.estore, nil, world.resources)
 
@@ -149,11 +153,12 @@ buildEstore = function(res)
   local map = estore:newEntity({
     {'pos', {}},
     {'map', {id=mapid}},
+    {'zChildren', {}},
   })
 
   for _,charStart in pairs(starts) do
     local char = map:newChild({
-      {'avatar', {}},
+      {'avatar', {name=charStart.name}},
       {'pos', {x=charStart.x+(charStart.width/2),y=charStart.y+charStart.height}},
       {'vel', {}},
       {'sprite', {spriteId=charStart.name, frame="down_2", sx=2, sy=2, offx=16, offy=32}},
@@ -163,6 +168,13 @@ buildEstore = function(res)
     if playerCharName == charStart.name then
       char:newComp('player',{name='dcrosby'})
       char:newComp('controller', {id='con1'})
+    else
+      char:newComp('controller', {name='bot'})
+      char:newChild({
+        {'tag', {name='Idling Townsman Behavior'}},
+        {'timer', {name='cscript', t=0, countDown=false}},
+        {'controllerScript', {script='idlingTownsman', timerName='cscript', controllerPath={'PARENT','controllers','bot','name'}}},
+      })
     end
   end
 

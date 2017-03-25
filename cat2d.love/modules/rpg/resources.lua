@@ -7,7 +7,15 @@ local function prepMaps()
       'town1',
       'town2',
     },
-    function(k) return sti("maps/"..k..".lua") end
+    function(k)
+      local map = sti("maps/"..k..".lua")
+      for _,layer in ipairs(map.layers) do
+        if layer.type == 'objectgroup' then
+          layer.visible = false
+        end
+      end
+      return map
+    end
   )
 end
 
@@ -62,23 +70,6 @@ local function prepSprites(res)
   end
 end
 
-local function mkTimeLookupFunc(data,opts)
-  opts = tcopy(opts,{loop=true})
-  return function(t)
-    local newVal = nil
-    if opts.loop then
-      t = t % data[#data-1]
-    end
-    for i=1, #data, 2 do
-      if t >= data[i] then
-        newVal = data[i+1]
-      else
-        return newVal
-      end
-    end
-    return newVal
-  end
-end
 
 local function mkIntervalSeries(interval, values)
   local data = {}
@@ -102,22 +93,22 @@ local function prepAnims(res)
 
   res.anims['rpg_walk_down'] = (function(t)
     local fnames = { "down_1", "down_2", "down_3", "down_2", "down_1" }
-    return mkTimeLookupFunc(mkIntervalSeries(interval, fnames))
+    return makeTimeLookupFunc(mkIntervalSeries(interval, fnames))
   end)()
 
   res.anims['rpg_walk_up'] = (function(t)
     local fnames = { "up_1", "up_2", "up_3", "up_2", "up_1" }
-    return mkTimeLookupFunc(mkIntervalSeries(interval, fnames))
+    return makeTimeLookupFunc(mkIntervalSeries(interval, fnames))
   end)()
 
   res.anims['rpg_walk_left'] = (function(t)
     local fnames = { "left_1", "left_2", "left_3", "left_2", "left_1"}
-    return mkTimeLookupFunc(mkIntervalSeries(interval, fnames))
+    return makeTimeLookupFunc(mkIntervalSeries(interval, fnames))
   end)()
 
   res.anims['rpg_walk_right'] = (function(t)
     local fnames = { "right_1", "right_2", "right_3", "right_2", "right_1" }
-    return mkTimeLookupFunc(mkIntervalSeries(interval, fnames))
+    return makeTimeLookupFunc(mkIntervalSeries(interval, fnames))
   end)()
 end
 

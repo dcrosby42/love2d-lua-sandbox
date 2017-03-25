@@ -98,3 +98,17 @@ function getPos(e)
     return e.pos.x, e.pos.y
   end
 end
+
+function resolveEntCompKeyByPath(e, path)
+  local key = path[#path]
+  local cur = e
+  for i=1,#path-2 do
+    if path[i] == 'PARENT' then
+      cur = cur:getParent()
+    else
+      cur = cur[path[i]]
+    end
+  end
+  local comp = cur[path[#path-1]]
+  return cur, comp, key
+end
