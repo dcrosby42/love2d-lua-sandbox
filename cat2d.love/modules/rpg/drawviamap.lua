@@ -98,45 +98,33 @@ end
 
 local function drawBounds(e)
   if e.pos then
+    -- draw small crosshairs at world location
     local x,y = getPos(e)
     love.graphics.setColor(255,255,255)
     love.graphics.line(x-5,y, x+5,y)
     love.graphics.line(x,y-5, x,y+5)
+    -- draw bounding box
     if e.bounds then
       x,y,w,h = getBoundingRect(e)
       love.graphics.rectangle("line", x,y,w,h)
-      -- local b = e.bounds
-      -- local sx = 1
-      -- local sy = 1
-      -- if e.scale then
-      --   sx = e.scale.sx
-      --   sy = e.scale.sy
-      -- end
-      -- love.graphics.rectangle("line", x-(sx*b.offx), y-(sy*b.offy), sx*b.w, sy*b.h)
     end
   end
 end
 
 return function(estore,res)
-  local mapF
+  local map
   estore:seekEntity(hasComps('map'), function(e,estore)
-    mapF = res.maps[e.map.id]
+    map = getMapResource(e,res)
   end)
 
-  if not mapF then
-    error("Drawing: no map registered with id="..e.map.id)
-  end
-  local map = mapF()
+  local bounds = false
 
-  if map then
-    local slayer = map.layers.CustomSpriteLayer
-    function slayer:draw()
-      estore:walkEntities(hasComps('pos'),function(e)
-        drawEntity(e,res)
-        -- drawBounds(e)
-      end)
-    end
-    map:draw()
-    -- map:bump_draw(map._sidecar.bumpWorld)
-  end
+  map:draw({bounds=bounds}, function()
+    estore:walkEntities(hasComps('pos'),function(e)
+      drawEntity(e,res)
+      if bounds then
+        drawBounds(e)
+      end
+    end)
+  end)
 end

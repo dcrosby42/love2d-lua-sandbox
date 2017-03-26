@@ -1,8 +1,6 @@
-local here = (...):match("(.*/)[^%/]+$")
+local here = dirname(...)
 
-require('helpers')
-local sti = require('sti')
-local bump = require('bump')
+local Map = require(here.."/map")
 
 
 local function prepMaps()
@@ -11,18 +9,7 @@ local function prepMaps()
       'town2',
     },
     function(k)
-      local map = sti("maps/"..k..".lua", {'bump'})
-      map._sidecar = {}
-      map._sidecar.bumpWorld = bump.newWorld() -- TODO FIXME this is dumb
-      map:bump_init(map._sidecar.bumpWorld)
-      for _,layer in ipairs(map.layers) do
-        -- print(tdebug1(layer))
-        if layer.type == 'objectgroup' then
-          layer.visible = false
-        end
-      end
-      map:addCustomLayer("CustomSpriteLayer", 6) -- TODO FIXME this is dumb
-      return map
+      return Map:new("maps/"..k..".lua")
     end
   )
 end

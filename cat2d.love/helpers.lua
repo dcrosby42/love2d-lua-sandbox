@@ -273,3 +273,7 @@ function makeTimeLookupFunc(data,opts)
     return newVal
   end
 end
+
+function dirname(fname)
+  return string.gsub(fname:match("(.*/)[^%/]+$"), "/$", "")
+end

@@ -119,6 +119,15 @@ function getBoundingRect(e)
   return x,y,w,h
 end
 
+function getMapResourceById(mapid, res)
+  local mgetter = res.maps[mapid]
+  if mgetter then return mgetter() end
+end
+
+function getMapResource(e, res)
+  return getMapResourceById(e.map.id, res)
+end
+
 function resolveEntCompKeyByPath(e, path)
   local key = path[#path]
   local cur = e

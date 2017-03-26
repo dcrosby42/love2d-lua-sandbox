@@ -144,9 +144,11 @@ buildEstore = function(res)
 
   -- Find the start position as defined by the map data:
   local mapid = 'town1'
-  local map = res.maps[mapid]()
+
+  local map = getMapResourceById(mapid,res)
+  -- res.maps[mapid]()
   local starts = {}
-  for _,obj in ipairs(map.objects) do
+  for _,obj in ipairs(map.map.objects) do
     if obj.type == 'StartPosition' then
       starts[obj.name] = obj
     end
