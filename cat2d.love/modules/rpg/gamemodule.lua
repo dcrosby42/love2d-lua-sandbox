@@ -16,6 +16,7 @@ local effectsSystem = require 'systems/effects'
 local controllerSystem = require 'systems/controller'
 local zChildrenSystem = require 'systems/zchildren'
 local drawSystem = require 'systems/drawstuff'
+local drawViaMap = require(here.."drawviamap")
 
 local avatarControlSystem = require(here.."/avatarcontrolsystem")
 local moverSystem = require(here.."/moversystem")
@@ -126,7 +127,9 @@ M.drawWorld = function(world)
   -- local pent = world.estore:getEntity(world.localPlayerEid)
   -- love.graphics.translate(512 - math.floor(pent.pos.x), 384 - math.floor(pent.pos.y))
 
-  drawSystem(world.estore, nil, world.resources)
+  -- drawSystem(world.estore, world.resources)
+  drawViaMap(world.estore, world.resources)
+
 
 
   -- love.graphics.draw(spritesheet.image, spritesheet.quads.dude, 400,200, 0, 2,2)
@@ -161,9 +164,12 @@ buildEstore = function(res)
       {'avatar', {name=charStart.name}},
       {'pos', {x=charStart.x+(charStart.width/2),y=charStart.y+charStart.height}},
       {'vel', {}},
-      {'sprite', {spriteId=charStart.name, frame="down_2", sx=2, sy=2, offx=16, offy=32}},
+      {'bounds', {offx=9, offy=32, w=18, h=32}},
+      {'sprite', {spriteId=charStart.name, frame="down_2", offx=16, offy=32}},
+      {'scale', {sx=2, sy=2}},
       {'timer', {name='animtimer', t=0, reset=1, countDown=false, loop=true}},
       {'effect', {name='anim', timer='animtimer', path={'sprite','frame'}, animFunc='rpg_idle'}},
+      {'collidable',{}},
     })
     if playerCharName == charStart.name then
       char:newComp('player',{name='dcrosby'})

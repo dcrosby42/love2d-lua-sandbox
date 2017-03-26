@@ -1,6 +1,7 @@
 local Comp = require 'ecs/component'
 
 Comp.define("bounds", {'offx',0,'offy',0,'w',0,'h',0})
+Comp.define("scale", {'sx',1,'sy',1})
 Comp.define("pos", {'x',0,'y',0})
 Comp.define("vel", {'dx',0,'dy',0})
 
@@ -29,3 +30,4 @@ Comp.define("output", {'kind',''})
 Comp.define("debug", {'value',''})
 
 Comp.define("map",{'id',''})
+Comp.define("collidable", {})

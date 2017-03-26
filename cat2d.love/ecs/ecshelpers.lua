@@ -99,6 +99,26 @@ function getPos(e)
   end
 end
 
+function getBoundingRect(e)
+  local x, y = getPos(e)
+  local bounds = e.bounds
+  if not bounds then return x,y,1,1 end
+
+  local sx = 1
+  local sy = 1
+  if e.scale then
+    sx = e.scale.sx
+    sy = e.scale.sy
+  end
+
+  x = x - bounds.offx*sx
+  y = y - bounds.offy*sy
+  local w = bounds.w*sx
+  local h = bounds.h*sy
+
+  return x,y,w,h
+end
+
 function resolveEntCompKeyByPath(e, path)
   local key = path[#path]
   local cur = e
