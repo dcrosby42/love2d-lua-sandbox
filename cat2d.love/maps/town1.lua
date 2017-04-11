@@ -8,7 +8,7 @@ return {
   height = 25,
   tilewidth = 64,
   tileheight = 64,
-  nextobjectid = 18,
+  nextobjectid = 32,
   properties = {},
   tilesets = {
     {
@@ -423,6 +423,40 @@ return {
             ["id"] = "housedoor1",
             ["link"] = "indoors:house/front"
           }
+        },
+        {
+          id = 21,
+          name = "ChurchDoor",
+          type = "Door",
+          shape = "rectangle",
+          x = 807,
+          y = 562,
+          width = 49,
+          height = 16,
+          rotation = 0,
+          visible = true,
+          properties = {
+            ["collidable"] = true,
+            ["id"] = "churchdoor1",
+            ["link"] = "indoors:church/front"
+          }
+        },
+        {
+          id = 23,
+          name = "ChurchDoor2",
+          type = "Door",
+          shape = "rectangle",
+          x = 882,
+          y = 454,
+          width = 14,
+          height = 52,
+          rotation = 0,
+          visible = true,
+          properties = {
+            ["collidable"] = true,
+            ["id"] = "churchdoor2",
+            ["link"] = "indoors:church/east"
+          }
         }
       }
     },
@@ -438,7 +472,7 @@ return {
       objects = {
         {
           id = 1,
-          name = "jeff",
+          name = "townsperson-1",
           type = "StartPosition",
           shape = "rectangle",
           x = 1088,
@@ -447,15 +481,108 @@ return {
           height = 64,
           rotation = 0,
           visible = true,
-          properties = {}
+          properties = {
+            ["actor"] = "jeff"
+          }
         },
         {
           id = 2,
-          name = "lea",
+          name = "town-enter-housedoor1",
           type = "StartPosition",
           shape = "rectangle",
-          x = 768,
-          y = 576,
+          x = 610,
+          y = 585,
+          width = 64,
+          height = 64,
+          rotation = 0,
+          visible = true,
+          properties = {}
+        },
+        {
+          id = 25,
+          name = "town-enter-west",
+          type = "StartPosition",
+          shape = "rectangle",
+          x = 322,
+          y = 602,
+          width = 64,
+          height = 64,
+          rotation = 0,
+          visible = true,
+          properties = {}
+        },
+        {
+          id = 26,
+          name = "town-enter-east",
+          type = "StartPosition",
+          shape = "rectangle",
+          x = 1349,
+          y = 578,
+          width = 64,
+          height = 64,
+          rotation = 0,
+          visible = true,
+          properties = {}
+        },
+        {
+          id = 27,
+          name = "town-enter-south",
+          type = "StartPosition",
+          shape = "rectangle",
+          x = 1050,
+          y = 1400,
+          width = 64,
+          height = 64,
+          rotation = 0,
+          visible = true,
+          properties = {}
+        },
+        {
+          id = 28,
+          name = "town-enter-north",
+          type = "StartPosition",
+          shape = "rectangle",
+          x = 1051,
+          y = 345,
+          width = 64,
+          height = 64,
+          rotation = 0,
+          visible = true,
+          properties = {}
+        },
+        {
+          id = 29,
+          name = "town-enter-shopdoor1",
+          type = "StartPosition",
+          shape = "rectangle",
+          x = 437,
+          y = 573,
+          width = 64,
+          height = 64,
+          rotation = 0,
+          visible = true,
+          properties = {}
+        },
+        {
+          id = 30,
+          name = "town-enter-churchdoor-east",
+          type = "StartPosition",
+          shape = "rectangle",
+          x = 901,
+          y = 444,
+          width = 64,
+          height = 64,
+          rotation = 0,
+          visible = true,
+          properties = {}
+        },
+        {
+          id = 31,
+          name = "town-enter-churchdoor1",
+          type = "StartPosition",
+          shape = "rectangle",
+          x = 829,
+          y = 584,
           width = 64,
           height = 64,
           rotation = 0,

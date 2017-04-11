@@ -25,14 +25,12 @@ local scriptSystem = require(here.."/scriptsystem")
 
 local M ={}
 
-local buildEstore
--- local mapSystem
+local initialEstore
 
 local runSystems = iterateFuncs({
   outputCleanupSystem,
   timerSystem,
   selfDestructSystem,
-  -- mapSystem,
   controllerSystem,
   scriptSystem,
   avatarControlSystem,
@@ -48,7 +46,7 @@ DefaultKeybdControls = { up='w', left='a', down='s', right='d' }
 
 M.newWorld = function()
   local res = Resources.load()
-  local estore = buildEstore(res)
+  local estore = initialEstore(res)
 
   local world = {
     bgcolor = {0,0,0},
@@ -140,58 +138,92 @@ end
 local Comp = require 'ecs/component'
 Comp.define("door", {'doorid','','link',''})
 
-buildEstore = function(res)
+local function avatarComps(actorName)
+  return {
+    {'avatar', {name=actorName}},
+    -- {'pos', {x=charStart.x+(charStart.width/2),y=charStart.y+charStart.height}},
+    {'vel', {}},
+    {'bounds', {offx=9, offy=32, w=18, h=32}},
+    {'sprite', {spriteId=actorName, frame="down_2", offx=16, offy=32}},
+    {'scale', {sx=2, sy=2}},
+    {'timer', {name='animtimer', t=0, reset=1, countDown=false, loop=true}},
+    {'effect', {name='anim', timer='animtimer', path={'sprite','frame'}, animFunc='rpg_idle'}},
+    {'collidable',{}},
+  }
+end
+
+local function startPosition(startPos)
+  return {
+    {'pos', {x=startPos.x+(startPos.width/2),y=startPos.y+startPos.height}}
+  }
+end
+
+local function playerControl(playerName, controllerId)
+  return {
+    {'player',{name=playerName}},
+    {'controller',{id=controllerId}}
+  }
+end
+
+local function idlingTownsman()
+  return {
+    {'script', {scriptId='idlingTownsman', params={timer='mope'}}},
+    {'controller',{}},
+    {'timer', {name='mope', countDown=false}},
+  }
+end
+
+initialEstore = function(res)
+  local situation = {
+    playerActor="lea",
+    mapId="town1",
+    playerStartPosition="town-enter-west",
+    playerName="dcrosby42",
+    controllerId="con1",
+  }
+
   local estore = Estore:new()
 
-  local playerCharName = 'lea'
-
   -- Find the start position as defined by the map data:
-  local mapid = 'town1'
-
-  local map = getMapResourceById(mapid,res)
-  -- res.maps[mapid]()
-  local starts = {}
-  local doors = {}
+  local map = getMapResourceById(situation.mapId, res)
+  local objectsByType = {}
   for _,obj in pairs(map.map.objects) do
-    if obj.type == 'StartPosition' then
-      starts[obj.name] = obj
-    elseif obj.type == 'Door' then
-      print(tdebug1(obj))
-      print("properties:"..tdebug1(obj.properties,'  '))
-      doors[obj.name] = obj
+    local sub = objectsByType[obj.type]
+    if not sub then
+      sub = {}
+      objectsByType[obj.type] = sub
     end
+    sub[obj.name] = obj
   end
-
+  -- print("objectsByType: "..tdebug1(objectsByType))
+  -- print("objectsByType.StartPosition: "..tdebug1(objectsByType.StartPosition))
+  -- print("objectsByType.Door: "..tdebug1(objectsByType.Door))
 
   local map = estore:newEntity({
     {'pos', {}},
-    {'map', {id=mapid}},
+    {'map', {id=situation.mapId}},
     {'zChildren', {}},
   })
 
-  for _,charStart in pairs(starts) do
-    local char = map:newChild({
-      {'avatar', {name=charStart.name}},
-      {'pos', {x=charStart.x+(charStart.width/2),y=charStart.y+charStart.height}},
-      {'vel', {}},
-      {'bounds', {offx=9, offy=32, w=18, h=32}},
-      {'sprite', {spriteId=charStart.name, frame="down_2", offx=16, offy=32}},
-      {'scale', {sx=2, sy=2}},
-      {'timer', {name='animtimer', t=0, reset=1, countDown=false, loop=true}},
-      {'effect', {name='anim', timer='animtimer', path={'sprite','frame'}, animFunc='rpg_idle'}},
-      {'collidable',{}},
-    })
-    if playerCharName == charStart.name then
-      char:newComp('player',{name='dcrosby'})
-      char:newComp('controller', {id='con1'})
-    else
-      char:newComp('script', {scriptId='idlingTownsman', params={timer='mope'}})
-      char:newComp('controller',{})
-      char:newComp('timer', {name='mope', countDown=false})
+  -- Spawn player character
+  local playerComps = avatarComps(situation.playerActor)
+  tconcat(playerComps, startPosition(objectsByType.StartPosition[situation.playerStartPosition]))
+  tconcat(playerComps, playerControl(situation.playerName, situation.controllerId))
+  map:newChild(playerComps)
+
+  -- Spawn NPCs at start positions
+  for name,startPos in pairs(objectsByType.StartPosition) do
+    if startPos.properties.actor then
+      print(tdebug1(startPos))
+      local comps = avatarComps(startPos.properties.actor)
+      tconcat(comps, startPosition(startPos))
+      tconcat(comps, idlingTownsman(startPos))
+      map:newChild(comps)
     end
   end
 
-  for doorname,door in pairs(doors) do
+  -- Spawn door entities
+  for doorname,door in pairs(objectsByType.Door) do
     local doorEnt = map:newChild({
       {'tag',{name='door'}},
       {'door', {name=door.name, doorid=door.properties.id, link=door.properties.link}},
@@ -201,8 +233,5 @@ buildEstore = function(res)
 
   return estore
 end
-
--- mapSystem = defineUpdateSystem({'map'}, function(e,estore,input,res)
--- end)
 
 return M
