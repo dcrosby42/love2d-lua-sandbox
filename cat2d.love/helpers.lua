@@ -108,14 +108,18 @@ function tdebug(t,ind)
 end
 
 function tdebug1(t,ind)
-  local s = ''
-  if not ind then
-    ind = '  '
+  if type(t) == 'table' then
+    local s = ''
+    if not ind then
+      ind = '  '
+    end
+    for k,v in pairs(t) do
+      s = s .. ind ..tostring(k)..": "..tostring(v).."\n"
+    end
+    return s
+  else
+    return ind..tostring(t)
   end
-  for k,v in pairs(t) do
-    s = s .. ind ..tostring(k)..": "..tostring(v).."\n"
-  end
-  return s
 end
 
 function keyvalsearch(t,matchFn,callbackFn)

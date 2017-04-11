@@ -137,6 +137,9 @@ M.drawWorld = function(world)
   -- ScreenPad.draw(world.screenPad)
 end
 
+local Comp = require 'ecs/component'
+Comp.define("door", {'doorid','','link',''})
+
 buildEstore = function(res)
   local estore = Estore:new()
 
@@ -148,9 +151,14 @@ buildEstore = function(res)
   local map = getMapResourceById(mapid,res)
   -- res.maps[mapid]()
   local starts = {}
-  for _,obj in ipairs(map.map.objects) do
+  local doors = {}
+  for _,obj in pairs(map.map.objects) do
     if obj.type == 'StartPosition' then
       starts[obj.name] = obj
+    elseif obj.type == 'Door' then
+      print(tdebug1(obj))
+      print("properties:"..tdebug1(obj.properties,'  '))
+      doors[obj.name] = obj
     end
   end
 
@@ -181,6 +189,14 @@ buildEstore = function(res)
       char:newComp('controller',{})
       char:newComp('timer', {name='mope', countDown=false})
     end
+  end
+
+  for doorname,door in pairs(doors) do
+    local doorEnt = map:newChild({
+      {'tag',{name='door'}},
+      {'door', {name=door.name, doorid=door.properties.id, link=door.properties.link}},
+    })
+    door.properties.entityid=doorEnt.eid
   end
 
   return estore

@@ -8,7 +8,7 @@ return {
   height = 25,
   tilewidth = 64,
   tileheight = 64,
-  nextobjectid = 9,
+  nextobjectid = 18,
   properties = {},
   tilesets = {
     {
@@ -377,6 +377,52 @@ return {
           rotation = 0,
           visible = true,
           properties = {}
+        }
+      }
+    },
+    {
+      type = "objectgroup",
+      name = "Zones",
+      visible = true,
+      opacity = 1,
+      offsetx = 0,
+      offsety = 0,
+      draworder = "topdown",
+      properties = {},
+      objects = {
+        {
+          id = 10,
+          name = "ShopDoor",
+          type = "Door",
+          shape = "rectangle",
+          x = 420,
+          y = 561,
+          width = 55,
+          height = 16,
+          rotation = 0,
+          visible = true,
+          properties = {
+            ["collidable"] = true,
+            ["id"] = "shopdoor1",
+            ["link"] = "indoors:shop/front"
+          }
+        },
+        {
+          id = 17,
+          name = "HouseDoor",
+          type = "Door",
+          shape = "rectangle",
+          x = 621,
+          y = 561,
+          width = 39,
+          height = 16,
+          rotation = 0,
+          visible = true,
+          properties = {
+            ["collidable"] = true,
+            ["id"] = "housedoor1",
+            ["link"] = "indoors:house/front"
+          }
         }
       }
     },
