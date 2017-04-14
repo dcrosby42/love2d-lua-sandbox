@@ -22,14 +22,9 @@ return defineUpdateSystem(hasComps('map'),
         if bumpWorld:hasItem(item) then
           bumpWorld:update(item, x, y, bw, bh)
         else
+          print("bumpWorld:add("..item..") bumpWorld="..tostring(bumpWorld).." map="..tostring(map))
           bumpWorld:add(item, x, y, bw,bh)
           table.insert(itemList, item)
-        end
-        for i=1,#itemList do
-          if not estore.comps[itemList[i]] then
-            bumpWorld:remove(item)
-            table.remove(itemList,item)
-          end
         end
         goalx = x + vel.dx * input.dt
         goaly = y + vel.dy * input.dt
@@ -59,6 +54,20 @@ return defineUpdateSystem(hasComps('map'),
         pos.y = pos.y + vel.dy * input.dt
       end
     end)
+
+    -- Make sure bumpWorld is cleared of any items whose comps no longer exist in estore
+    local removes = {}
+    for i=1,#itemList do
+      if not estore.comps[itemList[i]] then
+        table.insert(removes,i)
+      end
+    end
+    for i=1,#removes do
+      local item = itemList[removes[i]]
+      print("bumpWorld:remove("..item..")")
+      bumpWorld:remove(item)
+      table.remove(itemList,removes[i])
+    end
 
     for i=1,#entityCollisions do
       local ent,hitEnt = unpack(entityCollisions[i])

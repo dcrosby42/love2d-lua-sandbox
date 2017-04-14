@@ -207,6 +207,6 @@
 </data>
  </layer>
  <objectgroup name="SpawnPoints" visible="0">
-  <object id="1" name="Player1" type="StartPosition" x="1088" y="640" width="64" height="64"/>
+  <object id="1" name="town-enter-west" type="StartPosition" x="1088" y="640" width="64" height="64"/>
  </objectgroup>
 </map>

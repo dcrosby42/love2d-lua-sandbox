@@ -25,7 +25,7 @@ local scriptSystem = require(here.."/scriptsystem")
 
 local M ={}
 
-local initialEstore
+local initialEstore, spawnSituation, despawnMap, respawnSituation
 
 local runSystems = iterateFuncs({
   outputCleanupSystem,
@@ -45,10 +45,19 @@ DefaultKeybdControls = { up='w', left='a', down='s', right='d' }
 
 
 M.newWorld = function()
+  local situation = {
+    playerActor="lea",
+    mapId="town1",
+    playerStartPosition="town-enter-west",
+    playerName="dcrosby42",
+    controllerId="con1",
+  }
   local res = Resources.load()
   local estore = initialEstore(res)
+  spawnSituation(situation,estore,res)
 
   local world = {
+    situation = situation,
     bgcolor = {0,0,0},
     estore = estore,
     input = { dt=0, events={} },
@@ -99,13 +108,37 @@ end
 --   return world, nil
 -- end
 
+function despawnMap(estore)
+  local list = {}
+  estore:walkEntities(hasComps('map'),function(e)
+    table.insert(list,e)
+  end)
+  for i=1,#list do
+    estore:destroyEntity(list[i])
+  end
+end
+function respawnSituation(situation,estore,res)
+  despawnMap(estore)
+  spawnSituation(situation, estore, res)
+end
+
 Updaters.keyboard = function(world,action)
+  -- Control the game
   KeyboardController.handleKeyAction(world.keyboardController, action, world.input)
+
+  -- admin/dev tricks:
   if action.state == 'pressed' then
-    if action.key == '1' or action.key == '2' then
-      world.estore:walkEntities(hasComps('map'),function(e)
-        e.map.id = 'town'..action.key
-      end)
+    if action.key == '1' then
+      world.situation.mapId = "town1"
+      world.situation.playerActor = "lea"
+      world.situation.playerStartPosition = "town-enter-west"
+      respawnSituation(world.situation, world.estore, world.resources)
+    end
+    if action.key == '2' then
+      world.situation.mapId = "town2"
+      world.situation.playerActor = "jeff"
+      world.situation.playerStartPosition = "town-enter-west"
+      respawnSituation(world.situation, world.estore, world.resources)
     end
   end
   return world, nil
@@ -153,6 +186,7 @@ local function avatarComps(actorName)
 end
 
 local function startPosition(startPos)
+  print("startPosition "..startPos.name.." "..startPos.x..","..startPos.y)
   return {
     {'pos', {x=startPos.x+(startPos.width/2),y=startPos.y+startPos.height}}
   }
@@ -173,17 +207,7 @@ local function idlingTownsman()
   }
 end
 
-initialEstore = function(res)
-  local situation = {
-    playerActor="lea",
-    mapId="town1",
-    playerStartPosition="town-enter-west",
-    playerName="dcrosby42",
-    controllerId="con1",
-  }
-
-  local estore = Estore:new()
-
+function spawnSituation(situation, estore, res)
   -- Find the start position as defined by the map data:
   local map = getMapResourceById(situation.mapId, res)
   local objectsByType = {}
@@ -204,17 +228,18 @@ initialEstore = function(res)
     {'map', {id=situation.mapId}},
     {'zChildren', {}},
   })
+  print("Map: "..entityDebugString(map))
 
   -- Spawn player character
   local playerComps = avatarComps(situation.playerActor)
   tconcat(playerComps, startPosition(objectsByType.StartPosition[situation.playerStartPosition]))
   tconcat(playerComps, playerControl(situation.playerName, situation.controllerId))
-  map:newChild(playerComps)
+  local player = map:newChild(playerComps)
+  print("Player: "..entityDebugString(player))
 
   -- Spawn NPCs at start positions
   for name,startPos in pairs(objectsByType.StartPosition) do
     if startPos.properties.actor then
-      print(tdebug1(startPos))
       local comps = avatarComps(startPos.properties.actor)
       tconcat(comps, startPosition(startPos))
       tconcat(comps, idlingTownsman(startPos))
@@ -223,14 +248,17 @@ initialEstore = function(res)
   end
 
   -- Spawn door entities
-  for doorname,door in pairs(objectsByType.Door) do
+  for doorname,door in pairs(objectsByType.Door or {}) do
     local doorEnt = map:newChild({
       {'tag',{name='door'}},
       {'door', {name=door.name, doorid=door.properties.id, link=door.properties.link}},
     })
     door.properties.entityid=doorEnt.eid
   end
+end
 
+initialEstore = function(res)
+  local estore = Estore:new()
   return estore
 end
 

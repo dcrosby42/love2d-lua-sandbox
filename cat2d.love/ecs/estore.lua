@@ -251,19 +251,19 @@ end
 -- IF a node IS matched AND the processing of that node returns false (explicitly), the children are NOT processed.
 function Estore:walkEntities(matchFn, doFn)
   for _,e in pairs(self._root._children) do
-    self:_walkEntity(e, matchFn, doFn)
+    self:walkEntity(e, matchFn, doFn)
   end
 end
 
 -- Match/process the given node, then the child nodes from first to last).
 -- IF a node IS matched AND the processing of that node returns explicitly false, the children are NOT processed.
 -- (If children nodes supress processing their own children, this does not prevent processing of their own peers.)
-function Estore:_walkEntity(e, matchFn, doFn)
+function Estore:walkEntity(e, matchFn, doFn)
   if (not matchFn) or matchFn(e) then -- execute doFn if either a) no matcher, or b) matcher provided and returns true
     if doFn(e) == false then return end
   end
   for _,ch in ipairs(e._children) do
-    self:_walkEntity(ch, matchFn, doFn)
+    self:walkEntity(ch, matchFn, doFn)
   end
 end
 

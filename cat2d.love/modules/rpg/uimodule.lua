@@ -52,6 +52,7 @@ M.newWorld = function()
     gameWorld = GameModule.newWorld(),
 
     followingAvatar = 'lea',
+    followingPlayer = 'dcrosby42',
   }
 
   return uiWorld, nil
@@ -62,9 +63,14 @@ local Updaters = {}
 Updaters.tick = function(world,action)
   world.gameWorld, effects = GameModule.updateWorld(world.gameWorld, action)
 
-  world.gameWorld.estore:walkEntities(hasComps('avatar','pos'), function(e)
-    if e.avatar.name == world.followingAvatar then
-      addInputEvent(world.input, {type='viewportTarget', id=followingAvatar, x=e.pos.x, y=e.pos.y})
+  -- world.gameWorld.estore:walkEntities(hasComps('avatar','pos'), function(e)
+  --   if e.avatar.name == world.followingAvatar then
+  --     addInputEvent(world.input, {type='viewportTarget', id=followingAvatar, x=e.pos.x, y=e.pos.y})
+  --   end
+  -- end)
+  world.gameWorld.estore:walkEntities(hasComps('player','pos'), function(e)
+    if e.player.name == world.followingPlayer then
+      addInputEvent(world.input, {type='viewportTarget', x=e.pos.x, y=e.pos.y})
     end
   end)
 

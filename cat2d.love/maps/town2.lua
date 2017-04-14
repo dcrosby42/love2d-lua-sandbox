@@ -331,7 +331,7 @@ return {
       objects = {
         {
           id = 1,
-          name = "Player1",
+          name = "town-enter-west",
           type = "StartPosition",
           shape = "rectangle",
           x = 1088,
