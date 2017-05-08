@@ -26,7 +26,7 @@ end
 --
 -- INPUT EVENT HANDLERS
 --
-local keyboardAction = {type="keyboard", action=nil, key=nil}
+local keyboardAction = {type="keyboard", state='', key=''}
 function toKeyboardAction(state,key)
   keyboardAction.state=state
   keyboardAction.key=key
