@@ -186,7 +186,7 @@ local function avatarComps(actorName)
 end
 
 local function startPosition(startPos)
-  print("startPosition "..startPos.name.." "..startPos.x..","..startPos.y)
+  -- print("startPosition "..startPos.name.." "..startPos.x..","..startPos.y)
   return {
     {'pos', {x=startPos.x+(startPos.width/2),y=startPos.y+startPos.height}}
   }
@@ -228,14 +228,14 @@ function spawnSituation(situation, estore, res)
     {'map', {id=situation.mapId}},
     {'zChildren', {}},
   })
-  print("Map: "..entityDebugString(map))
+  -- print("Map: "..entityDebugString(map))
 
   -- Spawn player character
   local playerComps = avatarComps(situation.playerActor)
   tconcat(playerComps, startPosition(objectsByType.StartPosition[situation.playerStartPosition]))
   tconcat(playerComps, playerControl(situation.playerName, situation.controllerId))
   local player = map:newChild(playerComps)
-  print("Player: "..entityDebugString(player))
+  -- print("Player: "..entityDebugString(player))
 
   -- Spawn NPCs at start positions
   for name,startPos in pairs(objectsByType.StartPosition) do

@@ -70,6 +70,7 @@ Updaters.tick = function(world,action)
   -- end)
   world.gameWorld.estore:walkEntities(hasComps('player','pos'), function(e)
     if e.player.name == world.followingPlayer then
+      -- print("ui viewport tracking "..e.player.name.." "..e.pos.x..","..e.pos.y)
       addInputEvent(world.input, {type='viewportTarget', x=e.pos.x, y=e.pos.y})
     end
   end)
@@ -97,6 +98,20 @@ end
 -- end
 Updaters.keyboard = function(world,action)
   GameModule.updateWorld(world.gameWorld, action)
+  if action.type == 'keyboard' and action.state == 'pressed' then
+    if action.key == 'p' then
+      print(world.gameWorld.estore:debugString())
+    elseif action.key == 'm' then
+      -- print(tdebug(world.gameworld.resources.maps))
+      for k,map in pairs(world.gameWorld.resources.maps) do
+        print(k)
+        print(tdebug1(map().itemList))
+      end
+
+      -- world.gameWorld.resources
+
+    end
+  end
 end
 
 -- Updaters.keyboard = function(world,action)
@@ -119,6 +134,20 @@ M.updateWorld = function(world, action)
   return world, nil
 end
 
+local function drawDebugGrid()
+  local t = 0
+  local b = 1000
+  local l = 0
+  local r = 1000
+  local size = 100
+  for y=t,b,size do
+    love.graphics.line(l,y, r,y)
+  end
+  for x=l,r,size do
+    love.graphics.line(x,t, x,b)
+  end
+end
+
 M.drawWorld = function(world)
   love.graphics.setBackgroundColor(unpack(world.bgcolor))
 
@@ -126,6 +155,7 @@ M.drawWorld = function(world)
   -- love.graphics.translate(512 - math.floor(pent.pos.x), 384 - math.floor(pent.pos.y))
 
   world.estore:seekEntity(hasComps('viewport'), function(e)
+    -- x toggles between -158, -122
     love.graphics.translate(-e.viewport.x, -e.viewport.y)
   end)
 
@@ -133,6 +163,7 @@ M.drawWorld = function(world)
 
   GameModule.drawWorld(world.gameWorld)
 
+  drawDebugGrid()
   -- love.graphics.draw(spritesheet.image, spritesheet.quads.dude, 400,200, 0, 2,2)
 
   -- ScreenPad.draw(world.screenPad)

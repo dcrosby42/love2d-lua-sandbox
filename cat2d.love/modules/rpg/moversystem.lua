@@ -10,6 +10,20 @@ return defineUpdateSystem(hasComps('map'),
     local itemList = map.itemList
     local entityCollisions = {}
 
+    -- Make sure bumpWorld is cleared of any items whose comps no longer exist in estore
+    local removes = {}
+    for i=1,#itemList do
+      if not estore.comps[itemList[i]] then
+        table.insert(removes,i)
+      end
+    end
+    for i=1,#removes do
+      local item = itemList[removes[i]]
+      print("bumpWorld:remove("..item..")")
+      bumpWorld:remove(item)
+      table.remove(itemList,removes[i])
+    end
+
     estore:walkEntities(hasComps('vel','pos'), function(e)
       -- Update position based on velocity:
       local vel = e.vel
@@ -43,7 +57,7 @@ return defineUpdateSystem(hasComps('map'),
                 if col.other.properties then
                   otherdbg = otherdbg .. "--> properties:\n"..tdebug1(col.other.properties,'    ')
                 end
-                print("!! Unhandled collision while moving item="..item..": "..otherdbg)
+                -- print("!! Unhandled collision while moving item="..item..": "..otherdbg)
               end
             end
           end
@@ -54,20 +68,6 @@ return defineUpdateSystem(hasComps('map'),
         pos.y = pos.y + vel.dy * input.dt
       end
     end)
-
-    -- Make sure bumpWorld is cleared of any items whose comps no longer exist in estore
-    local removes = {}
-    for i=1,#itemList do
-      if not estore.comps[itemList[i]] then
-        table.insert(removes,i)
-      end
-    end
-    for i=1,#removes do
-      local item = itemList[removes[i]]
-      print("bumpWorld:remove("..item..")")
-      bumpWorld:remove(item)
-      table.remove(itemList,removes[i])
-    end
 
     for i=1,#entityCollisions do
       local ent,hitEnt = unpack(entityCollisions[i])
