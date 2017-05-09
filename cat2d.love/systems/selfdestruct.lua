@@ -1,3 +1,4 @@
+require 'ecs.ecshelpers'
 
 local selfDestructSystem = defineUpdateSystem(allOf(hasTag('self_destruct'), hasComps('timer')),
   function(e,estore,input,res)
