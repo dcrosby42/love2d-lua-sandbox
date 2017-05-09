@@ -1,4 +1,12 @@
 
+-- helpers.lua
+
+-- Messy grab-bag of any useful helper funcs and extensions I want globally
+-- available.
+
+-- Enable loading a dir as a package via ${package}/init.lua
+package.path = package.path .. ";./?/init.lua"
+
 numberlua = require 'vendor/numberlua' -- intentionally global
 bit32 = numberlua.bit32 -- intentionally global
 
@@ -51,6 +59,15 @@ function tcopy(orig, defaults)
     copy = orig
   end
   return copy
+end
+
+function shallowclone(src)
+  if src == nil then return {} end
+  local dest={}
+  for k,v in pairs(src) do
+    dest[k]=v
+  end
+  return dest
 end
 
 function deeptcopy(orig)
@@ -194,6 +211,10 @@ end
 
 function math.pointinrect(x1,y1, rx,ry,rw,rh)
   return x1 >= rx and x1 < rx+rw and y1 >= ry and y1 < ry + rh
+end
+
+function math.pointinbounds(x1,y1, b)
+  return x1 >= b.x and x1 < b.x+b.w and y1 >= b.y and y1 < b.y + b.h
 end
 
 function math.clamp(val, min, max)
