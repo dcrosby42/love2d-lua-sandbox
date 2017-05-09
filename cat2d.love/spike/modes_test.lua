@@ -3,12 +3,14 @@ require 'helpers'
 -- local Snow = require 'spike/snowmodule'
 -- local Mod = require 'modules/arcticcat'
 -- local Mod = require 'modules/tiledtest'
-local Mod = require 'modules/rpg/uimodule'
+-- local Mod = require 'modules/rpg/uimodule'
+local Mod = require 'modules.guitest'
 
 local world
 
 function love.load()
-  love.window.setMode(1024,768)
+  -- love.window.setMode(1024,768)
+  love.window.setMode(800,600)
   world = Mod.newWorld(world)
 end
 
