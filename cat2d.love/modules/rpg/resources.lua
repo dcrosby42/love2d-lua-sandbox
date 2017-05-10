@@ -6,6 +6,7 @@ local Map = require(here.."/map")
 local function prepMaps()
   return lazytable({
       'town1',
+      'shop1',
       'town2',
     },
     function(k)

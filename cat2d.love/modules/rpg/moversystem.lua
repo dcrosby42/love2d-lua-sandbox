@@ -1,5 +1,24 @@
+require 'helpers'
+local function parseDoorLink(linkStr)
+  local parts = split(linkStr, ":")
+  local kind = parts[1]
+  parts = split(parts[2], "/")
+  local mapname = parts[1]
+  local spawnPointName = parts[2]
+  return {
+    type=kind,
+    mapName=mapname,
+    spawnName=spawnPointName,
+  }
+end
 local function handleCollision(ent, hitEnt, estore, res)
-  print(entityDebugString(hitEnt))
+  -- print(entityDebugString(hitEnt))
+  if hitEnt.door then
+    print("Door "..hitEnt.door.doorid.." to: "..hitEnt.door.link)
+    local dl = parseDoorLink(hitEnt.door.link)
+    print("  --> "..tflatten(dl))
+    ent:newComp('output', {kind='door',value=dl})
+  end
 end
 
 return defineUpdateSystem(hasComps('map'),
@@ -33,6 +52,7 @@ return defineUpdateSystem(hasComps('map'),
         local x,y = getPos(e)
         x,y,bw,bh = getBoundingRect(e)
         local item = e.collidable.cid
+
         if bumpWorld:hasItem(item) then
           bumpWorld:update(item, x, y, bw, bh)
         else
@@ -40,6 +60,7 @@ return defineUpdateSystem(hasComps('map'),
           bumpWorld:add(item, x, y, bw,bh)
           table.insert(itemList, item)
         end
+
         goalx = x + vel.dx * input.dt
         goaly = y + vel.dy * input.dt
         finalx, finaly, cols, numcols = bumpWorld:move(item, goalx, goaly)

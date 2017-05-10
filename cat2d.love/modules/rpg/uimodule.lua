@@ -38,22 +38,42 @@ local runSystems = iterateFuncs({
 
 local M ={}
 
+local function checkGameWorlds(world)
+  local gw = world.gameWorlds[world.situation.mapId]
+  if not gw then
+    gw = GameModule.newWorld({situation=world.situation})
+    world.gameWorlds[world.situation.mapId] = gw
+    return false
+  end
+  return true
+end
+
 M.newWorld = function()
   local res = {} -- Resources.load()
   local estore = buildEstore(res)
+
+  local initialSituation = {
+    playerActor="lea",
+    mapId="town1",
+    playerStartPosition="town-enter-west",
+    playerName="dcrosby42",
+    controllerId="con1",
+  }
 
   local uiWorld = {
     bgcolor = {0,0,0},
     estore = estore,
     input = { dt=0, events={} },
     resources = res,
+    situation=initialSituation,
     screenPad = {}, -- ScreenPad.initialize({controllerId="con1"})
     keyboardController = {}, -- KeyboardController.initialize({controllerId="con1", bindings=DefaultKeybdControls}),
-    gameWorld = GameModule.newWorld(),
-
+    -- gameWorld = GameModule.newWorld({situation=initialSituation}),
+    gameWorlds = {},
     followingAvatar = 'lea',
     followingPlayer = 'dcrosby42',
   }
+  checkGameWorlds(uiWorld)
 
   return uiWorld, nil
 end
@@ -61,13 +81,34 @@ end
 local Updaters = {}
 
 Updaters.tick = function(world,action)
-  world.gameWorld, effects = GameModule.updateWorld(world.gameWorld, action)
+  -- world.gameWorld, gameFx = GameModule.updateWorld(world.gameWorld, action)
+  world.gameWorld, gameFx = GameModule.updateWorld(world.gameWorlds[world.situation.mapId], action)
+  if gameFx then
+    for i=1,#gameFx do
+      print("gameWorldFx after tick update: "..tdebug(gameFx[i]))
+      if gameFx[i].type == 'door' then
+        local doorLink = gameFx[i].value
+        print("door! "..tflatten(doorLink))
 
-  -- world.gameWorld.estore:walkEntities(hasComps('avatar','pos'), function(e)
-  --   if e.avatar.name == world.followingAvatar then
-  --     addInputEvent(world.input, {type='viewportTarget', id=followingAvatar, x=e.pos.x, y=e.pos.y})
-  --   end
-  -- end)
+        -- local situation = world.gameWorld.situation
+        -- situation.mapId = doorLink.mapName
+        -- -- situation.playerActor = "lea"
+        -- situation.playerStartPosition = doorLink.spawnName
+        -- GameModule.updateWorld(world.gameWorld, {type='situationChanged',situation=situation})
+        world.situation.mapId = doorLink.mapName
+        world.situation.playerStartPosition = doorLink.spawnName
+        if checkGameWorlds(world) then
+          local gw = world.gameWorlds[world.situation.mapId]
+          if not gw then
+            print("WTF no gw for "..world.situation.mapId)
+          end
+          GameModule.updateWorld(gw, {type='situationChanged',situation=world.situation})
+        end
+      end
+    end
+  end
+
+  -- Sync the UI ecs world with info from the gameWorld ecs, namely the viewport:
   world.gameWorld.estore:walkEntities(hasComps('player','pos'), function(e)
     if e.player.name == world.followingPlayer then
       -- print("ui viewport tracking "..e.player.name.." "..e.pos.x..","..e.pos.y)
@@ -75,6 +116,7 @@ Updaters.tick = function(world,action)
     end
   end)
 
+  -- Update the UI ecs world:
   world.input.dt = action.dt
   runSystems(world.estore, world.input, world.resources)
   world.input.events = {} -- clear the events that happened leading up to this tick
@@ -97,7 +139,31 @@ end
 --   return world, nil
 -- end
 Updaters.keyboard = function(world,action)
-  GameModule.updateWorld(world.gameWorld, action)
+  if action.state == 'pressed' then
+    -- if action.key == '1' then
+    --   local situation = world.gameWorld.situation
+    --   situation.mapId = "town1"
+    --   situation.playerActor = "lea"
+    --   situation.playerStartPosition = "town-enter-west"
+    --   GameModule.updateWorld(world.gameWorld, {type='situationChanged',situation=situation})
+    --   -- respawnSituation(world.situation, world.estore, world.resources)
+    -- end
+    -- if action.key == '2' then
+    --   local situation = world.gameWorld.situation
+    --   situation.mapId = "town2"
+    --   situation.playerActor = "jeff"
+    --   situation.playerStartPosition = "town-enter-west"
+    --   GameModule.updateWorld(world.gameWorld, {type='situationChanged',situation=situation})
+    --   -- respawnSituation(world.situation, world.estore, world.resources)
+    -- end
+  end
+
+  -- world.gameWorld, gameWorldFx = GameModule.updateWorld(world.gameWorld, action)
+  world.gameWorld, gameWorldFx = GameModule.updateWorld(world.gameWorlds[world.situation.mapId], action)
+  if gameWorldFx then
+    print("gameWorldFx after keyboard update: "..tdebug(gameWorldFx))
+  end
+
   if action.type == 'keyboard' and action.state == 'pressed' then
     if action.key == 'p' then
       print(world.gameWorld.estore:debugString())
@@ -161,7 +227,7 @@ M.drawWorld = function(world)
 
   -- drawSystem(world.estore, nil, world.resources)
 
-  GameModule.drawWorld(world.gameWorld)
+  GameModule.drawWorld(world.gameWorlds[world.situation.mapId])
 
   drawDebugGrid()
   -- love.graphics.draw(spritesheet.image, spritesheet.quads.dude, 400,200, 0, 2,2)

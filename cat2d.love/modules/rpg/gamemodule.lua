@@ -44,20 +44,19 @@ DefaultKeybdControls = { up='w', left='a', down='s', right='d' }
 
 
 
-M.newWorld = function()
-  local situation = {
-    playerActor="lea",
-    mapId="town1",
-    playerStartPosition="town-enter-west",
-    playerName="dcrosby42",
-    controllerId="con1",
-  }
+M.newWorld = function(opts)
+  -- local situation = {
+  --   playerActor="lea",
+  --   mapId="town1",
+  --   playerStartPosition="town-enter-west",
+  --   playerName="dcrosby42",
+  --   controllerId="con1",
+  -- }
   local res = Resources.load()
   local estore = initialEstore(res)
-  spawnSituation(situation,estore,res)
 
   local world = {
-    situation = situation,
+    situation = opts.situation,
     bgcolor = {0,0,0},
     estore = estore,
     input = { dt=0, events={} },
@@ -65,6 +64,7 @@ M.newWorld = function()
     screenPad = {}, -- ScreenPad.initialize({controllerId="con1"})
     keyboardController = KeyboardController.initialize({controllerId="con1", bindings=DefaultKeybdControls}),
   }
+  spawnSituation(world.situation,estore,res)
 
   estore:walkEntities(hasComps('player'), function(e)
     if e.player.name == 'dcrosby' then
@@ -122,25 +122,30 @@ function respawnSituation(situation,estore,res)
   spawnSituation(situation, estore, res)
 end
 
+Updaters.situationChanged = function(world,action)
+  world.situation = action.situation
+  respawnSituation(world.situation, world.estore, world.resources)
+end
+
 Updaters.keyboard = function(world,action)
   -- Control the game
   KeyboardController.handleKeyAction(world.keyboardController, action, world.input)
 
-  -- admin/dev tricks:
-  if action.state == 'pressed' then
-    if action.key == '1' then
-      world.situation.mapId = "town1"
-      world.situation.playerActor = "lea"
-      world.situation.playerStartPosition = "town-enter-west"
-      respawnSituation(world.situation, world.estore, world.resources)
-    end
-    if action.key == '2' then
-      world.situation.mapId = "town2"
-      world.situation.playerActor = "jeff"
-      world.situation.playerStartPosition = "town-enter-west"
-      respawnSituation(world.situation, world.estore, world.resources)
-    end
-  end
+  -- -- admin/dev tricks:
+  -- if action.state == 'pressed' then
+  --   if action.key == '1' then
+  --     world.situation.mapId = "town1"
+  --     world.situation.playerActor = "lea"
+  --     world.situation.playerStartPosition = "town-enter-west"
+  --     respawnSituation(world.situation, world.estore, world.resources)
+  --   end
+  --   if action.key == '2' then
+  --     world.situation.mapId = "town2"
+  --     world.situation.playerActor = "jeff"
+  --     world.situation.playerStartPosition = "town-enter-west"
+  --     respawnSituation(world.situation, world.estore, world.resources)
+  --   end
+  -- end
   return world, nil
 end
 

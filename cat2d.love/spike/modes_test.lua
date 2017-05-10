@@ -3,8 +3,8 @@ require 'helpers'
 -- local Snow = require 'spike/snowmodule'
 -- local Mod = require 'modules/arcticcat'
 -- local Mod = require 'modules/tiledtest'
--- local Mod = require 'modules/rpg/uimodule'
-local Mod = require 'modules.guitest'
+local Mod = require 'modules/rpg/uimodule'
+-- local Mod = require 'modules.guitest'
 
 local world
 

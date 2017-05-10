@@ -309,3 +309,11 @@ end
 function dirname(fname)
   return string.gsub(fname:match("(.*/)[^%/]+$"), "/$", "")
 end
+
+function split(str,char)
+  local res = {}
+  for i in string.gmatch(str, "[^"..char.."]+") do
+    table.insert(res,i)
+  end
+  return res
+end
