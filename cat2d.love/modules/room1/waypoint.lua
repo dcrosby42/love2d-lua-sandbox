@@ -89,6 +89,7 @@ end
 
 return {
   handleMouse=handleMouse,
+  handleTouch=handleTouch,
   System = iterateFuncs({
     addDestSystem,
     destSystem
