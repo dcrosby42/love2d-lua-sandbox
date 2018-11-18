@@ -83,13 +83,13 @@ M.uncache_package = function(name)
 end
 
 local function print_deps_debug(deps,ind)
-  if deps then
-    ind = ind or ""
-    for name,node in pairs(deps) do
-      log(ind..name)
-      print_deps_debug(node.deps,ind.."  ")
-    end
-  end
+  -- if deps then
+  --   ind = ind or ""
+  --   for name,node in pairs(deps) do
+  --     log(ind..name)
+  --     print_deps_debug(node.deps,ind.."  ")
+  --   end
+  -- end
 end
 
 M.debug_deps = function()

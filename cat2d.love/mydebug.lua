@@ -36,7 +36,7 @@ local function toLines()
   return lines
 end
 
-local function setup(game)
+local function setup()
   local bounds = D.d.bounds
   bounds.height = D.d.maxStringLines * D.d.lineHeight
   bounds.width = love.graphics.getWidth() / 2
@@ -44,13 +44,7 @@ local function setup(game)
   bounds.x = 0
 end
 
-local function update(game, dt, input)
-  for i,t in ipairs(input.touches) do
-    -- if t.type == "pressed" and geom.isPointInRect(t.x, t.y, 
-  end
-end
-
-local function draw(game)
+local function draw()
   -- DEBUG
   local dlines = toLines()
   local y = D.d.bounds.y

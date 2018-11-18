@@ -1,6 +1,7 @@
 local Engine = require 'crozeng/main'
 
-Engine.module_name = 'modules/animalscreen'
+Engine.module_name = 'modules/root'
+-- Engine.module_name = 'modules/animalscreen'
 
 Engine.onload = function()
   love.window.setMode(1024, 768, {
