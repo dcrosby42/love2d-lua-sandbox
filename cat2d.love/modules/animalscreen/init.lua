@@ -4,7 +4,11 @@ local A = require 'modules/animalscreen/animalpics'
 
 local M = {}
 
-M.newWorld = function()
+local function randint(lo,hi)
+  return math.floor(love.math.random() * (hi-lo+1)) + lo
+end
+
+function M.newWorld()
   Debug.setup()
 
   local w = love.graphics.getWidth()
@@ -16,11 +20,12 @@ M.newWorld = function()
   }
 end
 
-M.updateWorld = function(w,action)
+function M.updateWorld(w,action)
   if action.type == "touch" or action.type == "mouse" then
     if action.state == "pressed" then
-      local animal = A.animals[1+w.selector]
-      w.selector = (w.selector + 1) % #A.animals
+      -- local animal = A.animals[1+w.selector]
+      -- w.selector = (w.selector + 1) % #A.animals
+      local animal = A.animals[randint(1,#A.animals)]
       local stamp = {x=action.x, y=action.y, animal=animal}
       Debug.println("New ".. animal.name .. " @ " .. stamp.x .. "," .. stamp.y)
       table.insert(w.stamps, stamp)
@@ -35,7 +40,7 @@ M.updateWorld = function(w,action)
 end
 
 local r=0
-M.drawWorld = function(w)
+function M.drawWorld(w)
   love.graphics.setBackgroundColor(0,0,0,0)
   for _,stamp in ipairs(w.stamps) do
     local a = stamp.animal
