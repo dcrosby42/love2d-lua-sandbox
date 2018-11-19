@@ -46,6 +46,7 @@ end
 
 function M.drawWorld(world)
   drawAllAnimals()
+  -- love.graphics.rectangle("line",0,0,50,50)
 end
 
 return M

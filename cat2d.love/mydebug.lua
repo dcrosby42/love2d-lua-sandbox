@@ -6,7 +6,9 @@ D.d = {
   lineHeight = 12,
   maxStringLines = 10,
   stringLines = {},
-  bounds = {}
+  bounds = {},
+  bgColor = {0,0,0,100},
+  fgColor = {255,255,255}
 }
 
 local function appendScrolled(lines,s,max)
@@ -45,13 +47,18 @@ local function setup()
 end
 
 local function draw()
-  -- DEBUG
   local dlines = toLines()
   local y = D.d.bounds.y
+
+  love.graphics.setColor(unpack(D.d.bgColor))
+  love.graphics.rectangle("fill", 0,y, D.d.bounds.width, D.d.bounds.height)
+
+  love.graphics.setColor(unpack(D.d.fgColor))
   for i,line in ipairs(dlines) do
     love.graphics.print(line,0,y)
     y = y + D.d.lineHeight
   end
+  love.graphics.setColor(255,255,255,255)
 end
 
 D.toLines = toLines
