@@ -1,12 +1,14 @@
 local Debug = require 'mydebug'
 local R = require 'resourceloader'
-local A = require 'modules/animalscreen/animalpics'
+local A = require 'animalpics'
+require 'vendor/TEsound'
 
 local M = {}
 
 local function randint(lo,hi)
   return math.floor(love.math.random() * (hi-lo+1)) + lo
 end
+
 
 function M.newWorld()
   local bounds = {w=love.graphics.getWidth(), h=love.graphics.getHeight()}
@@ -16,20 +18,33 @@ function M.newWorld()
   bg.sizeX = bounds.w / bg.img:getWidth()
   bg.sizeY = bounds.h / bg.img:getHeight()
 
+  -- local bgMusicChannel = TEsound.playLooping("data/sounds/music/music.wav", {"bgmusic"})
+
   return {
     bounds=bounds,
     bg=bg,
     stamps={},
     selector=0,
+
+    playBgMusic=true,
+    bgMusic=0,
   }
+end
+
+function M.shutdownWorld(w)
+  for i,_ in ipairs(TEsound.channels) do
+    TEsound.stop(i)
+    TEsound.cleanup()
+  end
 end
 
 function M.updateWorld(w,action)
   if action.type == "touch" or action.type == "mouse" then
     if action.state == "pressed" then
-      if action.x < 50 and action.y < 50 then
+      if action.x < 75 and action.y < 75 then
         w.stamps = {}
         Debug.println("Clear")
+        w.playBgMusic = not w.playBgMusic
       else
         local animal = A.animals[randint(1,#A.animals)]
         local stamp = {x=action.x, y=action.y, animal=animal}
@@ -43,7 +58,18 @@ function M.updateWorld(w,action)
     end
   end
 
+  TEsound.cleanup()
+
   return w
+end
+
+local function updateMusic(w)
+  if w.playBgMusic and w.bgMusic == 0 then
+    w.bgMusic = TEsound.playLooping("data/sounds/music/music.wav", {"bgmusic"})
+  elseif w.playBgMusic == false and w.bgMusic ~= 0 then
+    TEsound.stop(w.bgMusic)
+    w.bgMusic = 0
+  end
 end
 
 local r=0
@@ -59,6 +85,8 @@ function M.drawWorld(w)
     offy=img:getHeight()*a.centerY
     love.graphics.draw(img, stamp.x, stamp.y, r, a.sizeX, a.sizeY, offx, offy)
   end
+
+  updateMusic(w)
 end
 
 return M

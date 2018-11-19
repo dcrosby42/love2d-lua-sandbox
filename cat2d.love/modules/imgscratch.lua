@@ -1,5 +1,5 @@
 local R = require 'resourceloader'
-local A = require 'modules/animalscreen/animalpics'
+local A = require 'animalpics'
 local M={}
 
 function drawAllAnimals()
