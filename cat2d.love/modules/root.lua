@@ -4,6 +4,7 @@ local ImgScratch = require 'modules/imgscratch'
 
 local M = {}
 
+
 M.newWorld = function()
   Debug.setup()
   local w = {}
@@ -11,7 +12,8 @@ M.newWorld = function()
   w.modes["f2"] = { module=AnimalScreen, state=AnimalScreen.newWorld() }
   w.modes["f3"] = { module=ImgScratch, state=ImgScratch.newWorld() }
   w.current = "f2"
-  if love.system.getOS() == "iOS" then
+  w.ios = love.system.getOS() == "iOS"
+  if w.ios then
     w.showLog = false
   else
     w.showLog = true
@@ -56,6 +58,7 @@ M.updateWorld = function(w,action)
     end
   end
 
+  -- toggle debug log?
   if action.type == "mouse" and action.state == "pressed" then
     if action.x < 75 and action.y > Debug.d.bounds.y then
       w.showLog = not w.showLog
@@ -63,10 +66,10 @@ M.updateWorld = function(w,action)
     end
   end
 
-  -- local mode = w.modes[w.current]
-  -- if mode then
-  --   mode.module.updateWorld(mode.state,action)
-  -- end
+  -- don't pass mouse events to sub module when on ios
+  if w.ios and action.type == "mouse" then return w end
+
+  -- Update current submodule
   withCurrentMode(w, function(mode) 
     mode.module.updateWorld(mode.state, action)
   end)

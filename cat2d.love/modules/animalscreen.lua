@@ -42,10 +42,15 @@ function M.updateWorld(w,action)
   elseif action.type == "touch" or action.type == "mouse" then
     if action.state == "pressed" then
       if action.x < 75 and action.y < 75 then
+        -- Clear animals
         w.stamps = {}
-        Debug.println("Clear")
+        Debug.println("Clear because "..flattenTable(action))
+        -- toggle bg music
         w.playBgMusic = not w.playBgMusic
+        Debug.println("w.playBgMusic "..tostring(w.playBgMusic))
       else
+
+        -- Stamp a new random animal
         local animal = A.animals[randint(1,#A.animals)]
         local stamp = {x=action.x, y=action.y, animal=animal}
         Debug.println("New ".. animal.name .. " @ " .. stamp.x .. "," .. stamp.y)
@@ -67,9 +72,11 @@ end
 local function updateMusic(w)
   if w.playBgMusic and w.bgMusic == 0 then
     w.bgMusic = TEsound.playLooping("data/sounds/music/music.wav", {"bgmusic"})
+    Debug.println("Started bg music: ".. w.bgMusic)
   elseif w.playBgMusic == false and w.bgMusic ~= 0 then
     TEsound.stop(w.bgMusic)
     w.bgMusic = 0
+    Debug.println("Stopped bg music")
   end
 end
 

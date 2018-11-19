@@ -41,7 +41,7 @@ end
 local function setup()
   local bounds = D.d.bounds
   bounds.height = D.d.maxStringLines * D.d.lineHeight
-  bounds.width = love.graphics.getWidth() / 2
+  bounds.width = love.graphics.getWidth() --/ 2
   bounds.y = love.graphics.getHeight() - bounds.height
   bounds.x = 0
 end
