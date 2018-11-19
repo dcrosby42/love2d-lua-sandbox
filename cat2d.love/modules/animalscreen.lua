@@ -9,20 +9,18 @@ local function randint(lo,hi)
   return math.floor(love.math.random() * (hi-lo+1)) + lo
 end
 
-
 function M.newWorld()
   local bounds = {w=love.graphics.getWidth(), h=love.graphics.getHeight()}
 
-  local bg = {file="data/images/zoo_keeper.png"}
-  bg.img = R.getImage(bg.file)
-  bg.sizeX = bounds.w / bg.img:getWidth()
-  bg.sizeY = bounds.h / bg.img:getHeight()
-
-  -- local bgMusicChannel = TEsound.playLooping("data/sounds/music/music.wav", {"bgmusic"})
+  local img = R.getImage("data/images/zoo_keeper.png")
 
   return {
     bounds=bounds,
-    bg=bg,
+    bg={
+      img=img,
+      sizeX=bounds.w / img:getWidth(),
+      sizeY=bounds.h / img:getHeight(),
+    },
     stamps={},
     selector=0,
 
@@ -39,7 +37,9 @@ function M.shutdownWorld(w)
 end
 
 function M.updateWorld(w,action)
-  if action.type == "touch" or action.type == "mouse" then
+  if action.type == "tick" then
+    -- print(flattenTable(action))
+  elseif action.type == "touch" or action.type == "mouse" then
     if action.state == "pressed" then
       if action.x < 75 and action.y < 75 then
         w.stamps = {}
@@ -52,6 +52,7 @@ function M.updateWorld(w,action)
         table.insert(w.stamps, stamp)
       end
     end
+
   elseif action.type == "keyboard" and action.state == "pressed" then
     if action.key == "tab" then
       w.stamps={}

@@ -11,7 +11,12 @@ M.newWorld = function()
   w.modes["f2"] = { module=AnimalScreen, state=AnimalScreen.newWorld() }
   w.modes["f3"] = { module=ImgScratch, state=ImgScratch.newWorld() }
   w.current = "f2"
-  w.showLog = true
+  if love.system.getOS() == "iOS" then
+    w.showLog = false
+  else
+    w.showLog = true
+  end
+
   return w
 end
 
@@ -48,6 +53,13 @@ M.updateWorld = function(w,action)
         end)
         w.current = action.key
       end
+    end
+  end
+
+  if action.type == "mouse" and action.state == "pressed" then
+    if action.x < 75 and action.y > Debug.d.bounds.y then
+      w.showLog = not w.showLog
+      return
     end
   end
 
