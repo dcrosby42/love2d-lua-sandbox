@@ -25,6 +25,7 @@ end
 
 function Entities.animal(estore, kind)
   return estore:newEntity({
+    {'tag',{name="animal"}},
     {'img', {imgId=kind, sx=0.5, sy=0.5, centerx=0.5, centery=0.5}}, 
     {'pos', {}},
   })

@@ -51,6 +51,7 @@ return function(estore,res)
           x-(img.sx*offx), y-(img.sy*offy),
           imgRes:getWidth() * img.sx, imgRes:getHeight() * img.sy)
       end
+      -- love.graphics.circle("line",x,y,70)
 
     --
     -- LABEL
