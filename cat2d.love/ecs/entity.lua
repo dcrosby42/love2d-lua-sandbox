@@ -56,6 +56,11 @@ function Entity:newChild(compInfos, subs)
   return self._estore:newEntity(compInfos, subs)
 end
 
+-- alias of newChild, allows polymorphic newEntity behavior w an estore
+function Entity:newEntity(compInfos, subs)
+  return self:newChild(compInfos, subs)
+end
+
 function Entity:addChild(childEnt)
   self._estore:setupParent(self, childEnt)
 end

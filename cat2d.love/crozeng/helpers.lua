@@ -425,6 +425,14 @@ function floatstr(x, places)
   return ""..math.round(x,places)
 end
 
+function randomInt(lo,hi)
+  return math.floor(love.math.random() * (hi-lo+1)) + lo
+end
+
+function pickRandom(list)
+  return list[randomInt(1, #list)]
+end
+
 -- split a string
 -- function string:split(delimiter)
 --   local result = { }

@@ -1,43 +1,61 @@
 
-local DBG=false
 local BOUNDS=false
 
-return function(estore,output,res)
+return function(estore,res)
   local drawBounds = false
-  estore:walkEntities(hasComps('tag','debug'), function(e)
-    if e.tags.debug then
-      if e.debugs.drawBounds then
-        drawBounds = e.debugs.drawBounds.value
-        return false -- stop searching
-      end
+  estore:walkEntities(hasComps('debug'), function(e)
+    if e.debugs.drawBounds then
+      drawBounds = e.debugs.drawBounds.value
     end
   end)
 
-  estore:walkEntities(nil, function(e)
-    if not e.pos then return false end
-
+  estore:walkEntities(hasComps('pos'), function(e)
     --
     -- IMG
     --
-    if e.img and e.pos then
+    if e.img then
       local img = e.img
       local x,y = getPos(e)
       local imgRes = res.images[img.imgId]
       if not imgRes then
         error("No image resource '"..img.imgId.."'")
       end
+
+      local offy = 0
+      local offy = 0
+      if img.centerx ~= '' then
+        -- offx = img.centerx * imgRes:getWidth() * img.sx
+        offx = img.centerx * imgRes:getWidth()
+      else
+        offx = img.offx
+      end
+      if img.centery ~= '' then
+        -- offy = img.centery * imgRes:getHeight() * img.sy
+        offy = img.centery * imgRes:getHeight()
+      else
+        offy = img.offy
+      end
+
       love.graphics.setColor(unpack(img.color))
+
       love.graphics.draw(
-        res.images[img.imgId],
+        imgRes,
         x,y,
         img.r,     -- radians
         img.sx, img.sy,
-        img.offx, img.offy)
+        offx, offy)
+
+      if img.drawBounds then
+        love.graphics.rectangle(
+          "line",
+          x-(img.sx*offx), y-(img.sy*offy),
+          imgRes:getWidth() * img.sx, imgRes:getHeight() * img.sy)
+      end
 
     --
     -- LABEL
     --
-    elseif e.label and e.pos then
+    elseif e.label then
       local label = e.label
       if label.font then
         local font = res.fonts[label.font]
@@ -65,7 +83,7 @@ return function(estore,output,res)
     --
     -- CIRCLE
     --
-    elseif e.circle and e.pos then
+    elseif e.circle then
       local circle = e.circle
       local x,y = getPos(e)
       x = x + circle.offx
@@ -77,10 +95,7 @@ return function(estore,output,res)
     --
     -- RECTANGLE
     --
-    elseif e.rect and e.pos then
-      if DBG then
-        print("DRAWING "..e.eid)
-      end
+    elseif e.rect then
       local x,y = getPos(e)
       local rect = e.rect
       love.graphics.setColor(unpack(rect.color))
@@ -100,9 +115,5 @@ return function(estore,output,res)
       end
     end
 
-    -- drewItems = drewItems + 1
   end)
-
-  if DBG then DBG=false end
-  -- print("drawstuff: visited "..drewItems.." items")
 end

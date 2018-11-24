@@ -188,9 +188,11 @@ function Estore:detachComp(e,comp)
     local plural = e[keyp]
 
     -- Remove comp from the plural ref table:
-    for k,c in pairs(plural) do
-      if c.cid == comp.cid then
-        plural[k] = nil
+    if plural then
+      for k,c in pairs(plural) do
+        if c.cid == comp.cid then
+          plural[k] = nil
+        end
       end
     end
 
@@ -225,6 +227,10 @@ end
 -- Remove the comp from its entity and the estore.
 -- The comp will be removed from the comps cache and released back to its object pool.
 function Estore:removeComp(comp)
+  if comp.eid == nil or comp.eid == '' then
+    print("!! Estore:removeComp BAD EID comp="..Comp.debugString(comp))
+    return
+  end
   self:detachComp(self.ents[comp.eid], comp)
 
   self.comps[comp.cid] = nil -- uncache
@@ -246,29 +252,39 @@ function Estore:getComp(cid)
   return self.comps[cid]
 end
 
+function Estore:getCompAndEntityForCid(cid)
+  local comp = self.comps[cid]
+  if comp then
+    local ent = self.ents[comp.eid]
+    return comp,ent
+  else
+    return nil,nil
+  end
+end
+
 -- Iterate all Entities by walking the parent-child tree in preorder fashion.
 -- (Ie, match/process the given node, then the child nodes from first to last)
 -- IF a node IS matched AND the processing of that node returns false (explicitly), the children are NOT processed.
 function Estore:walkEntities(matchFn, doFn)
   for _,e in pairs(self._root._children) do
-    self:_walkEntity(e, matchFn, doFn)
+    self:walkEntity(e, matchFn, doFn)
   end
 end
 
 -- Match/process the given node, then the child nodes from first to last).
 -- IF a node IS matched AND the processing of that node returns explicitly false, the children are NOT processed.
 -- (If children nodes supress processing their own children, this does not prevent processing of their own peers.)
-function Estore:_walkEntity(e, matchFn, doFn)
+function Estore:walkEntity(e, matchFn, doFn)
   if (not matchFn) or matchFn(e) then -- execute doFn if either a) no matcher, or b) matcher provided and returns true
     if doFn(e) == false then return end
   end
   for _,ch in ipairs(e._children) do
-    self:_walkEntity(ch, matchFn, doFn)
+    self:walkEntity(ch, matchFn, doFn)
   end
 end
 
 -- Similar to walkEntities, but with the purpose of finding a particular result then exiting the search immediately.
--- If the doFn() is applied to an Entity and returns explicitly tree, the traversal exits and returns true.
+-- If the doFn() is applied to an Entity and returns explicitly true, the traversal exits and returns true.
 function Estore:seekEntity(matchFn, doFn)
   for _,e in pairs(self._root._children) do
     if self:_seekEntity(e, matchFn, doFn) == true then return true end
