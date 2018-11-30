@@ -32,8 +32,8 @@ end
 function M.shutdownWorld(w)
   for i,_ in ipairs(TEsound.channels) do
     TEsound.stop(i)
-    TEsound.cleanup()
   end
+  TEsound.cleanup()
 end
 
 function M.updateWorld(w,action)

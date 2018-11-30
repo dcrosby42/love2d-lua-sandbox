@@ -16,6 +16,7 @@ local UPDATE = composeSystems(requireModules({
 
 local DRAW = composeDrawSystems(requireModules({
   'systems.drawstuff',
+  'systems.drawsound',
 }))
 
 local M = {}

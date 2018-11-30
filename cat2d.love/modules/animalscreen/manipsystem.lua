@@ -26,6 +26,7 @@ return function(estore, input, res)
       e.pos.x = touch.x
       e.pos.y = touch.y
       e:newComp('manipulator', {id=touch.id, mode='drag'}) -- TODO MORE INFO HERE
+      e:newComp('sound', {sound="cow"})
     end,
 
     moved =function(touch)

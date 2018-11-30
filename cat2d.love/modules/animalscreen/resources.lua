@@ -31,6 +31,18 @@ local animalNames = {
   "zebra",
 }
 
+local animalsWithSounds = {
+  "cat",
+  "cow",
+  "elepant",
+  "elephant",
+  "fish",
+  "horse",
+  "lion",
+  "monkey",
+  "pig",
+}
+
 local cached
 function Res.load()
   if not cached then
@@ -42,6 +54,13 @@ function Res.load()
     for _,name in ipairs(animalNames) do
       r.images[name] = R.getImage("data/images/"..name..".png")
     end
+
+    r.soundFilenames = {}
+    for _,name in ipairs(animalsWithSounds) do
+      r.soundFilenames[name] = "data/sounds/fx/"..name..".wav"
+    end
+    r.soundFilenames["bgmusic"] = "data/sounds/music/music.wav" 
+
     cached = r
   end
   return cached

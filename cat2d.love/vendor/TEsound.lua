@@ -90,7 +90,12 @@ end
 -- @param channel See TEsound.volume
 -- @param finish If true, the sound will be allowed to finish playing instead of stopping immediately.
 function TEsound.stop(channel, finish)
-	if type(channel) == "number" then local c = TEsound.channels[channel] c[2] = nil if not finish then c[1]:stop() end
+	if type(channel) == "number" then 
+    local c = TEsound.channels[channel] 
+    if c then 
+      c[2] = nil 
+      if not finish then c[1]:stop() end
+    end
 	elseif type(channel) == "string" then for k,v in pairs(TEsound.findTag(channel)) do TEsound.stop(v, finish) end
 	end
 end
