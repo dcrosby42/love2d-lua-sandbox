@@ -69,7 +69,7 @@ function loadAnimalSounds()
     if not cfg.data then
       cfg.data = love.sound.newSoundData(cfg.file)
     end
-    if not cfg.duration then
+    if not cfg.duration or cfg.duration == '' then
       cfg.duration = cfg.data:getDuration()
     end
   end

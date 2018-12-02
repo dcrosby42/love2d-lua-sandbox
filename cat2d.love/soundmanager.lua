@@ -40,18 +40,29 @@ function SoundManager:update(estore, _, res)
         -- Sound already known. 
         -- TODO Update src from sound component state
       else
-        -- Sound component is new, we need to act.
-        local soundCfg = res.sounds[snd.sound]
-        if soundCfg then
-          local src = love.audio.newSource(soundCfg.data, soundCfg.mode or "static")
-          src:setLooping(snd.loop)
-          src:setVolume(snd.volume)
-          print("snd.volume "..snd.volume)
+        if snd.state == 'playing' then
+          -- Sound component is new, we need to act.
+          local soundCfg = res.sounds[snd.sound]
+          if soundCfg then
+            local src = love.audio.newSource(soundCfg.data, soundCfg.mode or "static")
+            src:setLooping(snd.loop)
+            -- if snd.loop and snd.duration and snd.duration ~= '' then
+            --   src:seek(snd.playtime % snd.duration)
+            -- else
+            if snd.duration == '' then
+              print("Wtf? blank duration? "..tflatten(snd))
+            else
+              src:seek(snd.playtime % snd.duration)
+            end
+            -- end
+            src:setVolume(snd.volume)
+            -- print("snd.volume "..snd.volume)
 
-          self.sources[snd.cid] = src
-					src:play()
-        else
-          print("!! SoundManager:upadte(): unknown sound in "..tflatten(snd))
+            self.sources[snd.cid] = src
+            src:play()
+          else
+            print("!! SoundManager:upadte(): unknown sound in "..tflatten(snd))
+          end
         end
       end
     end -- end for-each sound

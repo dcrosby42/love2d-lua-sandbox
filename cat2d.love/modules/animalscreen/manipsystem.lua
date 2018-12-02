@@ -23,7 +23,7 @@ return function(estore, input, res)
       local name
       if not e then
         name = pickRandom(res.animalNames)
-        e = Entities.animal(estore, name)
+        e = Entities.animal(estore, res, name)
 			else
         name = e.img.imgId
       end
@@ -38,10 +38,10 @@ return function(estore, input, res)
       if cfg then
         local s = e:newComp('sound', {
           sound=name,
+          -- state='playing', -- default
           duration=cfg.duration,
 					volume=cfg.volume or 1,
         })
-				Debug.println(tflatten(s))
       else
 				Debug.println("(No sound for "..tostring(name)..")")
       end

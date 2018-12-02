@@ -19,13 +19,14 @@ local DRAW = composeDrawSystems(requireModules({
 local M = {}
 
 function M.newWorld()
+  local res = Resources.load()
   local world={
-    estore = Entities.initialEntities(),
+    estore = Entities.initialEntities(res),
     input = {
       dt=0,
       events={},
     },
-    resources = Resources.load(),
+    resources = res,
     soundmgr=SoundManager:new(),
   }
   return world
