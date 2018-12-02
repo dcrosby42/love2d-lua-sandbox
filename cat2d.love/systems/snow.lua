@@ -39,7 +39,7 @@ local function addSnowflake(e,y)
     {'snow', {lowerbound=e.pos.y+e.bounds.h}},
     {'vel', {dx=e.snowmachine.dx, dy=e.snowmachine.dy}},
     {'pos', { x=x, y=y}},
-    {'circle', { radius=rad, color={255,255,255}}},
+    {'circle', { radius=rad, color={1,1,1}}},
   })
 end
 

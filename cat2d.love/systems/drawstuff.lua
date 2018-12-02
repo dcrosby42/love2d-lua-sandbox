@@ -106,7 +106,7 @@ return function(estore,res)
     if BOUNDS or drawBounds then
       if e.pos then
         local x,y = getPos(e)
-        love.graphics.setColor(255,255,255)
+        love.graphics.setColor(1,1,1,1)
         love.graphics.line(x-5,y, x+5,y)
         love.graphics.line(x,y-5, x,y+5)
         if e.bounds then

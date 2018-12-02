@@ -1,12 +1,12 @@
 
 local Colors = {
-  White = {255,255,255,255},
-  Red = {255,100,100},
-  Green = {100,255,100},
-  Blue = {100,100,255},
-  Purple = {100,0,255},
-  Yellow = {255,255,100},
-  GreenTrans = {100,255,100,200},
-  BlueTrans= {100,100,255, 200},
+  White = {1,1,1,1},
+  Red = {1,0.4,0.4},
+  Green = {0.4,1,0.4},
+  Blue = {0.4,0.4,1},
+  Purple = {0.4,0,1},
+  Yellow = {1,1,0.4},
+  GreenTrans = {0.4,1,0.4,0.78},
+  BlueTrans= {0.4,0.4,1, 0.78},
 }
 return Colors

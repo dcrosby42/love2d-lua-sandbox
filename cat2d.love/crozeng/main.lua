@@ -116,8 +116,8 @@ function love.update(dt)
 end
 
 function drawErrorScreen(w)
-  love.graphics.setBackgroundColor(150,0,0)
-  love.graphics.setColor(255,255,255)
+  love.graphics.setBackgroundColor(0.5,0,0)
+  love.graphics.setColor(1,1,1)
   love.graphics.print("!! CAUGHT ERROR !!\n\nHIT 'R' TO RELOAD\n\n"..w.err.."\n\n(inside crozeng)"..w.traceback,0,0)
 end
 

@@ -7,7 +7,7 @@ D.d = {
   maxStringLines = 10,
   stringLines = {},
   bounds = {},
-  bgColor = {0,0,0,1},
+  bgColor = {0,0,0,0.5},
   fgColor = {1,1,1,1}
 }
 
@@ -50,12 +50,10 @@ local function draw()
   local dlines = toLines()
   local y = D.d.bounds.y
 
-  -- love.graphics.setColor(unpack(D.d.bgColor))
-  love.graphics.setColor(0,0,0,0.5)
+  love.graphics.setColor(unpack(D.d.bgColor))
   love.graphics.rectangle("fill", 0,y, D.d.bounds.width, D.d.bounds.height)
 
-  -- love.graphics.setColor(unpack(D.d.fgColor))
-  love.graphics.setColor(1,1,1,1)
+  love.graphics.setColor(unpack(D.d.fgColor))
   for i,line in ipairs(dlines) do
     love.graphics.print(line,0,y)
     y = y + D.d.lineHeight

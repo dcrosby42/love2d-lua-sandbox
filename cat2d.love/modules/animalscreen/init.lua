@@ -5,10 +5,6 @@ local Resources = require 'modules.animalscreen.resources'
 local SoundManager = require 'soundmanager'
 local Debug = require 'mydebug'
 
--- local R = require 'resourceloader'
--- local A = require 'animalpics'
--- require 'vendor/TEsound'
-
 local UPDATE = composeSystems(requireModules({
   'systems.timer',
   'systems.sound',

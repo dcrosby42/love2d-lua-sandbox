@@ -1,6 +1,5 @@
 local Debug = require 'mydebug'
 local AnimalScreen = require 'modules/animalscreen'
-local AnimalScreenProto = require 'modules/animalscreenproto'
 local ImgScratch = require 'modules/imgscratch'
 
 local M = {}
@@ -11,8 +10,7 @@ M.newWorld = function()
   local w = {}
   w.modes={}
   w.modes["f2"] = { module=AnimalScreen, state=AnimalScreen.newWorld() }
-  w.modes["f3"] = { module=AnimalScreenProto, state=AnimalScreenProto.newWorld() }
-  w.modes["f4"] = { module=ImgScratch, state=ImgScratch.newWorld() }
+  w.modes["f3"] = { module=ImgScratch, state=ImgScratch.newWorld() }
   w.current = "f2"
   w.ios = love.system.getOS() == "iOS"
   if w.ios then
