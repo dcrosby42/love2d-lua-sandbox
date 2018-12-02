@@ -34,8 +34,8 @@ M.updateWorld = function(w,action)
     -- Reload game?
     if action.key == 'r' then
       withCurrentMode(w, function(mode) 
-        if mode.module.shutdownWorld then
-          mode.module.shutdownWorld(mode.state)
+        if mode.module.stopWorld then
+          mode.module.stopWorld(mode.state)
         end
       end)
       return w, {{type="crozeng.reloadRootModule"}}
@@ -51,8 +51,8 @@ M.updateWorld = function(w,action)
     if mode then
       if w.current ~= action.key then
         withCurrentMode(w, function(mode) 
-          if mode.module.shutdownWorld then
-            mode.module.shutdownWorld(mode.state)
+          if mode.module.stopWorld then
+            mode.module.stopWorld(mode.state)
           end
         end)
         w.current = action.key

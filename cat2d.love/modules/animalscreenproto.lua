@@ -29,7 +29,7 @@ function M.newWorld()
   }
 end
 
-function M.shutdownWorld(w)
+function M.stopWorld(w)
   for i,_ in ipairs(TEsound.channels) do
     TEsound.stop(i)
   end

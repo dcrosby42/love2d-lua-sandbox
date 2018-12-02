@@ -2,6 +2,9 @@ local Debug = require 'mydebug'
 local EventHelpers = require 'eventhelpers'
 local Entities = require 'modules.animalscreen.entities'
 
+local function addSound(e, sname, res)
+end
+
 return function(estore, input, res)
   EventHelpers.handle(input.events, 'touch', {
 
@@ -17,16 +20,32 @@ return function(estore, input, res)
         end
       )
       local e = hit
+      local name
       if not e then
-        local name = pickRandom(res.animalNames)
+        name = pickRandom(res.animalNames)
         e = Entities.animal(estore, name)
+			else
+        name = e.img.imgId
       end
       e.img.sx = 0.7
       e.img.sy = 0.7
       e.pos.x = touch.x
       e.pos.y = touch.y
       e:newComp('manipulator', {id=touch.id, mode='drag'}) -- TODO MORE INFO HERE
-      e:newComp('sound', {sound="cow"})
+
+      -- Add a sound
+      local cfg = res.sounds[name]
+      if cfg then
+        local s = e:newComp('sound', {
+          sound=name,
+          duration=cfg.duration,
+					volume=cfg.volume or 1,
+        })
+				Debug.println(tflatten(s))
+      else
+				Debug.println("(No sound for "..tostring(name)..")")
+      end
+
     end,
 
     moved =function(touch)

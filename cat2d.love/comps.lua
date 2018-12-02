@@ -26,4 +26,5 @@ Comp.define("output", {'kind',''})
 Comp.define("debug", {'value',''})
 
 Comp.define("manipulator", {'id','','mode',''})
-Comp.define("sound", {'sound','','loop',false})
+
+Comp.define("sound", {'sound','','loop',false,'state','stopped','volume',1,'pitch',1,'playtime',0,'duration',''})

@@ -2,6 +2,7 @@
 require 'ecs.ecshelpers'
 local Entities = require 'modules.animalscreen.entities'
 local Resources = require 'modules.animalscreen.resources'
+local SoundManager = require 'soundmanager'
 local Debug = require 'mydebug'
 
 -- local R = require 'resourceloader'
@@ -10,13 +11,13 @@ local Debug = require 'mydebug'
 
 local UPDATE = composeSystems(requireModules({
   'systems.timer',
+  'systems.sound',
   -- 'modules.animalscreen.zookeeper',
   'modules.animalscreen.manipsystem',
 }))
 
 local DRAW = composeDrawSystems(requireModules({
   'systems.drawstuff',
-  'systems.drawsound',
 }))
 
 local M = {}
@@ -29,11 +30,13 @@ function M.newWorld()
       events={},
     },
     resources = Resources.load(),
+    soundmgr=SoundManager:new(),
   }
   return world
 end
 
-function M.shutdownWorld(w)
+function M.stopWorld(w)
+  w.soundmgr:clear()
 end
 
 local function resetInput(i) i.dt=0 i.events={} end
@@ -57,6 +60,7 @@ function M.updateWorld(w,action)
 end
 
 function M.drawWorld(w)
+  w.soundmgr:update(w.estore, nil, w.resources)
   DRAW(w.estore, w.resources)
 end
 
